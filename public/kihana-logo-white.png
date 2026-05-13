@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- Background -->
+  <rect width="200" height="60" fill="transparent"/>
+  
+  <!-- Leaf icon (white) -->
+  <path d="M20 15 Q25 10, 30 15 Q28 25, 20 30 Q15 25, 20 15" fill="#F6EFE5" stroke="#F6EFE5" stroke-width="1"/>
+  <path d="M22 18 Q24 20, 22 26" stroke="#1A1A1A" stroke-width="1" fill="none"/>
+  
+  <!-- Text "KIBANA" (white) -->
+  <text x="45" y="38" font-family="serif" font-size="24" font-weight="300" letter-spacing="2" fill="#F6EFE5">KIBANA</text>
+</svg>
