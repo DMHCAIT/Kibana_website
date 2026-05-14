@@ -6,7 +6,6 @@ import { ProductGrid } from "@/components/product/product-grid";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
-import { MobileProductCTA } from "./mobile-product-cta";
 import { ShopHeader } from "@/components/shop/shop-header";
 
 export async function generateStaticParams() {
@@ -29,7 +28,7 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <section className="container py-2 md:py-8 pb-20 sm:pb-8">
+      <section className="container py-2 md:py-8 pb-24 md:pb-8">
         <ShopHeader
           heading={categories.find((c) => c.slug === product.category)?.name ?? "Shop all bags"}
           count={catProductCount}
@@ -37,20 +36,22 @@ export default async function ProductDetailPage({
           showSort={false}
         />
 
-        <div className="grid gap-4 sm:gap-8 md:gap-10 sm:grid-cols-2 mt-1 sm:mt-4">
+        <div className="grid gap-4 sm:gap-8 md:gap-10 sm:grid-cols-2 mt-1 sm:mt-4 w-full min-w-0">
           {/* Gallery */}
+          <div className="w-full min-w-0">
           <ProductGallery
             images={allImages}
             productName={product.name}
             discountPct={pct}
           />
+          </div>
 
           {/* Details */}
-          <div className="pt-2 sm:pt-0">
+          <div className="pt-2 sm:pt-0 w-full min-w-0">
             <p className="text-[10px] tracking-[0.3em] uppercase text-kibana-camel">
               {product.category.replace("-", " ")}
             </p>
-            <h1 className="font-display text-xl sm:text-3xl md:text-4xl mt-1 leading-tight">{product.name}</h1>
+            <h1 className="font-display text-xl sm:text-3xl md:text-4xl mt-1 leading-tight break-words">{product.name}</h1>
 
             <div className="mt-2 flex items-center gap-2 text-sm">
               <div className="flex items-center gap-0.5">
@@ -179,9 +180,6 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </section>
-
-      {/* Mobile sticky Add to Cart — only shows on mobile */}
-      <MobileProductCTA product={product} />
 
       {related.length > 0 && (
         <section className="container py-6 md:py-14 pb-20 sm:pb-8">

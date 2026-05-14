@@ -29,7 +29,7 @@ export function DeliveryCheck() {
   return (
     <div>
       <h3 className="text-sm font-semibold mb-3">Delivery Details</h3>
-      <div className="flex">
+      <div className="flex w-full">
         <input
           type="text"
           inputMode="numeric"
@@ -38,7 +38,7 @@ export function DeliveryCheck() {
             setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))
           }
           placeholder="Enter your Pincode"
-          className="flex-1 border border-border border-r-0 px-3 py-2 text-sm outline-none focus:border-foreground placeholder:text-muted-foreground bg-background"
+          className="min-w-0 flex-1 border border-border border-r-0 px-3 py-2 text-sm outline-none focus:border-foreground placeholder:text-muted-foreground bg-background"
           maxLength={6}
           onKeyDown={(e) => e.key === "Enter" && check()}
         />

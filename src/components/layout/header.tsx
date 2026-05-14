@@ -109,9 +109,9 @@ export function Header() {
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
-            width={200}
-            height={80}
-            className="h-16 w-auto"
+            width={280}
+            height={112}
+            className="h-24 w-auto"
           />
         </Link>
         {/* Desktop: logo */}

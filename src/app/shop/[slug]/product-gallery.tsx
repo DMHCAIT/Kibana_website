@@ -20,7 +20,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
   return (
     <>
       {/* ── Mobile: main image → horizontal thumbs below ── */}
-      <div className="flex flex-col gap-3 md:hidden">
+      <div className="flex flex-col gap-3 md:hidden w-full min-w-0">
         {/* Main image */}
         <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#f0ece4]">
           <Image
@@ -40,7 +40,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
 
         {/* Horizontal thumb strip — scrollable, no arrows */}
         {allImages.length > 1 && (
-          <div ref={hScrollRef} className="flex flex-row gap-2 overflow-x-auto scrollbar-hide">
+          <div ref={hScrollRef} className="flex flex-row gap-2 overflow-x-auto scrollbar-hide w-full">
             {allImages.map((src, i) => (
               <button
                 key={i}

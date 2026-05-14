@@ -35,7 +35,7 @@ export function AddToCartButton({ product }: { product: Product }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full min-w-0">
       {/* Quantity selector */}
       <div className="flex items-center gap-4">
         <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">

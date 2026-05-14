@@ -29,7 +29,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur">
+    <nav className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-sm" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <ul className="grid grid-cols-5">
         {navItems.map((item) => {
           const Icon = item.icon;
