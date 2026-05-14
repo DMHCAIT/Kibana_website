@@ -13,7 +13,7 @@ import { useAuth } from "@/store/auth-store";
 
 type Props = {
   product: Product;
-  variant?: "compact" | "full";
+  variant?: "compact" | "full" | "minimal";
   className?: string;
 };
 
@@ -58,7 +58,7 @@ export function ProductCard({ product, variant = "compact", className }: Props) 
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {/* Discount badge — top left on image */}
-        {pct > 0 && (
+        {pct > 0 && variant !== "minimal" && (
           <span className="absolute left-2 top-2 bg-gray-900 text-white text-[10px] font-bold px-1.5 py-0.5 tracking-wide">
             {pct}% OFF
           </span>
@@ -76,7 +76,7 @@ export function ProductCard({ product, variant = "compact", className }: Props) 
             fill={inWishlist ? "currentColor" : "none"}
           />
         </button>
-        {product.colors.length > 0 && (
+        {product.colors.length > 0 && variant !== "minimal" && (
           <div className="absolute bottom-2 left-2 flex gap-1">
             {product.colors.slice(0, 4).map((c) => (
               <span
@@ -96,14 +96,16 @@ export function ProductCard({ product, variant = "compact", className }: Props) 
         >
           {product.name}
         </Link>
-        <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-[11px] sm:text-xs md:text-sm font-bold">{formatINR(product.price)}</span>
-          {product.compareAtPrice && (
-            <span className="text-[10px] sm:text-xs text-muted-foreground line-through">
-              {formatINR(product.compareAtPrice)}
-            </span>
-          )}
-        </div>
+        {variant !== "minimal" && (
+          <div className="flex items-center gap-1 flex-wrap">
+            <span className="text-[11px] sm:text-xs md:text-sm font-bold">{formatINR(product.price)}</span>
+            {product.compareAtPrice && (
+              <span className="text-[10px] sm:text-xs text-muted-foreground line-through">
+                {formatINR(product.compareAtPrice)}
+              </span>
+            )}
+          </div>
+        )}
         {variant === "full" && (
           <Button
             size="sm"

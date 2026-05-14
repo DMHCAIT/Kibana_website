@@ -36,17 +36,17 @@ const columns = [
 export function Footer() {
   return (
     <footer className="bg-kibana-ink text-kibana-cream pb-16 md:pb-0">
-      <div className="px-5 sm:px-8 md:container py-8 md:py-14">
+      <div className="px-5 sm:px-8 md:container py-5 md:py-10">
 
         {/* Newsletter section */}
-        <div className="mb-6 pb-6 border-b border-kibana-cream/10">
+        <div className="mb-4 pb-4 border-b border-kibana-cream/10">
           <h3 className="font-bold text-base sm:text-lg md:text-2xl uppercase tracking-[0.15em] mb-3">Get In Touch</h3>
           <NewsletterForm />
         </div>
 
         {/* Logo + Nav columns */}
-        <div className="mb-6">
-          <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-16">
+        <div className="mb-4">
+          <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-16">
 
             {/* Logo */}
             <div className="md:flex-shrink-0">
@@ -55,7 +55,7 @@ export function Footer() {
                 <img
                   src="/extracted/kibana logo_white.png"
                   alt="Kibana"
-                  className="h-12 sm:h-14 md:h-16 w-auto"
+                  className="h-28 sm:h-32 md:h-44 w-auto"
                 />
               </Link>
             </div>
@@ -83,14 +83,14 @@ export function Footer() {
         </div>
 
         {/* Social row */}
-        <div className="pt-8 border-t border-kibana-cream/10">
+        <div className="pt-5 border-t border-kibana-cream/10">
           <div className="flex flex-col items-center gap-3">
             <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-kibana-cream/70">Follow us</h3>
             <div className="flex items-center gap-7">
-              <Link href="#" aria-label="Facebook" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
+              <Link href="https://www.facebook.com/kibanalife" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" aria-label="Instagram" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
+              <Link href="https://www.instagram.com/kibanalifeofficial/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
                 <Instagram className="h-5 w-5" />
               </Link>
               <Link href="#" aria-label="Threads" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors inline-block">

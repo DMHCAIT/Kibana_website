@@ -23,6 +23,9 @@ export const ProductSchema = z.object({
   isBestSeller: z.boolean().optional(),
   isTrending: z.boolean().optional(),
   colors: z.array(z.string()).default([]),
+  colorVariants: z
+    .array(z.object({ color: z.string(), image: z.string(), slug: z.string() }))
+    .optional(),
   features: z.array(z.string()).default([]),
   specs: z.record(z.string(), z.string()).default({}),
   rating: z.number().min(0).max(5).default(0),

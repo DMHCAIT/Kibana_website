@@ -5,10 +5,9 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart, Menu, Search, ShoppingBag, User, X, ChevronRight, ChevronLeft, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/store/cart-store";
-import { useWishlist } from "@/store/wishlist-store";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
 
@@ -49,10 +48,10 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
   const count = useCart((s) => s.items.reduce((a, i) => a + i.quantity, 0));
-  const wishlistCount = useWishlist((s) => s.items.length);
   const { user, openAuthModal, logout } = useAuth();
 
   const handleSubmenuOpen = (menuLabel: string) => {
@@ -69,6 +68,7 @@ export function Header() {
       router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setOpen(false);
+      setShowMobileSearch(false);
     }
   };
 
@@ -95,7 +95,7 @@ export function Header() {
           ))}
         </div>
       </div>
-      <div className="container flex h-14 items-center gap-3 md:h-16 lg:h-18">
+      <div className="container relative flex h-14 items-center gap-3 md:h-16 lg:h-18">
         <button
           aria-label="Open menu"
           onClick={() => setOpen(true)}
@@ -104,13 +104,24 @@ export function Header() {
           <Menu className="h-5 w-5" />
         </button>
 
-        <Link href="/" className="flex items-center">
+        {/* Mobile: centered logo image */}
+        <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
-            width={180}
-            height={72}
-            className="h-9 sm:h-10 md:h-12 w-auto"
+            width={200}
+            height={80}
+            className="h-16 w-auto"
+          />
+        </Link>
+        {/* Desktop: logo */}
+        <Link href="/" className="hidden md:flex items-center">
+          <Image
+            src="/extracted/kibana logo black.png"
+            alt="Kibana"
+            width={280}
+            height={112}
+            className="md:h-24 w-auto"
           />
         </Link>
 
@@ -139,22 +150,32 @@ export function Header() {
         </div>
 
         <div className={cn("flex items-center gap-1 md:gap-2", "ml-auto md:ml-3")}>
-          {/* Wishlist */}
-          <Link
-            href="/wishlist"
-            aria-label="Wishlist"
-            className="relative inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
+
+          {/* Search icon — mobile only */}
+          <button
+            aria-label="Search"
+            onClick={() => setShowMobileSearch((v) => !v)}
+            className="relative md:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20 transition-colors"
           >
-            <Heart className="h-5 w-5" />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-red-500 px-1 text-[10px] font-semibold text-white">
-                {wishlistCount}
+            {showMobileSearch ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+          </button>
+
+          {/* Mobile cart */}
+          <Link
+            href="/cart"
+            aria-label="Cart"
+            className="relative md:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                {count}
               </span>
             )}
           </Link>
 
-          {/* Account */}
-          <div className="relative">
+          {/* Account — desktop */}
+          <div className="relative hidden md:block">
             {user ? (
               <button
                 aria-label="Account menu"
@@ -166,29 +187,20 @@ export function Header() {
                 </span>
               </button>
             ) : (
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 aria-label="Login"
                 onClick={() => openAuthModal()}
+                className="relative inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
               >
                 <User className="h-5 w-5" />
-              </Button>
+              </button>
             )}
             {showUserMenu && user && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border shadow-lg z-50">
                 <div className="px-4 py-3 border-b border-border">
                   <p className="text-sm font-medium truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.phone}</p>
                 </div>
-                <Link
-                  href="/wishlist"
-                  className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted transition-colors"
-                  onClick={() => setShowUserMenu(false)}
-                >
-                  <Heart className="h-4 w-4" />
-                  My Wishlist
-                </Link>
                 <button
                   onClick={() => { logout(); setShowUserMenu(false); }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted transition-colors text-left"
@@ -200,11 +212,21 @@ export function Header() {
             )}
           </div>
 
+          {/* Wishlist — desktop only */}
+          <Link
+            href={user ? "/wishlist" : "#"}
+            aria-label="Wishlist"
+            onClick={(e) => { if (!user) { e.preventDefault(); openAuthModal(); } }}
+            className="relative hidden md:inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
+          >
+            <Heart className="h-5 w-5" />
+          </Link>
+
           {/* Cart */}
           <Link
             href="/cart"
             aria-label="Cart"
-            className="relative inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20"
+            className="relative hidden md:inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20"
           >
             <ShoppingBag className="h-5 w-5" />
             {count > 0 && (
@@ -216,20 +238,23 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile search row */}
-      <div className="md:hidden border-t border-border bg-background">
-        <div className="container py-2">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search" 
-              className="pl-9 h-9 bg-muted/60"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
+      {/* Mobile search bar — slides in below header */}
+      {showMobileSearch && (
+        <div className="md:hidden border-b border-border bg-background">
+          <div className="container py-2.5">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                autoFocus
+                placeholder="Search for bags, wallets…"
+                className="pl-9 h-9 bg-muted/60"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </form>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Mobile drawer */}
       {open && (

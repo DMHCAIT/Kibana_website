@@ -9,7 +9,7 @@ export function NewArrivals() {
       <SectionHeading title="Shop by New Arrivals" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
         {items.map((p) => (
-          <ProductCard key={p.id} product={p} variant="full" />
+          <ProductCard key={p.id} product={p} variant="minimal" />
         ))}
       </div>
     </section>

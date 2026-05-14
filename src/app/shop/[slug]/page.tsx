@@ -29,7 +29,7 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <section className="container py-3 md:py-8 pb-36 sm:pb-8">
+      <section className="container py-2 md:py-8 pb-20 sm:pb-8">
         <ShopHeader
           heading={categories.find((c) => c.slug === product.category)?.name ?? "Shop all bags"}
           count={catProductCount}
@@ -37,7 +37,7 @@ export default async function ProductDetailPage({
           showSort={false}
         />
 
-        <div className="grid gap-6 sm:gap-8 md:gap-10 sm:grid-cols-2 mt-1 sm:mt-4">
+        <div className="grid gap-4 sm:gap-8 md:gap-10 sm:grid-cols-2 mt-1 sm:mt-4">
           {/* Gallery */}
           <ProductGallery
             images={allImages}
@@ -46,7 +46,7 @@ export default async function ProductDetailPage({
           />
 
           {/* Details */}
-          <div className="pt-4 sm:pt-0">
+          <div className="pt-2 sm:pt-0">
             <p className="text-[10px] tracking-[0.3em] uppercase text-kibana-camel">
               {product.category.replace("-", " ")}
             </p>
@@ -93,25 +93,32 @@ export default async function ProductDetailPage({
                   Colour
                 </p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {product.colors.map((c) => (
-                    <span
-                      key={c}
-                      className="h-7 w-7 rounded-full ring-2 ring-offset-2 ring-transparent hover:ring-kibana-tan/60 transition-shadow"
-                      style={{ backgroundColor: c }}
-                      title={c}
+                  {(product.colorVariants && product.colorVariants.length > 1
+                    ? product.colorVariants.map((v) => ({ color: v.color, slug: v.slug }))
+                    : product.colors.map((c) => ({ color: c, slug: product.slug }))
+                  ).map((item) => (
+                    <a
+                      key={item.color}
+                      href={`/shop/${item.slug}`}
+                      className={cn(
+                        "block h-7 w-7 rounded-full ring-2 ring-offset-2 transition-all hover:ring-kibana-tan",
+                        item.slug === product.slug ? "ring-kibana-ink" : "ring-transparent"
+                      )}
+                      style={{ backgroundColor: item.color }}
+                      title={item.color}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Add to cart — hidden on mobile (sticky bar handles it) */}
-            <div className="mt-5 hidden sm:block">
+            {/* Add to cart */}
+            <div className="mt-5">
               <AddToCartButton product={product} />
             </div>
 
             {/* Delivery check */}
-            <div className="mt-5 pt-4 border-t border-border hidden sm:block">
+            <div className="mt-5 pt-4 border-t border-border">
               <DeliveryCheck />
             </div>
 
@@ -177,7 +184,7 @@ export default async function ProductDetailPage({
       <MobileProductCTA product={product} />
 
       {related.length > 0 && (
-        <section className="container py-8 md:py-14 pb-36 sm:pb-8">
+        <section className="container py-6 md:py-14 pb-20 sm:pb-8">
           <h2 className="text-sm font-semibold uppercase tracking-[0.18em] mb-4">
             You may also like
           </h2>

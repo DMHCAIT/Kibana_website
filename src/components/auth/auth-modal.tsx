@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
@@ -10,21 +10,17 @@ import { cn } from "@/lib/utils";
 export function AuthModal() {
   const { showAuthModal, authModalMessage, closeAuthModal, login, signup } = useAuth();
   const [tab, setTab] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Reset form on open
   useEffect(() => {
     if (showAuthModal) {
-      setEmail("");
+      setPhone("");
       setPassword("");
       setName("");
-      setMobile("");
       setError("");
       setTab("login");
     }
@@ -38,35 +34,26 @@ export function AuthModal() {
     setLoading(true);
     let result: { error?: string };
     if (tab === "login") {
-      result = await login(email, password);
+      result = await login(phone, password);
     } else {
       if (!name.trim()) {
         setError("Please enter your name.");
         setLoading(false);
         return;
       }
-      if (mobile && !/^[0-9]{10}$/.test(mobile)) {
-        setError("Please enter a valid 10-digit mobile number.");
-        setLoading(false);
-        return;
-      }
-      result = await signup(email, password, name);
+      result = await signup(phone, password, name);
     }
     setLoading(false);
     if (result.error) setError(result.error);
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
-      ref={overlayRef}
-      onClick={(e) => e.target === overlayRef.current && closeAuthModal()}
-    >
-      <div className="relative w-full sm:max-w-md bg-white sm:mx-4 shadow-2xl rounded-t-2xl sm:rounded-none max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="relative w-full max-w-md mx-4 bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
         {/* Close */}
         <button
           onClick={closeAuthModal}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-700 transition-colors"
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-700 transition-colors z-10"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
@@ -82,7 +69,7 @@ export function AuthModal() {
           </h2>
 
           {authModalMessage && (
-            <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 mb-4">
+            <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 mb-4 mt-2">
               {authModalMessage}
             </p>
           )}
@@ -114,7 +101,7 @@ export function AuthModal() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {tab === "signup" && (
               <div>
                 <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
@@ -130,31 +117,27 @@ export function AuthModal() {
                 />
               </div>
             )}
+
             <div>
               <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
                 Mobile Number
               </label>
-              <Input
-                type="tel"
-                placeholder="10-digit mobile number"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                className="h-11"
-              />
+              <div className="flex gap-2">
+                <span className="inline-flex items-center px-3 h-11 border border-input bg-muted text-sm text-muted-foreground rounded-none select-none">
+                  +91
+                </span>
+                <Input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="10-digit mobile number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  required
+                  className="h-11 flex-1"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
-                Email
-              </label>
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
+
             <div>
               <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
                 Password
@@ -178,7 +161,7 @@ export function AuthModal() {
             <Button
               type="submit"
               disabled={loading}
-              className="mt-2 h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
+              className="mt-1 h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
             >
               {loading ? "Please wait…" : tab === "login" ? "Login" : "Create Account"}
             </Button>

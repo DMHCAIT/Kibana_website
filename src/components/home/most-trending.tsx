@@ -4,101 +4,62 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { products } from "@/lib/data";
 import { SectionHeading } from "./section-heading";
 
-const editorial = [
-  {
-    image:
-      "https://placehold.co/800x900/EFEAE3/1A1A1A?text=Soft+Power&font=playfair",
-    label: "Soft Power",
-    href: "/shop?cat=tote-bag",
-  },
-  {
-    image:
-      "https://placehold.co/800x900/8B2A2A/FFFFFF?text=Bold+Carry&font=playfair",
-    label: "Bold Carry",
-    href: "/shop?cat=sling-bag",
-  },
-  {
-    image:
-      "https://placehold.co/800x900/D4AF37/1A1A1A?text=Gold+Standard&font=playfair",
-    label: "Gold Standard",
-    href: "/shop?cat=wallet",
-  },
-];
+const trendingProducts = products.filter((p) => p.isTrending);
 
 export function MostTrending() {
   const [current, setCurrent] = useState(0);
+  const total = trendingProducts.length;
 
-  const next = () => {
-    setCurrent((current + 1) % editorial.length);
-  };
+  const next = () => setCurrent((prev) => (prev + 2) % total);
+  const prev = () => setCurrent((prev) => (prev - 2 + total) % total);
 
-  const prev = () => {
-    setCurrent((current - 1 + editorial.length) % editorial.length);
-  };
+  const visible = [
+    trendingProducts[current % total],
+    trendingProducts[(current + 1) % total],
+  ];
 
   return (
     <section className="container py-6 md:py-10">
       <SectionHeading title="Most Trending" />
       <div className="relative">
-        <div className="flex items-stretch gap-2 sm:gap-3">
-          {/* Prev arrow */}
-          <button
-            onClick={prev}
-            aria-label="Previous"
-            className="flex-shrink-0 flex items-center justify-center w-8 sm:w-9 hover:bg-accent/20 transition-colors"
-          >
-            <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-          </button>
+        {/* Prev arrow — inside left edge */}
+        <button
+          onClick={prev}
+          aria-label="Previous"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 text-white drop-shadow-md hover:scale-110 transition-transform"
+        >
+          <ChevronLeft className="h-7 w-7" />
+        </button>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1">
-            {editorial.slice(current, current + 2).map((e) => (
-              <Link
-                key={e.label}
-                href={e.href}
-                className="group relative block overflow-hidden bg-kibana-cream aspect-[3/3.5] sm:aspect-[4/5] md:aspect-[5/6]"
-              >
-                <Image
-                  src={e.image}
-                  alt={e.label}
-                  fill
-                  sizes="(max-width: 768px) 45vw, 50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5">
-                  <span className="text-white text-sm sm:text-lg font-semibold tracking-[0.15em] uppercase">
-                    {e.label}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Next arrow */}
-          <button
-            onClick={next}
-            aria-label="Next"
-            className="flex-shrink-0 flex items-center justify-center w-8 sm:w-9 hover:bg-accent/20 transition-colors"
-          >
-            <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-          </button>
-        </div>
-
-        {/* Dots indicator */}
-        <div className="mt-4 flex items-center justify-center gap-2">
-          {editorial.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`h-2 rounded-full transition-all ${
-                i === current ? "w-6 bg-foreground" : "w-2 bg-foreground/30"
-              }`}
-            />
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          {visible.map((p) => (
+            <Link
+              key={p.slug}
+              href={`/shop/${p.slug}`}
+              className="group relative block overflow-hidden bg-kibana-cream aspect-[3/5] sm:aspect-[4/5]"
+            >
+              <Image
+                src={p.image}
+                alt={p.name}
+                fill
+                sizes="(max-width: 640px) 50vw, 45vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </Link>
           ))}
         </div>
+
+        {/* Next arrow — inside right edge */}
+        <button
+          onClick={next}
+          aria-label="Next"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 text-white drop-shadow-md hover:scale-110 transition-transform"
+        >
+          <ChevronRight className="h-7 w-7" />
+        </button>
       </div>
     </section>
   );

@@ -4,8 +4,10 @@ import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { CookiesBanner } from "@/components/layout/cookies-banner";
 import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { AuthAutoPopup } from "@/components/auth/auth-auto-popup";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({
@@ -17,6 +19,11 @@ export const metadata: Metadata = {
   title: "Kibana — Pure. Minimal. Luxe.",
   description:
     "Premium vegan-leather handbags, totes, slings and backpacks. Hand-finished, every day.",
+  icons: {
+    icon: "/favicon-16x16.png",
+    shortcut: "/favicon-16x16.png",
+    apple: "/favicon-16x16.png",
+  },
   openGraph: {
     title: "Kibana — Pure. Minimal. Luxe.",
     description: "Premium vegan-leather handbags.",
@@ -37,6 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Header />
           <AuthModal />
+          <AuthAutoPopup />
+          <CookiesBanner />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <MobileBottomNav />
           <Footer />

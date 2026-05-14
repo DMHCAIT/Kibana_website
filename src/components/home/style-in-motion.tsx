@@ -40,7 +40,7 @@ export function StyleInMotion() {
         {/* Left Arrow */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 z-10 bg-kibana-ink text-kibana-cream p-2 rounded-full hover:bg-kibana-camel transition-colors"
+          className="absolute left-0 z-10 bg-kibana-cream text-kibana-ink p-2 rounded-full hover:bg-kibana-stone transition-colors"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -81,7 +81,7 @@ export function StyleInMotion() {
         {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 z-10 bg-kibana-ink text-kibana-cream p-2 rounded-full hover:bg-kibana-camel transition-colors"
+          className="absolute right-0 z-10 bg-kibana-cream text-kibana-ink p-2 rounded-full hover:bg-kibana-stone transition-colors"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-5 w-5" />
@@ -89,15 +89,15 @@ export function StyleInMotion() {
       </div>
 
       {/* Trust Badges */}
-      <div className="grid grid-cols-3 gap-4 sm:gap-6 text-center py-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-2">
         {badges.map((badge) => {
           const Icon = badge.icon;
           return (
-            <div key={badge.label} className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
-                <Icon className="h-7 w-7 sm:h-8 sm:w-8 text-foreground/70" />
+            <div key={badge.label} className="flex flex-col items-center gap-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-foreground/70" />
               </div>
-              <p className="text-xs sm:text-sm font-medium text-foreground/70 uppercase tracking-[0.1em]">
+              <p className="text-xs font-medium text-foreground/70 uppercase tracking-[0.1em]">
                 {badge.label}
               </p>
             </div>

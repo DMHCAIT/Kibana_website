@@ -51,7 +51,7 @@ export function MobileProductCTA({ product }: { product: Product }) {
       )}
 
       {/* Sticky bottom bar — mobile only */}
-      <div className="sm:hidden fixed bottom-16 inset-x-0 z-40 bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+      <div className="sm:hidden fixed bottom-[52px] inset-x-0 z-[60] bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
         {/* Product name + price strip */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-border/50">
           <p className="text-xs font-medium truncate max-w-[55%]">{product.name}</p>

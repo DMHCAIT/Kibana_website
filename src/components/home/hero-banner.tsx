@@ -15,6 +15,9 @@ export function HeroBanner() {
   const [prevImage, setPrevImage] = useState<number | null>(null);
   const [fading, setFading] = useState(false);
 
+  const FADE_MS = 600;
+  const INTERVAL_MS = 4000;
+
   const goTo = (index: number) => {
     if (index === currentImage || fading) return;
     setPrevImage(currentImage);
@@ -23,10 +26,10 @@ export function HeroBanner() {
     setTimeout(() => {
       setPrevImage(null);
       setFading(false);
-    }, 2000);
+    }, FADE_MS);
   };
 
-  // Auto-advance every 2s
+  // Auto-advance every 4s
   useEffect(() => {
     if (fading) return;
     const timer = setInterval(() => {
@@ -37,8 +40,8 @@ export function HeroBanner() {
       setTimeout(() => {
         setPrevImage(null);
         setFading(false);
-      }, 2000);
-    }, 2000);
+      }, FADE_MS);
+    }, INTERVAL_MS);
     return () => clearInterval(timer);
   }, [currentImage, fading]);
 
@@ -53,7 +56,7 @@ export function HeroBanner() {
           fill
           className="object-cover"
           sizes="100vw"
-          style={{ opacity: fading ? 0 : 1, transition: "opacity 2s ease-in-out" }}
+          style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
         />
       )}
       {/* Current image (fading in) */}
@@ -65,7 +68,7 @@ export function HeroBanner() {
         priority
         className="object-cover"
         sizes="100vw"
-        style={{ opacity: fading ? 1 : 1, transition: "opacity 2s ease-in-out" }}
+        style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
       />
       {/* Clickable pagination dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
