@@ -1,18 +1,20 @@
-import { getSiteConfig } from "@/lib/server-data";
-import { HomepageManager } from "@/components/admin/homepage-manager";
+import { getSiteConfig, getProducts } from "@/lib/server-data";
+import { HomepageTabs } from "./HomepageTabs";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomepagePage() {
-  const config = await getSiteConfig();
+  const [config, allProducts] = await Promise.all([getSiteConfig(), getProducts()]);
 
   return (
-    <div className="p-6 overflow-y-auto h-full">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Homepage Sections</h1>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="px-6 pt-6 pb-3 flex-shrink-0">
+        <h1 className="text-2xl font-bold text-gray-900">Homepage</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Control which sections are visible and their display order.
+          Edit every homepage section — layout, images, text and product assignments.
         </p>
       </div>
-      <HomepageManager initialSections={config.sections} />
+      <HomepageTabs config={config as Parameters<typeof HomepageTabs>[0]["config"]} allProducts={allProducts} />
     </div>
   );
 }

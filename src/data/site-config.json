@@ -80,6 +80,19 @@
     "most-trending": [],
     "style-in-motion": []
   },
+  "sectionContent": {
+    "bestSellers": {
+      "leftImage": "/extracted/backpack-left.png",
+      "rightImage": "/extracted/backpack-right.png",
+      "heading": "GOT YOUR BACK",
+      "buttonText": "SHOP NOW",
+      "productSlug": "north-backpack"
+    },
+    "craftsmanship": {
+      "image": "/extracted/craftmanship.png",
+      "text": "Craftsmanship"
+    }
+  },
   "pages": {
     "about": {
       "title": "Crafted for the Ones Who Move the World",

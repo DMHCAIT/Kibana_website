@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
-import { Leaf, Zap, RotateCcw, ChevronLeft, ChevronRight, Play, X, ShoppingBag } from "lucide-react";
-import { useRef, useState } from "react";
+import { Leaf, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState, useCallback } from "react";
 import type { Product } from "@/types/product";
 
 const FALLBACK_TILES: { src: string; alt: string; label: string; href: string; video?: string }[] = [
@@ -23,17 +23,75 @@ const badges = [
 
 type Tile = { src: string; alt: string; label: string; href: string; video?: string };
 
+/** Individual card: shows image, plays video (with sound) on hover once, navigates on click */
+function TileCard({ tile }: { tile: Tile }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hovered, setHovered] = useState(false);
+
+  const handleMouseEnter = useCallback(() => {
+    if (!tile.video) return;
+    setHovered(true);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [tile.video]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHovered(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, []);
+
+  const handleEnded = useCallback(() => {
+    setHovered(false);
+  }, []);
+
+  return (
+    <Link
+      href={tile.href}
+      data-card
+      className="relative flex-shrink-0 w-[calc(50%-6px)] lg:w-[calc(20%-10px)] aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Always-visible product image */}
+      <Image
+        src={tile.src}
+        alt={tile.alt}
+        fill
+        sizes="180px"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+
+      {/* Video overlay — shown on hover, plays once with sound, no controls */}
+      {tile.video && (
+        <video
+          ref={videoRef}
+          src={tile.video}
+          playsInline
+          onEnded={handleEnded}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
+        />
+      )}
+
+      {/* Bottom label */}
+      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent pt-8 pb-2 px-2">
+        <span className="text-white font-semibold text-xs sm:text-sm uppercase tracking-[0.1em] block text-center">{tile.label}</span>
+      </div>
+    </Link>
+  );
+}
+
 export function StyleInMotion({ products = [] }: { products?: Product[] }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [modal, setModal] = useState<Tile | null>(null);
 
   const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -300 : 300,
-        behavior: "smooth",
-      });
-    }
+    if (!scrollContainerRef.current) return;
+    const width = scrollContainerRef.current.clientWidth;
+    scrollContainerRef.current.scrollBy({ left: direction === "left" ? -width : width, behavior: "smooth" });
   };
 
   // Use admin-assigned products as tiles if available; otherwise fall back to defaults
@@ -44,62 +102,32 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
   return (
     <section className="container py-6 md:py-10">
       <SectionHeading title="Style in Motion" />
-      <div className="relative flex items-center gap-4">
-        {/* Left Arrow */}
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 z-10 bg-kibana-cream text-kibana-ink p-2 rounded-full hover:bg-kibana-stone transition-colors"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-
-        {/* Carousel */}
-        <div className="overflow-hidden flex-1 mx-10">
+      <div className="relative">
+        {/* Carousel — clips overflow so no partial cards bleed out */}
+        <div className="overflow-hidden">
           <div ref={scrollContainerRef} className="flex overflow-x-auto pb-2 gap-3 sm:gap-4 md:gap-6 mb-8 scrollbar-hide">
             {tiles.map((t, i) => (
-              <div
-                key={`${t.label}-${i}`}
-                className="relative flex-shrink-0 w-36 sm:w-44 md:w-52 lg:w-56 aspect-[1/2.2] overflow-hidden bg-kibana-cream group cursor-pointer"
-                onClick={() => t.video ? setModal(t) : undefined}
-              >
-                {/* Image or muted looping video preview */}
-                {t.video ? (
-                  <video
-                    src={t.video}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <Link href={t.href} className="absolute inset-0">
-                    <Image src={t.src} alt={t.alt} fill sizes="180px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </Link>
-                )}
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {t.video && (
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/40 flex items-center justify-center">
-                      <Play className="h-5 w-5 text-white fill-white ml-0.5" />
-                    </div>
-                  )}
-                  <span className="text-white font-semibold text-xs sm:text-sm uppercase tracking-[0.1em] px-2 text-center">{t.label}</span>
-                </div>
-              </div>
+              <TileCard key={`${t.label}-${i}`} tile={t} />
             ))}
           </div>
         </div>
 
-        {/* Right Arrow */}
+        {/* Left Arrow — inside the left fade zone */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-1 top-[calc(50%-1rem)] -translate-y-1/2 z-10 text-foreground/60 hover:text-foreground transition-colors"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+
+        {/* Right Arrow — inside the right fade zone */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 z-10 bg-kibana-cream text-kibana-ink p-2 rounded-full hover:bg-kibana-stone transition-colors"
+          className="absolute right-1 top-[calc(50%-1rem)] -translate-y-1/2 z-10 text-foreground/60 hover:text-foreground transition-colors"
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
@@ -119,49 +147,6 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
           );
         })}
       </div>
-
-      {/* Video Modal */}
-      {modal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-          onClick={() => setModal(null)}
-        >
-          <div
-            className="relative w-full max-w-sm bg-black rounded-2xl overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setModal(null)}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            {/* Video */}
-            <video
-              src={modal.video}
-              autoPlay
-              controls
-              playsInline
-              className="w-full aspect-[9/16] object-cover"
-            />
-
-            {/* Product CTA */}
-            <div className="p-4 bg-kibana-ink">
-              <p className="text-kibana-cream text-sm font-semibold mb-3 truncate">{modal.label}</p>
-              <Link
-                href={modal.href}
-                onClick={() => setModal(null)}
-                className="flex items-center justify-center gap-2 w-full py-3 bg-kibana-tan text-kibana-ink text-sm font-bold uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                View Product
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

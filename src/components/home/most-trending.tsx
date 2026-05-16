@@ -22,20 +22,11 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   return (
     <section className="container py-6 md:py-10">
       <SectionHeading title="Most Trending" />
-      <div className="relative">
-        {/* Left arrow */}
-        <button
-          onClick={() => scroll("left")}
-          aria-label="Previous"
-          className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 bg-white border border-border shadow-sm p-1.5 hover:bg-muted transition-colors"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-
+      <div className="relative overflow-hidden">
         {/* Scrollable card row */}
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-1"
+          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth"
         >
           {trendingProducts.map((p) => (
             <div
@@ -48,13 +39,22 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
           ))}
         </div>
 
-        {/* Right arrow */}
+        {/* Left arrow — overlaid inside the scroll area */}
+        <button
+          onClick={() => scroll("left")}
+          aria-label="Previous"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 text-foreground/70 hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+
+        {/* Right arrow — overlaid inside the scroll area */}
         <button
           onClick={() => scroll("right")}
           aria-label="Next"
-          className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 bg-white border border-border shadow-sm p-1.5 hover:bg-muted transition-colors"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 text-foreground/70 hover:text-foreground transition-colors"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
     </section>

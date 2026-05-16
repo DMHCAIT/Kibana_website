@@ -51,13 +51,13 @@ export default async function HomePage() {
 
   const SECTION_COMPONENTS: Record<string, (products: Product[]) => React.ReactNode> = {
     "new-arrivals":     (p) => <NewArrivals products={p} />,
-    "best-sellers":     (p) => <BestSellers products={p} />,
+    "best-sellers":     (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
     "shop-by-category": (_) => <ShopByCategory categories={categories} />,
     "viral-bags":       (p) => <ViralBags products={p} />,
     "most-trending":    (p) => <MostTrending products={p} />,
     "about-us":         (_) => <AboutUs />,
     "style-in-motion":  (p) => <StyleInMotion products={p} />,
-    "craftsmanship":    (_) => <Craftsmanship />,
+    "craftsmanship":    (_) => <Craftsmanship config={config.sectionContent?.craftsmanship} />,
     "customer-review":  (_) => <CustomerReview />,
   };
 

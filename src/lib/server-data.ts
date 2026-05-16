@@ -196,6 +196,19 @@ export type SiteConfig = {
   };
   announcementBar: string;
   sectionProducts: Record<string, string[]>;
+  sectionContent?: {
+    bestSellers?: {
+      leftImage?: string;
+      rightImage?: string;
+      heading?: string;
+      buttonText?: string;
+      productSlug?: string;
+    };
+    craftsmanship?: {
+      image?: string;
+      text?: string;
+    };
+  };
   pages: {
     about: {
       title: string;
@@ -293,6 +306,20 @@ export async function getSiteConfig(): Promise<SiteConfig> {
         }
       }
     }
+    // Ensure every section from the local fallback exists in the DB config
+    // (handles cases where a section was added to the JSON after the DB config was saved)
+    if (cfg.sections) {
+      const dbIds = new Set(cfg.sections.map((s: { id: string }) => s.id));
+      for (const ls of fallback.sections) {
+        if (!dbIds.has(ls.id)) {
+          cfg.sections.push(ls);
+        }
+      }
+      cfg.sections.sort((a: { order: number }, b: { order: number }) => a.order - b.order);
+    } else {
+      cfg.sections = fallback.sections;
+    }
+
     return cfg as unknown as SiteConfig;
   } catch {
     return fallback;
