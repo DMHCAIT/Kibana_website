@@ -148,6 +148,10 @@ export async function saveCategory(cat: AdminCategory): Promise<void> {
     .onConflictDoUpdate({ target: categoriesTable.slug, set: row });
 }
 
+export async function deleteCategory(slug: string): Promise<void> {
+  await db.delete(categoriesTable).where(eq(categoriesTable.slug, slug));
+}
+
 export async function reorderCategories(orderedSlugs: string[]): Promise<void> {
   await Promise.all(
     orderedSlugs.map((slug, i) =>

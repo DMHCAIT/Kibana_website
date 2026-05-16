@@ -3,15 +3,60 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Pencil, ChevronUp, ChevronDown, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Pencil, ChevronUp, ChevronDown, ExternalLink, CheckCircle2, AlertCircle, Trash2, AlertTriangle, X } from "lucide-react";
 import type { Product } from "@/types/product";
 
 type P = Product & { order?: number };
+
+function DeleteConfirm({
+  product,
+  onConfirm,
+  onClose,
+}: {
+  product: P;
+  onConfirm: () => Promise<void>;
+  onClose: () => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-sm mx-4 p-6">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+          <X className="h-4 w-4" />
+        </button>
+        <div className="flex items-start gap-4 mb-5">
+          <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">Delete Product</h3>
+            <p className="text-sm text-gray-500">
+              Delete <span className="font-semibold text-gray-700">{product.name}</span>? This cannot be undone and will remove it from the storefront immediately.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={async () => { setDeleting(true); await onConfirm(); }}
+            disabled={deleting}
+            className="flex-1 bg-red-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+          >
+            {deleting ? "Deleting…" : "Delete"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ProductsListClient({ initialProducts }: { initialProducts: P[] }) {
   const [products, setProducts] = useState<P[]>(initialProducts);
   const [reorderSaving, setReorderSaving] = useState(false);
   const [reorderMsg, setReorderMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<P | null>(null);
 
   const move = async (index: number, dir: -1 | 1) => {
     const next = [...products];
@@ -37,8 +82,21 @@ export function ProductsListClient({ initialProducts }: { initialProducts: P[] }
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const res = await fetch(`/api/admin/products/${deleteTarget.id}`, { method: "DELETE" });
+    if (res.ok) {
+      setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+      setReorderMsg({ type: "ok", text: `"${deleteTarget.name}" deleted successfully.` });
+    } else {
+      setReorderMsg({ type: "err", text: "Failed to delete product." });
+    }
+    setDeleteTarget(null);
+  };
+
   return (
-    <div className="p-6 overflow-y-auto h-full">
+    <>
+      <div className="p-6 overflow-y-auto h-full">
       <div className="max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -192,6 +250,13 @@ export function ProductsListClient({ initialProducts }: { initialProducts: P[] }
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                         </Link>
+                        <button
+                          onClick={() => setDeleteTarget(p)}
+                          className="p-1.5 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete product"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -201,6 +266,15 @@ export function ProductsListClient({ initialProducts }: { initialProducts: P[] }
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      {deleteTarget && (
+        <DeleteConfirm
+          product={deleteTarget}
+          onConfirm={handleDelete}
+          onClose={() => setDeleteTarget(null)}
+        />
+      )}
+    </>
   );
 }

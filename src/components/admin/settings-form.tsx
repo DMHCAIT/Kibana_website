@@ -220,6 +220,7 @@ export function HeroEditor({ initialConfig }: { initialConfig: SiteConfig }) {
             />
             <div className="flex gap-2 flex-wrap">
               {config.hero.images.map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img key={i} src={src} alt="" className="h-20 w-28 rounded-lg border object-cover" />
               ))}
             </div>

@@ -131,6 +131,7 @@ export function AboutEditor({ initialData }: { initialData: AboutData }) {
             <Field label="Subtitle" value={data.subtitle} onChange={(v) => set("subtitle", v)} />
             <TextArea label="Main Content / Story" value={data.content} onChange={(v) => set("content", v)} rows={5} hint="This is the main brand story text." />
             <Field label="Hero Image URL" value={data.heroImage} onChange={(v) => set("heroImage", v)} placeholder="/extracted/img-010.jpg" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             {data.heroImage && <img src={data.heroImage} alt="" className="h-32 w-auto rounded-xl border object-cover" />}
           </div>
 
@@ -470,6 +471,7 @@ export function ShopPageEditor({ initialData }: { initialData: ShopData }) {
             <Field label="Page Title" value={data.title} onChange={(v) => set("title", v)} placeholder="Shop All Bags" />
             <Field label="Subtitle" value={data.subtitle} onChange={(v) => set("subtitle", v)} placeholder="Discover our complete collection" />
             <Field label="Banner Image URL (optional)" value={data.bannerImage} onChange={(v) => set("bannerImage", v)} placeholder="/extracted/img-010.jpg" hint="Large banner shown at top of shop page" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             {data.bannerImage && <img src={data.bannerImage} alt="" className="h-32 w-full rounded-xl border object-cover" />}
           </div>
         </div>

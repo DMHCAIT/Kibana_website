@@ -1,11 +1,21 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { updateOrderStatus } from "@/lib/server-data";
 import type { AdminOrder } from "@/lib/server-data";
+
+async function isAdmin() {
+  const cookieStore = await cookies();
+  return cookieStore.get("admin_token")?.value === "authenticated";
+}
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const body = await req.json() as { status?: string };
   if (!body.status) {

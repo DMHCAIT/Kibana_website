@@ -298,6 +298,7 @@ export function GalleryUpload({ label, value, onChange, bucket, basePath, hint }
         <div className="flex gap-2 flex-wrap mt-2">
           {value.map((src, i) => (
             <div key={i} className="relative group/img">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="" className="h-16 w-16 rounded-lg border object-cover" />
               <button
                 type="button"

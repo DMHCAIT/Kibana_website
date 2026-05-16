@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types/product";
-import { Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, CheckCircle2, ImageIcon, Tag, DollarSign, Layers, Star, Palette, Video } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, CheckCircle2, ImageIcon, Tag, DollarSign, Layers, Star, Palette, Video, Film, Info } from "lucide-react";
 import { MediaUpload, GalleryUpload } from "@/components/admin/media-upload";
 
 type ColorVariant = {
@@ -218,6 +218,7 @@ function ColorVariantCard({ variant, index, onChange, onRemove }: {
               type="image"
               hint="Primary image shown when this color is selected"
             />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             {variant.image && <img src={variant.image} alt="" className="h-28 w-auto rounded-xl border object-cover" />}
             <GalleryUpload
               label="Gallery Images"
@@ -324,6 +325,11 @@ export function ProductEditForm({ product, isNew = false }: Props) {
   const save = async () => {
     setSaving(true);
     setMsg(null);
+    if (!form.image && !form.video) {
+      setMsg({ type: "err", text: "Please provide at least one image or video before saving." });
+      setSaving(false);
+      return;
+    }
     try {
       const res = isNew
         ? await fetch("/api/admin/products", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) })
@@ -427,52 +433,142 @@ export function ProductEditForm({ product, isNew = false }: Props) {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
-            <SectionHeader icon={ImageIcon} title="Default Images" subtitle="Shown when no color variant is active, or as fallback" />
-            <MediaUpload
-              label="Main / Hero Image"
-              value={form.image}
-              onChange={(v) => set("image", v)}
-              bucket="product-images"
-              storagePath={`${form.id}/main`}
-              type="image"
-              required
-            />
-            {form.image && (
-              <div>
-                <p className="text-xs text-gray-500 mb-2">Preview:</p>
-                <img src={form.image} alt="preview" className="h-48 w-auto rounded-xl border object-cover" />
+          {/* ── Media & Style in Motion ─────────────────────────────── */}
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-start gap-3 p-5 border-b border-gray-100 bg-gradient-to-r from-gray-900 to-gray-700 text-white">
+              <div className="h-9 w-9 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Film className="h-5 w-5 text-white" />
               </div>
-            )}
-            <GalleryUpload
-              label="Gallery Images"
-              value={form.gallery}
-              onChange={(v) => set("gallery", v)}
-              bucket="product-images"
-              basePath={form.id}
-              hint="Appear as thumbnails in the product image carousel"
-            />
-          </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold">Media — Style in Motion</h3>
+                <p className="text-xs text-white/70 mt-0.5">Upload an image, a video, or both. At least one is required. These appear in the <strong className="text-white">Style in Motion</strong> carousel on the homepage.</p>
+              </div>
+              <span className="flex-shrink-0 bg-white/20 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full border border-white/30">
+                {form.image && form.video ? "Image + Video ✓" : form.image ? "Image ✓" : form.video ? "Video ✓" : "⚠ Required"}
+              </span>
+            </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
-            <SectionHeader icon={Video} title="Product Video" subtitle="Optional promotional video shown on the product page" />
-            <MediaUpload
-              label="Product Video"
-              value={form.video ?? ""}
-              onChange={(v) => set("video", v)}
-              bucket="product-videos"
-              storagePath={`${form.id}/video`}
-              type="video"
-              hint="MP4 or WEBM recommended. Shown as an autoplay muted loop on the product page."
-            />
-            {form.video && (
-              <video
-                src={form.video}
-                controls
-                muted
-                className="w-full max-h-56 rounded-xl border object-cover"
-              />
-            )}
+            <div className="p-5 space-y-5">
+              {!form.image && !form.video && (
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                  <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800">Provide at least one image or video. Both can be added for a richer carousel experience — the video plays inline on the homepage.</p>
+                </div>
+              )}
+
+              {/* Two-column media panels */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Image panel */}
+                <div className={`rounded-xl border-2 p-4 space-y-3 transition-colors ${
+                  form.image ? "border-blue-200 bg-blue-50/30" : "border-gray-200 bg-gray-50/30"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <ImageIcon className="h-3.5 w-3.5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-800">Image</p>
+                        <p className="text-[10px] text-gray-400">JPEG, PNG, WEBP</p>
+                      </div>
+                    </div>
+                    {form.image && (
+                      <span className="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Added ✓</span>
+                    )}
+                  </div>
+                  <MediaUpload
+                    label="Main / Hero Image"
+                    value={form.image}
+                    onChange={(v) => set("image", v)}
+                    bucket="product-images"
+                    storagePath={`${form.id}/main`}
+                    type="image"
+                    placeholder="https://... or upload image file"
+                  />
+                  {form.image && (
+                    <div className="relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={form.image} alt="preview" className="w-full h-40 rounded-lg border border-blue-200 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => set("image", "")}
+                        className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 text-gray-500 hover:text-red-500 p-1 rounded-full shadow border opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Video panel */}
+                <div className={`rounded-xl border-2 p-4 space-y-3 transition-colors ${
+                  form.video ? "border-purple-200 bg-purple-50/30" : "border-gray-200 bg-gray-50/30"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-lg bg-purple-100 flex items-center justify-center">
+                        <Video className="h-3.5 w-3.5 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-800">Video</p>
+                        <p className="text-[10px] text-gray-400">MP4, WEBM, MOV</p>
+                      </div>
+                    </div>
+                    {form.video && (
+                      <span className="text-[10px] font-semibold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Added ✓</span>
+                    )}
+                  </div>
+                  <MediaUpload
+                    label="Product Video"
+                    value={form.video ?? ""}
+                    onChange={(v) => set("video", v || undefined)}
+                    bucket="product-videos"
+                    storagePath={`${form.id}/video`}
+                    type="video"
+                    placeholder="https://... or upload video file"
+                  />
+                  {form.video && (
+                    <div className="relative group">
+                      <video
+                        src={form.video}
+                        controls
+                        muted
+                        className="w-full h-40 rounded-lg border border-purple-200 object-cover bg-black"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => set("video", undefined)}
+                        className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 text-gray-500 hover:text-red-500 p-1 rounded-full shadow border opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-gray-400 leading-relaxed">Plays as an autoplay muted loop in the Style in Motion carousel. Max 200 MB.</p>
+                </div>
+              </div>
+
+              {/* Homepage usage note */}
+              <div className="flex items-start gap-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                <Film className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                <p className="text-[11px] text-gray-500 leading-relaxed">
+                  <strong className="text-gray-700">Style in Motion carousel:</strong> When this product is assigned to the Style in Motion section, its video (if provided) plays inline in the tile; otherwise the image is shown. You can assign products to homepage sections under <strong className="text-gray-700">Admin → Homepage → Section Products</strong>.
+                </p>
+              </div>
+
+              {/* Gallery below */}
+              <div className="border-t border-gray-100 pt-4">
+                <GalleryUpload
+                  label="Gallery Images (Product Page)"
+                  value={form.gallery}
+                  onChange={(v) => set("gallery", v)}
+                  bucket="product-images"
+                  basePath={form.id}
+                  hint="These appear as additional thumbnails in the product image carousel on the product detail page"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">

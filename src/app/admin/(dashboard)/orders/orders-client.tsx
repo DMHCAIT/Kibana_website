@@ -62,6 +62,7 @@ function OrderRow({ order }: { order: AdminOrder }) {
         <td className="px-4 py-4">
           <div className="flex -space-x-2">
             {order.items.slice(0, 3).map((item, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={i}
                 src={item.image}
@@ -118,6 +119,7 @@ function OrderRow({ order }: { order: AdminOrder }) {
                 <div className="space-y-2">
                   {order.items.map((item, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={item.image} alt={item.name} className="h-12 w-12 rounded-lg border object-cover flex-shrink-0" />
                       <div className="flex-1">
                         <p className="text-xs font-semibold text-gray-900">{item.name}</p>

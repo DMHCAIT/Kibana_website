@@ -12,7 +12,7 @@ export default async function AdminDashboard() {
   const totalCategories = categories.length;
   const bestSellers = products.filter((p) => p.isBestSeller).length;
   const newArrivals = products.filter((p) => p.isNew).length;
-  const _trending = products.filter((p) => p.isTrending).length;
+  const trending = products.filter((p) => p.isTrending).length;
 
   const stats = [
     { label: "Total Products", value: totalProducts, icon: Package, bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-100" },
@@ -21,6 +21,7 @@ export default async function AdminDashboard() {
     { label: "Orders", value: orders.length, icon: ShoppingCart, bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-100" },
     { label: "Best Sellers", value: bestSellers, icon: Star, bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-100" },
     { label: "New Arrivals", value: newArrivals, icon: Sparkles, bg: "bg-green-50", text: "text-green-700", border: "border-green-100" },
+    { label: "Trending", value: trending, icon: Sparkles, bg: "bg-red-50", text: "text-red-700", border: "border-red-100" },
   ];
 
   return (

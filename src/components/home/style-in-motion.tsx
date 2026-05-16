@@ -7,7 +7,7 @@ import { Leaf, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import type { Product } from "@/types/product";
 
-const FALLBACK_TILES = [
+const FALLBACK_TILES: { src: string; alt: string; label: string; href: string; video?: string }[] = [
   { src: "/extracted/img-030.jpg", alt: "Beauto styling", label: "BEAUTO", href: "/shop" },
   { src: "/extracted/img-040.jpg", alt: "Fabulous styling", label: "FABULOUS", href: "/shop" },
   { src: "/extracted/img-050.jpg", alt: "Luxury styling", label: "Luxury", href: "/shop" },
@@ -35,7 +35,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
 
   // Use admin-assigned products as tiles if available; otherwise fall back to defaults
   const tiles = products.length > 0
-    ? products.map((p) => ({ src: p.image, alt: p.name, label: p.name, href: `/shop/${p.slug}` }))
+    ? products.map((p) => ({ src: p.image, alt: p.name, label: p.name, href: `/shop/${p.slug}`, video: p.video }))
     : FALLBACK_TILES;
 
   return (
@@ -60,7 +60,18 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
                 href={t.href}
                 className="relative flex-shrink-0 w-36 sm:w-44 md:w-52 lg:w-56 aspect-[1/2.2] overflow-hidden bg-kibana-cream group cursor-pointer"
               >
-                <Image src={t.src} alt={t.alt} fill sizes="180px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                {t.video ? (
+                  <video
+                    src={t.video}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <Image src={t.src} alt={t.alt} fill sizes="180px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-2 sm:p-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-white font-semibold text-xs sm:text-sm uppercase tracking-[0.1em]">{t.label}</span>
                 </div>

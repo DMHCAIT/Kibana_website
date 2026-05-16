@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/store/auth-store";
 
 /**
@@ -10,8 +11,11 @@ import { useAuth } from "@/store/auth-store";
  */
 export function AuthAutoPopup() {
   const { user, _hasHydrated, openAuthModal } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Never show the customer auth modal on admin pages
+    if (pathname.startsWith("/admin")) return;
     if (!_hasHydrated) return;
     if (user) return;
 
@@ -20,7 +24,7 @@ export function AuthAutoPopup() {
     if (dismissed) return;
 
     openAuthModal();
-  }, [_hasHydrated, user, openAuthModal]);
+  }, [_hasHydrated, user, openAuthModal, pathname]);
 
   return null;
 }

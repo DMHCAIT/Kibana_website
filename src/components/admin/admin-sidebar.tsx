@@ -7,8 +7,7 @@ import { useState } from "react";
 import {
   LayoutDashboard, Package, Tag, LogOut, ExternalLink,
   Home, Settings, Users, ShoppingCart, ChevronDown, ChevronRight,
-  HelpCircle, RotateCcw, Store, Phone, BookOpen,
-  TrendingUp, Activity,
+  BookOpen, TrendingUp, Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,11 +57,19 @@ const NAV: NavGroup[] = [
           { href: "/admin/homepage/hero", label: "Hero Banner" },
         ],
       },
-      { href: "/admin/pages/about", label: "About Us", icon: BookOpen },
-      { href: "/admin/pages/contact", label: "Contact Page", icon: Phone },
-      { href: "/admin/pages/faqs", label: "FAQs", icon: HelpCircle },
-      { href: "/admin/pages/returns", label: "Returns Policy", icon: RotateCcw },
-      { href: "/admin/pages/shop", label: "Shop Page", icon: Store },
+      {
+        href: "/admin/pages",
+        label: "Website Pages",
+        icon: BookOpen,
+        children: [
+          { href: "/admin/pages", label: "All Pages" },
+          { href: "/admin/pages/about", label: "About Us" },
+          { href: "/admin/pages/contact", label: "Contact" },
+          { href: "/admin/pages/faqs", label: "FAQs" },
+          { href: "/admin/pages/returns", label: "Returns Policy" },
+          { href: "/admin/pages/shop", label: "Shop Page" },
+        ],
+      },
     ],
   },
   {
