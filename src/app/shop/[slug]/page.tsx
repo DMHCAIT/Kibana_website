@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { Check, Star } from "lucide-react";
 import { getProducts, getCategories } from "@/lib/server-data";
@@ -7,10 +9,6 @@ import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
 import { ShopHeader } from "@/components/shop/shop-header";
-
-export async function generateStaticParams() {
-  return (await getProducts()).map((p) => ({ slug: p.slug }));
-}
 
 export default async function ProductDetailPage({
   params,

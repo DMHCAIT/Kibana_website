@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getProducts, getCategories } from "@/lib/server-data";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopByGender } from "@/components/product/shop-by-gender";

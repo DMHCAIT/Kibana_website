@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, AlertCircle } from "lucide-react";
 import { MediaUpload } from "./media-upload";
 import { Field, SaveBar } from "./page-content-editor";
 

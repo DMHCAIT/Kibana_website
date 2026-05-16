@@ -1,4 +1,6 @@
-import dynamic from "next/dynamic";
+export const dynamic = "force-dynamic";
+
+import dynamicImport from "next/dynamic";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
 import { Craftsmanship } from "@/components/home/craftsmanship";
@@ -8,13 +10,13 @@ import type { Product } from "@/types/product";
 const SectionSkeleton = () => <div className="w-full h-48 md:h-64 bg-muted/40 animate-pulse" />;
 
 // Lazy-load everything below the fold
-const BestSellers    = dynamic(() => import("@/components/home/best-sellers").then(m => ({ default: m.BestSellers })), { loading: () => <SectionSkeleton /> });
-const ShopByCategory = dynamic(() => import("@/components/home/shop-by-category").then(m => ({ default: m.ShopByCategory })), { loading: () => <SectionSkeleton /> });
-const ViralBags      = dynamic(() => import("@/components/home/viral-bags").then(m => ({ default: m.ViralBags })), { loading: () => <SectionSkeleton /> });
-const MostTrending   = dynamic(() => import("@/components/home/most-trending").then(m => ({ default: m.MostTrending })), { loading: () => <SectionSkeleton /> });
-const AboutUs        = dynamic(() => import("@/components/home/about-us").then(m => ({ default: m.AboutUs })), { loading: () => <SectionSkeleton /> });
-const StyleInMotion  = dynamic(() => import("@/components/home/style-in-motion").then(m => ({ default: m.StyleInMotion })), { loading: () => <SectionSkeleton /> });
-const CustomerReview = dynamic(() => import("@/components/home/customer-review").then(m => ({ default: m.CustomerReview })), { loading: () => <SectionSkeleton /> });
+const BestSellers    = dynamicImport(() => import("@/components/home/best-sellers").then(m => ({ default: m.BestSellers })), { loading: () => <SectionSkeleton /> });
+const ShopByCategory = dynamicImport(() => import("@/components/home/shop-by-category").then(m => ({ default: m.ShopByCategory })), { loading: () => <SectionSkeleton /> });
+const ViralBags      = dynamicImport(() => import("@/components/home/viral-bags").then(m => ({ default: m.ViralBags })), { loading: () => <SectionSkeleton /> });
+const MostTrending   = dynamicImport(() => import("@/components/home/most-trending").then(m => ({ default: m.MostTrending })), { loading: () => <SectionSkeleton /> });
+const AboutUs        = dynamicImport(() => import("@/components/home/about-us").then(m => ({ default: m.AboutUs })), { loading: () => <SectionSkeleton /> });
+const StyleInMotion  = dynamicImport(() => import("@/components/home/style-in-motion").then(m => ({ default: m.StyleInMotion })), { loading: () => <SectionSkeleton /> });
+const CustomerReview = dynamicImport(() => import("@/components/home/customer-review").then(m => ({ default: m.CustomerReview })), { loading: () => <SectionSkeleton /> });
 
 /** Resolve which products to show for a section.
  *  If the admin has pinned specific product IDs → use those in that order.
