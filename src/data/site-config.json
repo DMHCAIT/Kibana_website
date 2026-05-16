@@ -99,9 +99,10 @@
       "email": "hello@kibanalife.com",
       "phone": "+91 00000 00000",
       "address": "Kibana Life, 123 Design District, Mumbai, Maharashtra 400001",
-      "instagram": "https://instagram.com/kibanalife",
-      "twitter": "",
-      "responseTime": "We typically respond within 24 hours."
+      "responseTime": "We typically respond within 24 hours.",
+      "socialLinks": [
+        { "id": "sl1", "platform": "Instagram", "url": "https://instagram.com/kibanalife", "label": "Follow us on Instagram" }
+      ]
     },
     "faqs": {
       "title": "Frequently Asked Questions",

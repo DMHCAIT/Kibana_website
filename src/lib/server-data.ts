@@ -35,6 +35,7 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
     colorVariants: (row.colorVariants as Product["colorVariants"]) ?? [],
     features: (row.features as string[]) ?? [],
     specs: (row.specs as Record<string, string>) ?? {},
+    video: row.video ?? undefined,
     rating: row.rating ?? 0,
     reviewCount: row.reviewCount ?? 0,
   };
@@ -54,22 +55,34 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
-  const [row] = await db
-    .select()
-    .from(productsTable)
-    .where(eq(productsTable.id, id));
-  return row ? rowToProduct(row) : undefined;
+  if (!hasDatabase) return localProducts.find((p) => p.id === id);
+  try {
+    const [row] = await db
+      .select()
+      .from(productsTable)
+      .where(eq(productsTable.id, id));
+    if (row) return rowToProduct(row);
+    return localProducts.find((p) => p.id === id);
+  } catch {
+    return localProducts.find((p) => p.id === id);
+  }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  const [row] = await db
-    .select()
-    .from(productsTable)
-    .where(eq(productsTable.slug, slug));
-  return row ? rowToProduct(row) : undefined;
+  if (!hasDatabase) return localProducts.find((p) => p.slug === slug);
+  try {
+    const [row] = await db
+      .select()
+      .from(productsTable)
+      .where(eq(productsTable.slug, slug));
+    if (row) return rowToProduct(row);
+    return localProducts.find((p) => p.slug === slug);
+  } catch {
+    return localProducts.find((p) => p.slug === slug);
+  }
 }
 
-export async function saveProduct(product: Product & { order?: number }): Promise<void> {
+export async function saveProduct(product: Product & { order?: number; video?: string }): Promise<void> {
   const row = {
     id: product.id,
     slug: product.slug,
@@ -88,6 +101,7 @@ export async function saveProduct(product: Product & { order?: number }): Promis
     colorVariants: product.colorVariants as unknown[],
     features: product.features as string[],
     specs: product.specs as Record<string, string>,
+    video: product.video ?? null,
     rating: product.rating,
     reviewCount: product.reviewCount,
     sortOrder: product.order ?? 999,
@@ -196,9 +210,8 @@ export type SiteConfig = {
       email: string;
       phone: string;
       address: string;
-      instagram: string;
-      twitter: string;
       responseTime: string;
+      socialLinks: { id: string; platform: string; url: string; label: string }[];
     };
     faqs: {
       title: string;
@@ -244,9 +257,8 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
       email: "",
       phone: "",
       address: "",
-      instagram: "",
-      twitter: "",
       responseTime: "",
+      socialLinks: [],
     },
     faqs: { title: "FAQs", subtitle: "", items: [] },
     returns: { title: "Returns", subtitle: "", sections: [] },
@@ -255,16 +267,35 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
 };
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  if (!hasDatabase) return localSiteConfig as unknown as SiteConfig;
+  const fallback = localSiteConfig as unknown as SiteConfig;
+  if (!hasDatabase) return fallback;
   try {
     const [row] = await db
       .select()
       .from(siteConfigTable)
       .where(eq(siteConfigTable.key, "config"));
-    if (!row) return localSiteConfig as unknown as SiteConfig;
-    return row.value as unknown as SiteConfig;
+    if (!row) return fallback;
+    const cfg = row.value as unknown as SiteConfig & {
+      pages?: {
+        contact?: { instagram?: string; twitter?: string; socialLinks?: SiteConfig["pages"]["contact"]["socialLinks"] };
+      };
+    };
+    // Migrate legacy instagram/twitter fields to socialLinks
+    if (cfg.pages?.contact) {
+      const c = cfg.pages.contact;
+      if (!c.socialLinks) {
+        c.socialLinks = [];
+        if ((c as { instagram?: string }).instagram) {
+          c.socialLinks.push({ id: "sl_ig", platform: "Instagram", url: (c as { instagram?: string }).instagram!, label: "Follow us on Instagram" });
+        }
+        if ((c as { twitter?: string }).twitter) {
+          c.socialLinks.push({ id: "sl_tw", platform: "Twitter / X", url: (c as { twitter?: string }).twitter!, label: "Follow us on Twitter" });
+        }
+      }
+    }
+    return cfg as unknown as SiteConfig;
   } catch {
-    return localSiteConfig as unknown as SiteConfig;
+    return fallback;
   }
 }
 

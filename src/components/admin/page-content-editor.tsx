@@ -164,55 +164,280 @@ export function AboutEditor({ initialData }: { initialData: AboutData }) {
 
 // ── Contact Page Editor ──────────────────────────────────────────────────────
 
+type SocialLink = { id: string; platform: string; url: string; label: string };
+
 type ContactData = {
-  title: string; subtitle: string; email: string; phone: string;
-  address: string; instagram: string; twitter: string; responseTime: string;
+  title: string;
+  subtitle: string;
+  email: string;
+  phone: string;
+  address: string;
+  responseTime: string;
+  socialLinks: SocialLink[];
+};
+
+const SOCIAL_PLATFORMS = [
+  "Instagram", "WhatsApp", "Facebook", "Twitter / X", "YouTube",
+  "Pinterest", "LinkedIn", "Snapchat", "TikTok", "Telegram", "Other",
+];
+
+const PLATFORM_ICONS: Record<string, string> = {
+  "Instagram": "📸",
+  "WhatsApp": "💬",
+  "Facebook": "👥",
+  "Twitter / X": "🐦",
+  "YouTube": "▶️",
+  "Pinterest": "📌",
+  "LinkedIn": "💼",
+  "Snapchat": "👻",
+  "TikTok": "🎵",
+  "Telegram": "✈️",
+  "Other": "🔗",
+};
+
+const PLATFORM_PLACEHOLDERS: Record<string, string> = {
+  "Instagram": "https://instagram.com/kibanalife",
+  "WhatsApp": "https://wa.me/919711414110",
+  "Facebook": "https://facebook.com/kibanalife",
+  "Twitter / X": "https://twitter.com/kibanalife",
+  "YouTube": "https://youtube.com/@kibanalife",
+  "Pinterest": "https://pinterest.com/kibanalife",
+  "LinkedIn": "https://linkedin.com/company/kibanalife",
+  "Snapchat": "https://snapchat.com/add/kibanalife",
+  "TikTok": "https://tiktok.com/@kibanalife",
+  "Telegram": "https://t.me/kibanalife",
+  "Other": "https://...",
 };
 
 export function ContactEditor({ initialData }: { initialData: ContactData }) {
-  const [data, setData] = useState<ContactData>(initialData);
+  const [data, setData] = useState<ContactData>({
+    ...initialData,
+    socialLinks: initialData.socialLinks ?? [],
+  });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
-  const set = (key: keyof ContactData, val: string) => setData((d) => ({ ...d, [key]: val }));
+  const [editingId, setEditingId] = useState<string | null>(null);
 
+  const set = (key: keyof Omit<ContactData, "socialLinks">, val: string) =>
+    setData((d) => ({ ...d, [key]: val }));
+
+  // ── Social link helpers ─────────────────────────────────────────────────
+  const addLink = () => {
+    const id = `sl${Date.now()}`;
+    const newLink: SocialLink = { id, platform: "Instagram", url: "", label: "Follow us on Instagram" };
+    setData((d) => ({ ...d, socialLinks: [...d.socialLinks, newLink] }));
+    setEditingId(id);
+  };
+
+  const updateLink = (id: string, patch: Partial<SocialLink>) =>
+    setData((d) => ({
+      ...d,
+      socialLinks: d.socialLinks.map((l) => l.id === id ? { ...l, ...patch } : l),
+    }));
+
+  const removeLink = (id: string) => {
+    setData((d) => ({ ...d, socialLinks: d.socialLinks.filter((l) => l.id !== id) }));
+    if (editingId === id) setEditingId(null);
+  };
+
+  // ── Save ────────────────────────────────────────────────────────────────
   const save = async () => {
     setSaving(true);
     setMsg(null);
     try {
       const res = await fetch("/api/admin/site-config", { method: "GET" });
+      if (!res.ok) throw new Error("Failed to fetch config");
       const config = await res.json();
       config.pages = { ...config.pages, contact: data };
-      const put = await fetch("/api/admin/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(config) });
-      setMsg(put.ok ? { type: "ok", text: "Contact page saved!" } : { type: "err", text: "Error saving." });
-    } finally { setSaving(false); }
+      const put = await fetch("/api/admin/site-config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(config),
+      });
+      setMsg(put.ok
+        ? { type: "ok", text: "Contact page saved! Refresh /contact to see changes." }
+        : { type: "err", text: "Error saving. Please try again." }
+      );
+    } catch {
+      setMsg({ type: "err", text: "Error saving. Check your connection." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="flex flex-col h-full">
       <div className="px-6 py-4 border-b border-gray-100 bg-white flex-shrink-0">
         <h1 className="text-lg font-bold text-gray-900">Contact Page</h1>
-        <p className="text-xs text-gray-400 mt-0.5">Edit content on the /contact page</p>
+        <p className="text-xs text-gray-400 mt-0.5">Edit contact info and social media links shown on /contact</p>
       </div>
       <SaveBar onSave={save} saving={saving} msg={msg} />
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl space-y-5">
+
+          {/* ── Page Heading ──────────────────────────────────────── */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
             <h3 className="text-sm font-bold text-gray-800">Page Heading</h3>
-            <Field label="Title" value={data.title} onChange={(v) => set("title", v)} />
-            <Field label="Subtitle" value={data.subtitle} onChange={(v) => set("subtitle", v)} />
-            <Field label="Response Time Message" value={data.responseTime} onChange={(v) => set("responseTime", v)} placeholder="We typically respond within 24 hours." />
+            <Field label="Title" value={data.title} onChange={(v) => set("title", v)} placeholder="Get in Touch" />
+            <Field label="Subtitle" value={data.subtitle} onChange={(v) => set("subtitle", v)} placeholder="We'd love to hear from you." />
+            <Field
+              label="Response Time Message"
+              value={data.responseTime}
+              onChange={(v) => set("responseTime", v)}
+              placeholder="We typically respond within 24 hours."
+            />
           </div>
+
+          {/* ── Contact Details ───────────────────────────────────── */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
             <h3 className="text-sm font-bold text-gray-800">Contact Details</h3>
             <Field label="Email Address" value={data.email} onChange={(v) => set("email", v)} placeholder="hello@kibanalife.com" />
-            <Field label="Phone Number" value={data.phone} onChange={(v) => set("phone", v)} placeholder="+91 00000 00000" />
-            <TextArea label="Address" value={data.address} onChange={(v) => set("address", v)} rows={3} />
+            <Field label="Phone / WhatsApp Number" value={data.phone} onChange={(v) => set("phone", v)} placeholder="+91 00000 00000" />
+            <TextArea label="Address" value={data.address} onChange={(v) => set("address", v)} rows={3} placeholder="123 Design District, Mumbai, Maharashtra 400001" />
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-            <h3 className="text-sm font-bold text-gray-800">Social Media Links</h3>
-            <Field label="Instagram URL" value={data.instagram} onChange={(v) => set("instagram", v)} placeholder="https://instagram.com/kibanalife" />
-            <Field label="Twitter / X URL" value={data.twitter} onChange={(v) => set("twitter", v)} placeholder="https://twitter.com/kibanalife" />
+
+          {/* ── Social Media Links ────────────────────────────────── */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-violet-50 to-pink-50">
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Social Media Links</h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Add any social profiles — Instagram, WhatsApp, Facebook, YouTube, etc.
+                </p>
+              </div>
+              <button
+                onClick={addLink}
+                className="flex items-center gap-1.5 text-xs px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add Link
+              </button>
+            </div>
+
+            <div className="p-5 space-y-3">
+              {data.socialLinks.length === 0 && (
+                <div className="text-center py-8 text-gray-400">
+                  <p className="text-sm font-medium mb-1">No social links yet</p>
+                  <p className="text-xs">Click &quot;Add Link&quot; to add Instagram, WhatsApp, Facebook, etc.</p>
+                </div>
+              )}
+
+              {data.socialLinks.map((link) => {
+                const isEditing = editingId === link.id;
+                return (
+                  <div
+                    key={link.id}
+                    className={`border-2 rounded-xl overflow-hidden transition-all ${
+                      isEditing ? "border-gray-900" : "border-gray-200"
+                    }`}
+                  >
+                    {/* Row header */}
+                    <div
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                        isEditing ? "bg-gray-900" : "bg-white hover:bg-gray-50"
+                      }`}
+                      onClick={() => setEditingId(isEditing ? null : link.id)}
+                    >
+                      <span className="text-lg leading-none">{PLATFORM_ICONS[link.platform] ?? "🔗"}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-semibold truncate ${isEditing ? "text-white" : "text-gray-800"}`}>
+                          {link.platform}
+                        </p>
+                        <p className={`text-[10px] truncate ${isEditing ? "text-white/50" : "text-gray-400"}`}>
+                          {link.url || <em className="italic">no URL set</em>}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {link.url && (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className={`p-1.5 rounded-lg transition-colors text-xs ${
+                              isEditing ? "text-white/60 hover:text-white hover:bg-white/10" : "text-blue-400 hover:text-blue-600 hover:bg-blue-50"
+                            }`}
+                            title="Open link"
+                          >
+                            ↗
+                          </a>
+                        )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeLink(link.id); }}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            isEditing ? "text-red-300 hover:text-red-100 hover:bg-red-900/30" : "text-gray-300 hover:text-red-500 hover:bg-red-50"
+                          }`}
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                        {isEditing
+                          ? <ChevronUp className="h-4 w-4 text-white/60" />
+                          : <ChevronDown className="h-4 w-4 text-gray-400" />
+                        }
+                      </div>
+                    </div>
+
+                    {/* Expanded edit form */}
+                    {isEditing && (
+                      <div className="p-4 space-y-3 bg-gray-50 border-t border-gray-200">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            Platform
+                          </label>
+                          <select
+                            value={link.platform}
+                            onChange={(e) => {
+                              const p = e.target.value;
+                              updateLink(link.id, {
+                                platform: p,
+                                label: `Follow us on ${p}`,
+                              });
+                            }}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 bg-white transition-colors"
+                          >
+                            {SOCIAL_PLATFORMS.map((p) => (
+                              <option key={p} value={p}>{PLATFORM_ICONS[p]} {p}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            URL <span className="text-red-400">*</span>
+                          </label>
+                          <input
+                            type="url"
+                            value={link.url}
+                            onChange={(e) => updateLink(link.id, { url: e.target.value })}
+                            placeholder={PLATFORM_PLACEHOLDERS[link.platform] ?? "https://..."}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-400 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            Label (tooltip / accessibility)
+                          </label>
+                          <input
+                            type="text"
+                            value={link.label}
+                            onChange={(e) => updateLink(link.id, { label: e.target.value })}
+                            placeholder={`Follow us on ${link.platform}`}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-400 transition-colors"
+                          />
+                        </div>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="w-full py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          Done editing
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
         </div>
       </div>
     </div>
