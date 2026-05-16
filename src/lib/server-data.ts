@@ -8,6 +8,11 @@ import {
 } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import type { Product } from "@/types/product";
+import { products as localProducts } from "@/lib/data";
+import localCategories from "@/data/categories.json";
+import localSiteConfig from "@/data/site-config.json";
+
+const hasDatabase = !!process.env.DATABASE_URL;
 
 // ── Products ─────────────────────────────────────────────────────────────────
 
@@ -36,6 +41,7 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
+  if (!hasDatabase) return localProducts;
   const rows = await db
     .select()
     .from(productsTable)
@@ -118,6 +124,7 @@ function rowToCategory(row: typeof categoriesTable.$inferSelect): AdminCategory 
 }
 
 export async function getCategories(): Promise<AdminCategory[]> {
+  if (!hasDatabase) return localCategories as AdminCategory[];
   const rows = await db
     .select()
     .from(categoriesTable)
@@ -235,6 +242,7 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
 };
 
 export async function getSiteConfig(): Promise<SiteConfig> {
+  if (!hasDatabase) return localSiteConfig as unknown as SiteConfig;
   const [row] = await db
     .select()
     .from(siteConfigTable)
