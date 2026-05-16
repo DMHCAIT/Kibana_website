@@ -42,11 +42,15 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 
 export async function getProducts(): Promise<Product[]> {
   if (!hasDatabase) return localProducts;
-  const rows = await db
-    .select()
-    .from(productsTable)
-    .orderBy(asc(productsTable.sortOrder));
-  return rows.map(rowToProduct);
+  try {
+    const rows = await db
+      .select()
+      .from(productsTable)
+      .orderBy(asc(productsTable.sortOrder));
+    return rows.length ? rows.map(rowToProduct) : localProducts;
+  } catch {
+    return localProducts;
+  }
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
@@ -125,11 +129,15 @@ function rowToCategory(row: typeof categoriesTable.$inferSelect): AdminCategory 
 
 export async function getCategories(): Promise<AdminCategory[]> {
   if (!hasDatabase) return localCategories as AdminCategory[];
-  const rows = await db
-    .select()
-    .from(categoriesTable)
-    .orderBy(asc(categoriesTable.sortOrder));
-  return rows.map(rowToCategory);
+  try {
+    const rows = await db
+      .select()
+      .from(categoriesTable)
+      .orderBy(asc(categoriesTable.sortOrder));
+    return rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
+  } catch {
+    return localCategories as AdminCategory[];
+  }
 }
 
 export async function saveCategory(cat: AdminCategory): Promise<void> {
@@ -243,12 +251,16 @@ const DEFAULT_SITE_CONFIG: SiteConfig = {
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   if (!hasDatabase) return localSiteConfig as unknown as SiteConfig;
-  const [row] = await db
-    .select()
-    .from(siteConfigTable)
-    .where(eq(siteConfigTable.key, "config"));
-  if (!row) return DEFAULT_SITE_CONFIG;
-  return row.value as unknown as SiteConfig;
+  try {
+    const [row] = await db
+      .select()
+      .from(siteConfigTable)
+      .where(eq(siteConfigTable.key, "config"));
+    if (!row) return localSiteConfig as unknown as SiteConfig;
+    return row.value as unknown as SiteConfig;
+  } catch {
+    return localSiteConfig as unknown as SiteConfig;
+  }
 }
 
 export async function saveSiteConfig(config: SiteConfig): Promise<void> {
@@ -288,8 +300,13 @@ function rowToUser(row: typeof usersTable.$inferSelect): AdminUser {
 }
 
 export async function getUsers(): Promise<AdminUser[]> {
-  const rows = await db.select().from(usersTable);
-  return rows.map(rowToUser);
+  if (!hasDatabase) return [];
+  try {
+    const rows = await db.select().from(usersTable);
+    return rows.map(rowToUser);
+  } catch {
+    return [];
+  }
 }
 
 export async function recordUserLogin(user: {
@@ -359,8 +376,13 @@ function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
 }
 
 export async function getOrders(): Promise<AdminOrder[]> {
-  const rows = await db.select().from(ordersTable);
-  return rows.map(rowToOrder);
+  if (!hasDatabase) return [];
+  try {
+    const rows = await db.select().from(ordersTable);
+    return rows.map(rowToOrder);
+  } catch {
+    return [];
+  }
 }
 
 export async function saveOrder(order: AdminOrder): Promise<void> {
