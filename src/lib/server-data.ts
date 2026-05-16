@@ -214,6 +214,7 @@ export type SiteConfig = {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_SITE_CONFIG: SiteConfig = {
   hero: {
     title: "Kibana",
