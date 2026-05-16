@@ -8,9 +8,6 @@ import * as schema from "./schema";
 // Pooler URL format: postgresql://postgres.{ref}:{password}@aws-0-{region}.pooler.supabase.com:6543/postgres
 const connectionString = process.env.DATABASE_URL;
 
-// Detect if we're using the Supabase pooler (port 6543) to enable pgbouncer mode
-const isPooler = connectionString?.includes(":6543");
-
 declare global {
   // eslint-disable-next-line no-var
   var __kibana_pg: ReturnType<typeof postgres> | undefined;
@@ -19,11 +16,11 @@ declare global {
 const client =
   globalThis.__kibana_pg ??
   postgres(connectionString ?? "postgres://invalid", {
-    prepare: false,          // Required for both pooler and direct on serverless
+    prepare: false,          // Required for serverless
     max: 1,                  // Keep connections low on serverless
-    connect_timeout: 5,
-    idle_timeout: 10,
-    ...(isPooler ? { ssl: "require" } : {}),
+    connect_timeout: 10,
+    idle_timeout: 20,
+    ssl: "require",          // Always require SSL for Supabase
   });
 
 if (process.env.NODE_ENV !== "production") globalThis.__kibana_pg = client;
