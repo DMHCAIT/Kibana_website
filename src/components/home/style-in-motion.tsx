@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
 import { Leaf, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import type { Product } from "@/types/product";
 
 const FALLBACK_TILES = [

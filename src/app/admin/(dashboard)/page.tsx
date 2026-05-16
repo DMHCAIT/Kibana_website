@@ -12,7 +12,7 @@ export default async function AdminDashboard() {
   const totalCategories = categories.length;
   const bestSellers = products.filter((p) => p.isBestSeller).length;
   const newArrivals = products.filter((p) => p.isNew).length;
-  const trending = products.filter((p) => p.isTrending).length;
+  const _trending = products.filter((p) => p.isTrending).length;
 
   const stats = [
     { label: "Total Products", value: totalProducts, icon: Package, bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-100" },

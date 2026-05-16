@@ -30,7 +30,7 @@ export default async function AnalyticsPage() {
   const dayMs = 86_400_000;
   const todayLogins = users.filter((u) => now.getTime() - new Date(u.loginAt).getTime() < dayMs).length;
   const weekLogins = users.filter((u) => now.getTime() - new Date(u.loginAt).getTime() < 7 * dayMs).length;
-  const monthLogins = users.filter((u) => now.getTime() - new Date(u.loginAt).getTime() < 30 * dayMs).length;
+  const _monthLogins = users.filter((u) => now.getTime() - new Date(u.loginAt).getTime() < 30 * dayMs).length;
   const totalLogins = users.reduce((s, u) => s + (u.loginCount ?? 1), 0);
   const avgLogins = users.length ? Math.round(totalLogins / users.length) : 0;
 

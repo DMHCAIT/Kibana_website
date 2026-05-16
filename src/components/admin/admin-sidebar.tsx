@@ -7,7 +7,7 @@ import { useState } from "react";
 import {
   LayoutDashboard, Package, Tag, LogOut, ExternalLink,
   Home, Settings, Users, ShoppingCart, ChevronDown, ChevronRight,
-  Plus, FileText, HelpCircle, RotateCcw, Store, Phone, BookOpen,
+  HelpCircle, RotateCcw, Store, Phone, BookOpen,
   TrendingUp, Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
