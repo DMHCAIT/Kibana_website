@@ -1,0 +1,193 @@
+[
+  {
+    "id": "ord-001",
+    "user": {
+      "name": "Priya Sharma",
+      "phone": "9876543210",
+      "email": "priya@email.com"
+    },
+    "items": [
+      {
+        "productId": "p1",
+        "name": "Vistara Tote Bag",
+        "price": 2499,
+        "quantity": 1,
+        "image": "/extracted/img-001.jpg",
+        "color": "Teal Blue"
+      }
+    ],
+    "total": 2499,
+    "placedAt": "2026-05-14T09:23:00Z",
+    "status": "delivered",
+    "shippingAddress": "42 MG Road Koramangala Bangalore 560034",
+    "paymentMethod": "UPI",
+    "paymentStatus": "paid",
+    "trackingId": "DELHIVERY2345678"
+  },
+  {
+    "id": "ord-002",
+    "user": {
+      "name": "Ananya Iyer",
+      "phone": "9123456780",
+      "email": "ananya@email.com"
+    },
+    "items": [
+      {
+        "productId": "p2",
+        "name": "Horizon Laptop Bag",
+        "price": 3299,
+        "quantity": 1,
+        "image": "/extracted/img-002.jpg",
+        "color": "Mocha"
+      }
+    ],
+    "total": 3299,
+    "placedAt": "2026-05-13T14:10:00Z",
+    "status": "shipped",
+    "shippingAddress": "8 Anna Nagar Chennai 600040",
+    "paymentMethod": "Card",
+    "paymentStatus": "paid",
+    "trackingId": "BLUEDART9876543"
+  },
+  {
+    "id": "ord-003",
+    "user": {
+      "name": "Ritu Kapoor",
+      "phone": "9988776655",
+      "email": "ritu@email.com"
+    },
+    "items": [
+      {
+        "productId": "p4",
+        "name": "Cascade Clutch",
+        "price": 1599,
+        "quantity": 2,
+        "image": "/extracted/img-004.jpg",
+        "color": "Rose Gold"
+      }
+    ],
+    "total": 3198,
+    "placedAt": "2026-05-12T11:45:00Z",
+    "status": "processing",
+    "shippingAddress": "15 Banjara Hills Hyderabad 500034",
+    "paymentMethod": "COD",
+    "paymentStatus": "pending",
+    "trackingId": null
+  },
+  {
+    "id": "ord-004",
+    "user": {
+      "name": "Meera Nair",
+      "phone": "8765432109",
+      "email": "meera@email.com"
+    },
+    "items": [
+      {
+        "productId": "p1",
+        "name": "Vistara Tote Bag",
+        "price": 2499,
+        "quantity": 1,
+        "image": "/extracted/img-001.jpg",
+        "color": "Mint Green"
+      },
+      {
+        "productId": "p5",
+        "name": "Aria Backpack",
+        "price": 2799,
+        "quantity": 1,
+        "image": "/extracted/img-005.jpg",
+        "color": "Black"
+      }
+    ],
+    "total": 5298,
+    "placedAt": "2026-05-11T16:30:00Z",
+    "status": "delivered",
+    "shippingAddress": "23 Marine Drive Mumbai 400002",
+    "paymentMethod": "UPI",
+    "paymentStatus": "paid",
+    "trackingId": "EKART1234567"
+  },
+  {
+    "id": "ord-005",
+    "user": {
+      "name": "Sunita Reddy",
+      "phone": "7654321098",
+      "email": "sunita@email.com"
+    },
+    "items": [
+      {
+        "productId": "p3",
+        "name": "Nomad Sling",
+        "price": 1899,
+        "quantity": 1,
+        "image": "/extracted/img-003.jpg",
+        "color": "Tan"
+      }
+    ],
+    "total": 1899,
+    "placedAt": "2026-05-10T08:15:00Z",
+    "status": "pending",
+    "shippingAddress": "7 Connaught Place New Delhi 110001",
+    "paymentMethod": "Card",
+    "paymentStatus": "paid",
+    "trackingId": null
+  },
+  {
+    "id": "ord-006",
+    "user": {
+      "name": "Deepa Verma",
+      "phone": "6543210987",
+      "email": "deepa@email.com"
+    },
+    "items": [
+      {
+        "productId": "p2",
+        "name": "Horizon Laptop Bag",
+        "price": 3299,
+        "quantity": 1,
+        "image": "/extracted/img-002.jpg",
+        "color": "Black"
+      },
+      {
+        "productId": "p4",
+        "name": "Cascade Clutch",
+        "price": 1599,
+        "quantity": 1,
+        "image": "/extracted/img-004.jpg",
+        "color": "Nude"
+      }
+    ],
+    "total": 4898,
+    "placedAt": "2026-05-08T13:20:00Z",
+    "status": "cancelled",
+    "shippingAddress": "11 Park Street Kolkata 700016",
+    "paymentMethod": "UPI",
+    "paymentStatus": "refunded",
+    "trackingId": null
+  },
+  {
+    "id": "ord-007",
+    "user": {
+      "name": "Kavya Menon",
+      "phone": "5432109876",
+      "email": "kavya@email.com"
+    },
+    "items": [
+      {
+        "productId": "p5",
+        "name": "Aria Backpack",
+        "price": 2799,
+        "quantity": 1,
+        "image": "/extracted/img-005.jpg",
+        "color": "Navy"
+      }
+    ],
+    "total": 2799,
+    "placedAt": "2026-05-05T10:00:00Z",
+    "status": "delivered",
+    "shippingAddress": "4 Jubilee Hills Hyderabad 500033",
+    "paymentMethod": "Card",
+    "paymentStatus": "paid",
+    "trackingId": "AMAZON7654321"
+  }
+]

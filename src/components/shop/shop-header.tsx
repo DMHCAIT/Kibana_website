@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { categories } from "@/lib/data";
+import { categories as staticCategories } from "@/lib/data";
 import { SortSelect } from "@/app/shop/sort-select";
 import { cn } from "@/lib/utils";
+
+type Cat = { slug: string; name: string; image: string };
 
 type Props = {
   heading: string;
@@ -10,9 +12,11 @@ type Props = {
   activeCat?: string;
   sort?: string;
   showSort?: boolean;
+  categories?: Cat[];
 };
 
-export function ShopHeader({ heading, count, activeCat, sort = "featured", showSort = true }: Props) {
+export function ShopHeader({ heading, count, activeCat, sort = "featured", showSort = true, categories }: Props) {
+  const cats = categories ?? staticCategories;
   return (
     <div className="mb-6">
       {/* Title row */}
@@ -47,7 +51,7 @@ export function ShopHeader({ heading, count, activeCat, sort = "featured", showS
             All
           </Link>
         </li>
-        {categories.map((c) => (
+        {cats.map((c) => (
           <li key={c.slug}>
             <Link
               href={`/shop?cat=${c.slug}`}

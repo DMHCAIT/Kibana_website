@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
-import { products, categories } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/server-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kibana.example";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [products, categories] = await Promise.all([getProducts(), getCategories()]);
+
   const staticEntries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/shop`, changeFrequency: "daily", priority: 0.9 },

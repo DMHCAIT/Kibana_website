@@ -1,17 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
-import { products } from "@/lib/data";
+import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 
 export default function WishlistPage() {
   const { user, openAuthModal, _hasHydrated } = useAuth();
   const { items } = useWishlist();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then(setAllProducts)
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (_hasHydrated && !user) {
@@ -40,7 +48,7 @@ export default function WishlistPage() {
     );
   }
 
-  const wishlistProducts = products.filter((p) => items.includes(p.id));
+  const wishlistProducts = allProducts.filter((p) => items.includes(p.id));
 
   if (wishlistProducts.length === 0) {
     return (

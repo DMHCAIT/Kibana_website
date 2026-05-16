@@ -1,10 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
+import { ProductCard } from "@/components/product/product-card";
+import type { Product } from "@/types/product";
 
-const PRODUCT_SLUG = "north-backpack";
+const FALLBACK_SLUG = "north-backpack";
 
-export function BestSellers() {
+export function BestSellers({ products = [] }: { products?: Product[] }) {
+  // If admin has assigned specific products → show them as a product grid
+  if (products.length > 0) {
+    return (
+      <section className="container py-6 md:py-10">
+        <SectionHeading title="Best Sellers" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Fallback: original banner layout
   return (
     <section className="container py-6 md:py-10">
       <SectionHeading title="Best Sellers" />
@@ -13,7 +30,7 @@ export function BestSellers() {
       <div className="relative flex h-56 sm:h-72 md:h-[380px] lg:h-[480px] overflow-hidden">
 
         {/* Left image — back view */}
-        <Link href={`/shop/${PRODUCT_SLUG}`} className="relative w-1/2 overflow-hidden">
+        <Link href={`/shop/${FALLBACK_SLUG}`} className="relative w-1/2 overflow-hidden">
           <Image
             src="/extracted/backpack-left.png"
             alt="Best seller — back view"
@@ -24,7 +41,7 @@ export function BestSellers() {
         </Link>
 
         {/* Right image — shows right half of diptych (holding view) */}
-        <Link href={`/shop/${PRODUCT_SLUG}`} className="relative w-1/2 overflow-hidden">
+        <Link href={`/shop/${FALLBACK_SLUG}`} className="relative w-1/2 overflow-hidden">
           <Image
             src="/extracted/img-050.jpg"
             alt="Best seller — front view"
@@ -41,7 +58,7 @@ export function BestSellers() {
               GOT<br />YOUR<br />BACK
             </h2>
             <Link
-              href={`/shop/${PRODUCT_SLUG}`}
+              href={`/shop/${FALLBACK_SLUG}`}
               className="bg-white text-kibana-ink text-[10px] sm:text-xs font-light tracking-[0.25em] uppercase px-5 sm:px-7 py-2.5 hover:bg-kibana-ink hover:text-white transition-colors whitespace-nowrap"
             >
               SHOP NOW

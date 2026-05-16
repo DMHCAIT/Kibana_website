@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
+import { getSiteConfig } from "@/lib/server-data";
 import { Footer } from "@/components/layout/footer";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { CookiesBanner } from "@/components/layout/cookies-banner";
@@ -37,12 +38,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const config = await getSiteConfig();
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-dvh flex flex-col">
         <Providers>
-          <Header />
+          <Header announcementText={config.announcementBar} />
           <AuthModal />
           <AuthAutoPopup />
           <CookiesBanner />

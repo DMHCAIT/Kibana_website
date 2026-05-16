@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
-import { products, getProductBySlug } from "@/lib/data";
+import { getProducts, getProductBySlug } from "@/lib/server-data";
 
 export const productsRouter = router({
   list: publicProcedure
@@ -13,8 +13,8 @@ export const productsRouter = router({
         })
         .default({ limit: 24 }),
     )
-    .query(({ input }) => {
-      let items = products;
+    .query(async ({ input }) => {
+      let items = await getProducts();
       if (input.category) items = items.filter((p) => p.category === input.category);
       if (input.gender) items = items.filter((p) => p.gender === input.gender);
       return items.slice(0, input.limit);
@@ -22,7 +22,10 @@ export const productsRouter = router({
 
   bySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
-    .query(({ input }) => getProductBySlug(input.slug)),
+    .query(async ({ input }) => getProductBySlug(input.slug)),
 
-  trending: publicProcedure.query(() => products.filter((p) => p.isTrending)),
+  trending: publicProcedure.query(async () => {
+    const items = await getProducts();
+    return items.filter((p) => p.isTrending);
+  }),
 });

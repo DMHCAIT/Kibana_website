@@ -1,8 +1,8 @@
-import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
+import type { Product } from "@/types/product";
 
-export function NewArrivals() {
+export function NewArrivals({ products }: { products: Product[] }) {
   const items = products.filter((p) => p.isNew).slice(0, 4);
   return (
     <section className="container py-6 md:py-10">

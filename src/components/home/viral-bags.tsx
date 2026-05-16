@@ -1,8 +1,8 @@
-import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
+import type { Product } from "@/types/product";
 
-export function ViralBags() {
+export function ViralBags({ products }: { products: Product[] }) {
   const items = products.filter((p) => p.isTrending).slice(0, 3);
   return (
     <section className="container py-4 md:py-8">

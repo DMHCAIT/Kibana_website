@@ -3,92 +3,87 @@ import {
   text,
   integer,
   boolean,
+  real,
   timestamp,
-  uuid,
-  numeric,
-  pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
-export const genderEnum = pgEnum("gender", ["men", "women", "unisex"]);
-export const categoryEnum = pgEnum("category", [
-  "tote-bag",
-  "laptop-bag",
-  "sling-bag",
-  "bucket-bag",
-  "backpack",
-  "wallet",
-]);
-export const orderStatusEnum = pgEnum("order_status", [
-  "pending",
-  "paid",
-  "shipped",
-  "delivered",
-  "cancelled",
-  "refunded",
-]);
-
+// ── Products ─────────────────────────────────────────────────────────────────
 export const products = pgTable("products", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  price: integer("price_in_paise").notNull(),
-  compareAtPrice: integer("compare_at_price_in_paise"),
-  image: text("image").notNull(),
-  gallery: text("gallery").array().notNull().default([]),
-  category: categoryEnum("category").notNull(),
-  gender: genderEnum("gender").notNull().default("women"),
+  name: text("name").notNull().default(""),
+  description: text("description").notNull().default(""),
+  price: integer("price").notNull().default(0),
+  compareAtPrice: integer("compare_at_price"),
+  image: text("image").notNull().default(""),
+  gallery: jsonb("gallery").$type<string[]>().notNull().default([]),
+  category: text("category").notNull().default(""),
+  gender: text("gender").notNull().default("women"),
   isNew: boolean("is_new").notNull().default(false),
   isBestSeller: boolean("is_best_seller").notNull().default(false),
   isTrending: boolean("is_trending").notNull().default(false),
-  colors: text("colors").array().notNull().default([]),
-  rating: numeric("rating", { precision: 3, scale: 2 }).notNull().default("0"),
+  inStock: boolean("in_stock").notNull().default(true),
+  colors: jsonb("colors").$type<string[]>().notNull().default([]),
+  colorVariants: jsonb("color_variants").$type<unknown[]>().notNull().default([]),
+  features: jsonb("features").$type<string[]>().notNull().default([]),
+  specs: jsonb("specs").$type<Record<string, string>>().notNull().default({}),
+  video: text("video").default(""),
+  rating: real("rating").notNull().default(0),
   reviewCount: integer("review_count").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(999),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── Categories ───────────────────────────────────────────────────────────────
+export const categories = pgTable("categories", {
+  slug: text("slug").primaryKey(),
+  name: text("name").notNull(),
+  image: text("image").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(999),
+});
+
+// ── Orders ────────────────────────────────────────────────────────────────────
 export const orders = pgTable("orders", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id"), // FK to auth.users
-  email: text("email").notNull(),
-  status: orderStatusEnum("status").notNull().default("pending"),
-  subtotal: integer("subtotal_in_paise").notNull(),
-  shipping: integer("shipping_in_paise").notNull().default(0),
-  total: integer("total_in_paise").notNull(),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  id: text("id").primaryKey(),
+  user: jsonb("user").$type<{ name: string; phone: string; email?: string } | null>(),
+  items: jsonb("items")
+    .$type<{ productId: string; name: string; price: number; quantity: number; image: string; color?: string }[]>()
+    .notNull()
+    .default([]),
+  total: integer("total").notNull().default(0),
+  status: text("status")
+    .$type<"pending" | "processing" | "shipped" | "delivered" | "cancelled">()
+    .notNull()
+    .default("pending"),
+  shippingAddress: text("shipping_address"),
+  paymentMethod: text("payment_method"),
+  paymentStatus: text("payment_status").$type<"paid" | "pending" | "refunded">().default("pending"),
+  trackingId: text("tracking_id"),
+  placedAt: timestamp("placed_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const orderItems = pgTable("order_items", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  orderId: uuid("order_id")
-    .notNull()
-    .references(() => orders.id, { onDelete: "cascade" }),
-  productId: uuid("product_id")
-    .notNull()
-    .references(() => products.id, { onDelete: "restrict" }),
-  quantity: integer("quantity").notNull(),
-  priceAtPurchase: integer("price_at_purchase_in_paise").notNull(),
+// ── Storefront users (login tracking) ─────────────────────────────────────────
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().default(""),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  loginAt: timestamp("login_at", { withTimezone: true }).defaultNow().notNull(),
+  loginCount: integer("login_count").notNull().default(1),
+  registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const ordersRelations = relations(orders, ({ many }) => ({
-  items: many(orderItems),
-}));
+// ── Site config (single JSON blob, key = "config") ────────────────────────────
+export const siteConfig = pgTable("site_config", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
 
-export const orderItemsRelations = relations(orderItems, ({ one }) => ({
-  order: one(orders, {
-    fields: [orderItems.orderId],
-    references: [orders.id],
-  }),
-  product: one(products, {
-    fields: [orderItems.productId],
-    references: [products.id],
-  }),
-}));
-
+// Inferred types
 export type ProductRow = typeof products.$inferSelect;
-export type NewProductRow = typeof products.$inferInsert;
+export type CategoryRow = typeof categories.$inferSelect;
 export type OrderRow = typeof orders.$inferSelect;
-export type OrderItemRow = typeof orderItems.$inferSelect;
+export type UserRow = typeof users.$inferSelect;

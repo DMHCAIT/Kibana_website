@@ -80,6 +80,12 @@ export const useAuth = create<AuthState>()(
         }
         const user: AuthUser = { id: entry.id, phone: normalized, name: entry.name };
         set({ user, showAuthModal: false });
+        // Track login for admin users panel
+        fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        }).catch(() => {});
         return {};
       },
 
@@ -100,6 +106,12 @@ export const useAuth = create<AuthState>()(
         saveCredStore(creds);
         const user: AuthUser = { id, phone: normalized, name: name.trim() };
         set({ user, showAuthModal: false });
+        // Track signup for admin users panel
+        fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        }).catch(() => {});
         return {};
       },
 

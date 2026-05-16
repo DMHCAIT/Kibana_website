@@ -1,64 +1,60 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
-import { products } from "@/lib/data";
+import { products as staticProducts } from "@/lib/data";
+import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
+import type { Product } from "@/types/product";
 
-const trendingProducts = products.filter((p) => p.isTrending);
 
-export function MostTrending() {
-  const [current, setCurrent] = useState(0);
-  const total = trendingProducts.length;
+export function MostTrending({ products: propProducts }: { products?: Product[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const trendingProducts = (propProducts ?? staticProducts).filter((p) => p.isTrending).slice(0, 6);
 
-  const next = () => setCurrent((prev) => (prev + 2) % total);
-  const prev = () => setCurrent((prev) => (prev - 2 + total) % total);
-
-  const visible = [
-    trendingProducts[current % total],
-    trendingProducts[(current + 1) % total],
-  ];
+  const scroll = (dir: "left" | "right") => {
+    if (!scrollRef.current) return;
+    const card = scrollRef.current.querySelector("[data-card]") as HTMLElement | null;
+    const amount = card ? card.offsetWidth + 12 : 280;
+    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   return (
     <section className="container py-6 md:py-10">
       <SectionHeading title="Most Trending" />
       <div className="relative">
-        {/* Prev arrow — inside left edge */}
+        {/* Left arrow */}
         <button
-          onClick={prev}
+          onClick={() => scroll("left")}
           aria-label="Previous"
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 text-white drop-shadow-md hover:scale-110 transition-transform"
+          className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 bg-white border border-border shadow-sm p-1.5 hover:bg-muted transition-colors"
         >
-          <ChevronLeft className="h-7 w-7" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
 
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          {visible.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/shop/${p.slug}`}
-              className="group relative block overflow-hidden bg-kibana-cream aspect-[3/5] sm:aspect-[4/5]"
+        {/* Scrollable card row */}
+        <div
+          ref={scrollRef}
+          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-1"
+        >
+          {trendingProducts.map((p) => (
+            <div
+              key={p.id}
+              data-card
+              className="flex-shrink-0 w-[calc(50%-6px)] sm:w-[calc(33.333%-8px)] md:w-[calc(33.333%-8px)]"
             >
-              <Image
-                src={p.image}
-                alt={p.name}
-                fill
-                sizes="(max-width: 640px) 50vw, 45vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </Link>
+              <ProductCard product={p} variant="compact" />
+            </div>
           ))}
         </div>
 
-        {/* Next arrow — inside right edge */}
+        {/* Right arrow */}
         <button
-          onClick={next}
+          onClick={() => scroll("right")}
           aria-label="Next"
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 text-white drop-shadow-md hover:scale-110 transition-transform"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 bg-white border border-border shadow-sm p-1.5 hover:bg-muted transition-colors"
         >
-          <ChevronRight className="h-7 w-7" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
     </section>

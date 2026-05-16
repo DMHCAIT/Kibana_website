@@ -1,0 +1,257 @@
+[
+  {
+    "id": "p1", "slug": "vistara-tote-bag", "name": "Vistara Tote Bag",
+    "description": "Spacious vegan leather tote with dual handles and a magnetic closure. Available in four fresh colourways — ideal for work and everyday carry.",
+    "price": 4999, "compareAtPrice": 6499,
+    "image": "/extracted/img-010.jpg",
+    "gallery": ["/extracted/img-011.png", "/extracted/img-012.jpg", "/extracted/img-013.png", "/extracted/img-014.jpg"],
+    "category": "tote-bag", "gender": "women",
+    "isBestSeller": true, "isTrending": true,
+    "colors": ["#2D8B8B", "#98D8C8", "#8B6456", "#B8D4E0"],
+    "colorVariants": [
+      { "color": "#2D8B8B", "image": "/extracted/img-010.jpg", "slug": "teal-blue" },
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" },
+      { "color": "#8B6456", "image": "/extracted/img-090.jpg", "slug": "mocha" },
+      { "color": "#B8D4E0", "image": "/extracted/img-070.jpg", "slug": "milky-blue" }
+    ],
+    "features": ["Vegan leather body", "Magnetic snap closure", "Dual top handles", "Interior zip pocket", "Spacious main compartment"],
+    "specs": { "Dimensions": "16 × 13 × 4 inches", "Weight": "697g", "Material": "Vegan Leather", "Closure": "Magnetic Snap" },
+    "rating": 4.6, "reviewCount": 94, "order": 1
+  },
+  {
+    "id": "p2", "slug": "prizma-sling-bag", "name": "Prizma Sling Bag",
+    "description": "Compact vegan leather sling bag with an adjustable crossbody strap and top zip closure. Four vibrant colourways.",
+    "price": 4999, "compareAtPrice": 6499,
+    "image": "/extracted/img-090.jpg",
+    "gallery": ["/extracted/img-091.png", "/extracted/img-092.jpg", "/extracted/img-093.png", "/extracted/img-094.jpg"],
+    "category": "sling-bag", "gender": "women",
+    "isBestSeller": true, "isTrending": true,
+    "colors": ["#2D8B8B", "#98D8C8", "#8B6456", "#B8D4E0"],
+    "colorVariants": [
+      { "color": "#2D8B8B", "image": "/extracted/img-090.jpg", "slug": "teal-blue" },
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" },
+      { "color": "#8B6456", "image": "/extracted/img-070.jpg", "slug": "mocha" },
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" }
+    ],
+    "features": ["Vegan leather body", "Adjustable crossbody strap", "Top zip closure", "Interior slip pocket", "Compact & lightweight"],
+    "specs": { "Dimensions": "12 × 7 × 4 inches", "Weight": "529g", "Material": "Vegan Leather", "Closure": "Top Zipper" },
+    "rating": 4.6, "reviewCount": 78, "order": 2
+  },
+  {
+    "id": "p3", "slug": "vistapack", "name": "Vistapack",
+    "description": "Structured vegan leather backpack with a padded back panel and dedicated laptop sleeve. Four colourways.",
+    "price": 5499, "compareAtPrice": 6999,
+    "image": "/extracted/img-051.png",
+    "gallery": ["/extracted/img-052.jpg", "/extracted/img-053.png", "/extracted/img-054.jpg", "/extracted/img-055.png"],
+    "category": "backpack", "gender": "women",
+    "isBestSeller": true,
+    "colors": ["#2D8B8B", "#B8D4E0", "#A07850", "#98D8C8"],
+    "colorVariants": [
+      { "color": "#2D8B8B", "image": "/extracted/img-051.png", "slug": "teal-blue" },
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" },
+      { "color": "#A07850", "image": "/extracted/img-070.jpg", "slug": "mocha-tan" },
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" }
+    ],
+    "features": ["Vegan leather body", "Padded laptop sleeve", "Adjustable shoulder straps", "Multiple compartments", "Ergonomic back panel"],
+    "specs": { "Dimensions": "12 × 8 × 4 inches", "Weight": "770g", "Material": "Vegan Leather", "Closure": "Top Zipper" },
+    "rating": 4.7, "reviewCount": 112, "order": 3
+  },
+  {
+    "id": "p4", "slug": "sandesh-laptop-bag", "name": "Sandesh Laptop Bag",
+    "description": "Premium vegan leather laptop bag with a dedicated padded sleeve for up to 15\" laptops. Four colourways.",
+    "price": 6999, "compareAtPrice": 8999,
+    "image": "/extracted/img-100.jpg",
+    "gallery": ["/extracted/img-101.png", "/extracted/img-102.jpg", "/extracted/img-103.png", "/extracted/img-104.jpg"],
+    "category": "laptop-bag", "gender": "women",
+    "isBestSeller": true,
+    "colors": ["#2D8B8B", "#98D8C8", "#A07850", "#B8D4E0"],
+    "colorVariants": [
+      { "color": "#2D8B8B", "image": "/extracted/img-100.jpg", "slug": "teal-blue" },
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" },
+      { "color": "#A07850", "image": "/extracted/img-070.jpg", "slug": "mocha-tan" },
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" }
+    ],
+    "features": ["Fits 15\" laptop", "Premium vegan leather", "Padded laptop sleeve", "Organizer pockets", "Detachable shoulder strap"],
+    "specs": { "Dimensions": "12 × 8 × 4 inches", "Weight": "1340g", "Material": "Vegan Leather", "Closure": "Top Zipper" },
+    "rating": 4.7, "reviewCount": 96, "order": 4
+  },
+  {
+    "id": "p5", "slug": "lekha-wallet", "name": "Lekha Wallet",
+    "description": "Compact vegan leather wallet with multiple card slots and a zippered coin pocket. Four fresh colourways.",
+    "price": 2199, "compareAtPrice": 2999,
+    "image": "/extracted/img-060.jpg",
+    "gallery": ["/extracted/img-061.png", "/extracted/img-062.jpg", "/extracted/img-063.png"],
+    "category": "clutch", "gender": "women",
+    "colors": ["#40E0D0", "#98D8C8", "#8B6456", "#B8D4E0"],
+    "colorVariants": [
+      { "color": "#40E0D0", "image": "/extracted/img-060.jpg", "slug": "turquoise-blue" },
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" },
+      { "color": "#8B6456", "image": "/extracted/img-090.jpg", "slug": "mocha" },
+      { "color": "#B8D4E0", "image": "/extracted/img-070.jpg", "slug": "milky-blue" }
+    ],
+    "features": ["Vegan leather exterior", "Multiple card slots", "Zip coin pocket", "Bill compartment", "Compact bi-fold design"],
+    "specs": { "Dimensions": "8.5 × 4.5 inches", "Weight": "263g", "Material": "Vegan Leather", "Closure": "Bi-fold" },
+    "rating": 4.4, "reviewCount": 58, "order": 5
+  },
+  {
+    "id": "p6", "slug": "zippy-wallet", "name": "Zippy Wallet",
+    "description": "Zip-around wallet in vegan leather with a full-length bill compartment and card slots. Four colourways.",
+    "price": 1999, "compareAtPrice": 2699,
+    "image": "/extracted/img-080.jpg",
+    "gallery": ["/extracted/img-081.png", "/extracted/img-082.jpg", "/extracted/img-083.png"],
+    "category": "wallet", "gender": "women",
+    "colors": ["#98D8C8", "#B8D4E0", "#A07850", "#2D8B8B"],
+    "colorVariants": [
+      { "color": "#98D8C8", "image": "/extracted/img-080.jpg", "slug": "mint-green" },
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" },
+      { "color": "#A07850", "image": "/extracted/img-070.jpg", "slug": "mocha-tan" },
+      { "color": "#2D8B8B", "image": "/extracted/img-090.jpg", "slug": "teal-blue" }
+    ],
+    "features": ["Zip-around closure", "Full-length bill compartment", "Multiple card slots", "Compact design", "Vegan leather exterior"],
+    "specs": { "Dimensions": "12 × 8 × 4 inches", "Weight": "99g", "Material": "100% PU Leather", "Closure": "Zip Around" },
+    "rating": 4.3, "reviewCount": 62, "order": 6
+  },
+  {
+    "id": "p7", "slug": "large-aurelia-fan-tote", "name": "Large Aurelia Fan Tote",
+    "description": "Statement large tote with a distinctive fan design in 100% PU leather. Two rich colourways.",
+    "price": 3499, "compareAtPrice": 4999,
+    "image": "/extracted/img-010.jpg",
+    "gallery": ["/extracted/img-011.png", "/extracted/img-012.jpg", "/extracted/img-013.png", "/extracted/img-014.jpg"],
+    "category": "tote-bag", "gender": "women",
+    "isTrending": true,
+    "colors": ["#8B6456", "#722F37"],
+    "colorVariants": [
+      { "color": "#8B6456", "image": "/extracted/img-010.jpg", "slug": "mocha" },
+      { "color": "#722F37", "image": "/extracted/img-090.jpg", "slug": "wine" }
+    ],
+    "features": ["Fan-design silhouette", "100% PU leather body", "Magnetic snap closure", "Spacious interior", "Dual top handles"],
+    "specs": { "Dimensions": "21 × 12.5 × 4 inches", "Weight": "638g", "Material": "100% PU Leather", "Closure": "Magnetic Snap" },
+    "rating": 4.5, "reviewCount": 84, "order": 7
+  },
+  {
+    "id": "p8", "slug": "mini-aurelia-fan-tote", "name": "Mini Aurelia Fan Tote",
+    "description": "Compact mini tote with a distinctive fan design in 100% PU leather. Two rich colourways.",
+    "price": 3499, "compareAtPrice": 4499,
+    "image": "/extracted/img-090.jpg",
+    "gallery": ["/extracted/img-091.png", "/extracted/img-092.jpg", "/extracted/img-093.png"],
+    "category": "tote-bag", "gender": "women",
+    "colors": ["#722F37", "#8B6456"],
+    "colorVariants": [
+      { "color": "#722F37", "image": "/extracted/img-090.jpg", "slug": "wine" },
+      { "color": "#8B6456", "image": "/extracted/img-070.jpg", "slug": "mocha" }
+    ],
+    "features": ["Fan-design mini silhouette", "100% PU leather body", "Magnetic snap closure", "Compact & lightweight", "Dual top handles"],
+    "specs": { "Dimensions": "16.5 × 7.5 × 3 inches", "Weight": "440g", "Material": "100% PU Leather", "Closure": "Magnetic Snap" },
+    "rating": 4.4, "reviewCount": 55, "order": 8
+  },
+  {
+    "id": "p9", "slug": "valera-dome", "name": "Valera Dome",
+    "description": "Dome-shaped sling bag in 100% PU leather with a top zip and detachable crossbody strap. Four colourways.",
+    "price": 3249, "compareAtPrice": 4299,
+    "image": "/extracted/img-090.jpg",
+    "gallery": ["/extracted/img-091.png", "/extracted/img-092.jpg", "/extracted/img-093.png"],
+    "category": "sling-bag", "gender": "women",
+    "isTrending": true,
+    "colors": ["#3C7A5A", "#1A1A1A", "#B8D4E0", "#4169E1"],
+    "colorVariants": [
+      { "color": "#3C7A5A", "image": "/extracted/img-090.jpg", "slug": "forest-green" },
+      { "color": "#1A1A1A", "image": "/extracted/img-070.jpg", "slug": "black" },
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" },
+      { "color": "#4169E1", "image": "/extracted/img-080.jpg", "slug": "royal-blue" }
+    ],
+    "features": ["Dome silhouette", "100% PU leather body", "Top zip closure", "Detachable crossbody strap", "Interior slip pocket"],
+    "specs": { "Dimensions": "14 × 6 × 4 inches", "Weight": "470g", "Material": "100% PU Leather", "Closure": "Top Zipper" },
+    "rating": 4.5, "reviewCount": 89, "order": 9
+  },
+  {
+    "id": "p10", "slug": "cordia-bag", "name": "Cordia Bag",
+    "description": "Structured tote in 100% PU leather with dual handles and a top zip closure. Four bold colourways.",
+    "price": 2999, "compareAtPrice": 3999,
+    "image": "/extracted/img-070.jpg",
+    "gallery": ["/extracted/img-071.png", "/extracted/img-072.jpg", "/extracted/img-073.png"],
+    "category": "tote-bag", "gender": "women",
+    "isTrending": true,
+    "colors": ["#1A1A1A", "#A07850", "#D9E76A", "#C8A2C8"],
+    "colorVariants": [
+      { "color": "#1A1A1A", "image": "/extracted/img-070.jpg", "slug": "black" },
+      { "color": "#A07850", "image": "/extracted/img-090.jpg", "slug": "mocha-tan" },
+      { "color": "#D9E76A", "image": "/extracted/img-080.jpg", "slug": "lime-yellow" },
+      { "color": "#C8A2C8", "image": "/extracted/img-060.jpg", "slug": "light-purple" }
+    ],
+    "features": ["Structured design", "100% PU leather body", "Dual top handles", "Top zip closure", "Fully lined interior"],
+    "specs": { "Dimensions": "14.5 × 6.5 × 3.5 inches", "Weight": "472g", "Material": "100% PU Leather", "Closure": "Top Zipper" },
+    "rating": 4.5, "reviewCount": 73, "order": 10
+  },
+  {
+    "id": "p11", "slug": "halo-mini", "name": "Halo Mini",
+    "description": "Mini structured sling bag in 100% PU leather. Compact, chic, and versatile for any occasion. Five colourways.",
+    "price": 4499, "compareAtPrice": 5999,
+    "image": "/extracted/img-070.jpg",
+    "gallery": ["/extracted/img-071.png", "/extracted/img-072.jpg", "/extracted/img-073.png"],
+    "category": "sling-bag", "gender": "women",
+    "isTrending": true, "isNew": true,
+    "colors": ["#1A1A1A", "#3C7A5A", "#C9A77B", "#40E0D0", "#722F37"],
+    "colorVariants": [
+      { "color": "#1A1A1A", "image": "/extracted/img-070.jpg", "slug": "black" },
+      { "color": "#3C7A5A", "image": "/extracted/img-080.jpg", "slug": "forest-green" },
+      { "color": "#C9A77B", "image": "/extracted/img-090.jpg", "slug": "tan" },
+      { "color": "#40E0D0", "image": "/extracted/img-060.jpg", "slug": "turquoise-blue" },
+      { "color": "#722F37", "image": "/extracted/img-010.jpg", "slug": "wine" }
+    ],
+    "features": ["Mini structured silhouette", "100% PU leather body", "Adjustable crossbody strap", "Top zip closure", "Card & phone interior slots"],
+    "specs": { "Dimensions": "20.3 × 10.2 × 20.3 cm", "Weight": "442g", "Material": "100% PU Leather", "Closure": "Top Zipper" },
+    "rating": 4.6, "reviewCount": 91, "order": 11
+  },
+  {
+    "id": "p12", "slug": "orwyn-backpack", "name": "Orwyn Backpack",
+    "description": "Full-size vegan leather backpack with multiple compartments and padded straps. Two classic colourways.",
+    "price": 4499, "compareAtPrice": 5999,
+    "image": "/extracted/img-051.png",
+    "gallery": ["/extracted/img-052.jpg", "/extracted/img-053.png", "/extracted/img-054.jpg", "/extracted/img-055.png"],
+    "category": "backpack", "gender": "women",
+    "isNew": true,
+    "colors": ["#1A1A1A", "#C9A77B"],
+    "colorVariants": [
+      { "color": "#1A1A1A", "image": "/extracted/img-051.png", "slug": "black" },
+      { "color": "#C9A77B", "image": "/extracted/img-060.jpg", "slug": "tan" }
+    ],
+    "features": ["Full-size backpack", "Vegan leather body", "Multiple compartments", "Padded back panel", "Adjustable padded straps"],
+    "specs": { "Dimensions": "11.43 × 30.48 × 41.91 cm", "Weight": "1046g", "Material": "Vegan Leather", "Closure": "Top Zipper" },
+    "rating": 4.5, "reviewCount": 83, "order": 12
+  },
+  {
+    "id": "p13", "slug": "crescent-sling-bag", "name": "Crescent Sling Bag",
+    "description": "Crescent-shaped sling bag in vegan leather with an adjustable crossbody strap. Three colourways.",
+    "price": 4299, "compareAtPrice": 5499,
+    "image": "/extracted/img-060.jpg",
+    "gallery": ["/extracted/img-061.png", "/extracted/img-062.jpg", "/extracted/img-063.png"],
+    "category": "sling-bag", "gender": "women",
+    "isNew": true,
+    "colors": ["#B8D4E0", "#40E0D0", "#722F37"],
+    "colorVariants": [
+      { "color": "#B8D4E0", "image": "/extracted/img-060.jpg", "slug": "milky-blue" },
+      { "color": "#40E0D0", "image": "/extracted/img-080.jpg", "slug": "turquoise-blue" },
+      { "color": "#722F37", "image": "/extracted/img-090.jpg", "slug": "wine" }
+    ],
+    "features": ["Crescent silhouette", "Vegan leather body", "Adjustable crossbody strap", "Top zip closure", "Interior card slots"],
+    "specs": { "Dimensions": "27.94 × 7.62 × 13.97 cm", "Weight": "431g", "Material": "Vegan Leather", "Closure": "Top Zipper" },
+    "rating": 4.5, "reviewCount": 64, "order": 13
+  },
+  {
+    "id": "p14", "slug": "business-laptop-briefcase", "name": "Business Laptop Briefcase",
+    "description": "Professional PU leather laptop briefcase with a dedicated laptop compartment and organizer pockets. Two classic colourways.",
+    "price": 5699, "compareAtPrice": 7499,
+    "image": "/extracted/img-100.jpg",
+    "gallery": ["/extracted/img-101.png", "/extracted/img-102.jpg", "/extracted/img-103.png", "/extracted/img-104.jpg"],
+    "category": "laptop-bag", "gender": "women",
+    "isNew": true,
+    "colors": ["#1A1A1A", "#C9A77B"],
+    "colorVariants": [
+      { "color": "#1A1A1A", "image": "/extracted/img-100.jpg", "slug": "black" },
+      { "color": "#C9A77B", "image": "/extracted/img-070.jpg", "slug": "tan" }
+    ],
+    "features": ["Professional briefcase design", "Fits 15\" laptop", "Multiple organizer pockets", "100% PU leather body", "Detachable shoulder strap"],
+    "specs": { "Dimensions": "39.37 × 7.62 × 29.21 cm", "Weight": "1283g", "Material": "100% PU Leather", "Closure": "Top Zipper" },
+    "rating": 4.5, "reviewCount": 76, "order": 14
+  }
+]

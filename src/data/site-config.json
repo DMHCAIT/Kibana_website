@@ -1,0 +1,169 @@
+{
+  "hero": {
+    "title": "Crafted for the Ones Who Move the World",
+    "subtitle": "Premium Vegan Leather Bags",
+    "ctaLabel": "Shop Now",
+    "ctaHref": "/shop",
+    "images": [
+      "/extracted/img-010.jpg",
+      "/extracted/img-060.jpg",
+      "/extracted/img-070.jpg"
+    ]
+  },
+  "sections": [
+    {
+      "id": "new-arrivals",
+      "label": "New Arrivals",
+      "visible": true,
+      "order": 1
+    },
+    {
+      "id": "best-sellers",
+      "label": "Best Sellers",
+      "visible": true,
+      "order": 2
+    },
+    {
+      "id": "shop-by-category",
+      "label": "Shop by Category",
+      "visible": true,
+      "order": 3
+    },
+    {
+      "id": "viral-bags",
+      "label": "Viral Bags",
+      "visible": true,
+      "order": 4
+    },
+    {
+      "id": "most-trending",
+      "label": "Most Trending",
+      "visible": true,
+      "order": 5
+    },
+    {
+      "id": "about-us",
+      "label": "About Us",
+      "visible": true,
+      "order": 6
+    },
+    {
+      "id": "style-in-motion",
+      "label": "Style in Motion",
+      "visible": true,
+      "order": 7
+    },
+    {
+      "id": "craftsmanship",
+      "label": "Craftsmanship",
+      "visible": true,
+      "order": 8
+    },
+    {
+      "id": "customer-review",
+      "label": "Customer Reviews",
+      "visible": true,
+      "order": 9
+    }
+  ],
+  "theme": {
+    "primaryColor": "#c9a96e",
+    "accentColor": "#1A1A1A",
+    "fontHeading": "playfair",
+    "fontBody": "inter"
+  },
+  "announcementBar": "FREE RETURNS ON ALL ORDERS · 100% PREMIUM VEGAN LEATHER · FREE SHIPPING ABOVE ₹999",
+  "sectionProducts": {
+    "new-arrivals": [],
+    "best-sellers": [],
+    "viral-bags": [],
+    "most-trending": [],
+    "style-in-motion": []
+  },
+  "pages": {
+    "about": {
+      "title": "Crafted for the Ones Who Move the World",
+      "subtitle": "We believe every woman deserves a bag that works as hard as she does.",
+      "content": "Kibana Life was born from a simple idea: luxury shouldn't come at the cost of the planet. Our vegan leather bags are handcrafted by skilled artisans, combining timeless design with modern ethics. Every stitch, every clasp, every detail is thoughtfully considered to give you a bag that lasts.",
+      "heroImage": "/extracted/img-010.jpg",
+      "stats": [
+        { "number": "10K+", "label": "Happy Customers" },
+        { "number": "50+", "label": "Unique Designs" },
+        { "number": "100%", "label": "Vegan Leather" },
+        { "number": "2Y", "label": "Warranty" }
+      ]
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "subtitle": "We'd love to hear from you. Our friendly team is always here to help.",
+      "email": "hello@kibanalife.com",
+      "phone": "+91 00000 00000",
+      "address": "Kibana Life, 123 Design District, Mumbai, Maharashtra 400001",
+      "instagram": "https://instagram.com/kibanalife",
+      "twitter": "",
+      "responseTime": "We typically respond within 24 hours."
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find answers to common questions about our products and services.",
+      "items": [
+        {
+          "id": "faq1",
+          "question": "What is vegan leather?",
+          "answer": "Vegan leather is a cruelty-free alternative to animal leather. Our bags use high-quality synthetic materials that look and feel like genuine leather without harming animals."
+        },
+        {
+          "id": "faq2",
+          "question": "How long does shipping take?",
+          "answer": "Standard shipping takes 3–5 business days. Express shipping (1–2 days) is available at checkout. Orders above ₹999 ship free."
+        },
+        {
+          "id": "faq3",
+          "question": "Can I return or exchange my order?",
+          "answer": "Yes! We offer free returns within 15 days of delivery. Items must be unused and in original packaging. Visit our Returns page for details."
+        },
+        {
+          "id": "faq4",
+          "question": "Do you offer a warranty?",
+          "answer": "All Kibana bags come with a 2-year manufacturing warranty covering stitching, zippers, and hardware defects."
+        },
+        {
+          "id": "faq5",
+          "question": "How do I care for my bag?",
+          "answer": "Wipe with a soft damp cloth. Avoid direct sunlight and heat. Store in the dust bag provided. Do not machine wash."
+        }
+      ]
+    },
+    "returns": {
+      "title": "Returns & Refunds",
+      "subtitle": "Shop with confidence. We make returns easy.",
+      "sections": [
+        {
+          "id": "rs1",
+          "heading": "Return Window",
+          "content": "You can return any unused item within 15 days of delivery. Items must be in original condition with all tags attached."
+        },
+        {
+          "id": "rs2",
+          "heading": "How to Initiate a Return",
+          "content": "Email us at returns@kibanalife.com with your order number and reason for return. We'll send you a prepaid return label within 24 hours."
+        },
+        {
+          "id": "rs3",
+          "heading": "Refund Timeline",
+          "content": "Once we receive the item, refunds are processed within 3–5 business days to your original payment method."
+        },
+        {
+          "id": "rs4",
+          "heading": "Non-Returnable Items",
+          "content": "Personalised or customised items cannot be returned unless they arrive damaged or defective."
+        }
+      ]
+    },
+    "shop": {
+      "title": "Shop All Bags",
+      "subtitle": "Discover our complete collection of premium vegan leather bags.",
+      "bannerImage": ""
+    }
+  }
+}

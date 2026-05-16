@@ -1,4 +1,4 @@
-import { products, categories } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/server-data";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopByGender } from "@/components/product/shop-by-gender";
 import { ShopHeader } from "@/components/shop/shop-header";
@@ -11,6 +11,8 @@ export default async function ShopPage({
   searchParams: Promise<SearchParams>;
 }) {
   const { cat, gender, q, sort = "featured" } = await searchParams;
+  const products = await getProducts();
+  const categories = await getCategories();
 
   let filtered = products;
   if (cat) filtered = filtered.filter((p) => p.category === cat);
@@ -36,8 +38,8 @@ export default async function ShopPage({
 
   return (
     <section className="container py-6 md:py-10">
-      {/* Gender category sections - show when not in search or filtered by gender */}
-      {!q && !gender && <ShopByGender />}
+      {/* Gender category sections - show only on unfiltered shop page */}
+      {!q && !gender && !cat && <ShopByGender />}
 
       <ShopHeader
         heading={heading}
@@ -45,6 +47,7 @@ export default async function ShopPage({
         activeCat={cat}
         sort={sort}
         showSort
+        categories={categories}
       />
 
       {filtered.length > 0 ? (

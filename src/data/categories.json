@@ -1,0 +1,8 @@
+[
+  { "slug": "tote-bag",   "name": "Tote Bag",    "image": "/extracted/img-100.jpg", "order": 1 },
+  { "slug": "laptop-bag", "name": "Laptop Bag",  "image": "/extracted/img-100.jpg", "order": 2 },
+  { "slug": "sling-bag",  "name": "Sling Bag",   "image": "/extracted/img-080.jpg", "order": 3 },
+  { "slug": "clutch",     "name": "Clutch",      "image": "/extracted/img-060.jpg", "order": 4 },
+  { "slug": "backpack",   "name": "Backpack",    "image": "/extracted/img-090.jpg", "order": 5 },
+  { "slug": "wallet",     "name": "Wallet",      "image": "/extracted/img-060.jpg", "order": 6 }
+]

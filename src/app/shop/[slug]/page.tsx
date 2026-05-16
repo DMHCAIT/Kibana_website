@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Check, Star } from "lucide-react";
-import { getProductBySlug, products, categories } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { ProductGrid } from "@/components/product/product-grid";
 import { AddToCartButton } from "./add-to-cart";
@@ -9,19 +9,36 @@ import { DeliveryCheck } from "./delivery-check";
 import { ShopHeader } from "@/components/shop/shop-header";
 
 export async function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return (await getProducts()).map((p) => ({ slug: p.slug }));
 }
 
 export default async function ProductDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ color?: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const { color } = await searchParams;
+  const products = await getProducts();
+  const categories = await getCategories();
+  const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
-  const allImages = [product.image, ...(product.gallery ?? [])].filter(Boolean);
+  const activeVariant =
+    product.colorVariants?.find((v) => v.slug === color) ??
+    product.colorVariants?.[0];
+  const primaryImage = activeVariant?.image ?? product.image;
+  const galleryImages = activeVariant?.gallery?.length ? activeVariant.gallery : product.gallery ?? [];
+  const allImages = [primaryImage, ...galleryImages].filter(Boolean);
+
+  // Per-color content overrides (fall back to product-level if not set per-color)
+  const activeDescription = activeVariant?.description || product.description;
+  const activeFeatures    = activeVariant?.features?.length ? activeVariant.features : product.features;
+  const activeSpecs       = activeVariant?.specs && Object.keys(activeVariant.specs).length
+    ? activeVariant.specs
+    : product.specs;
   const pct = discountPct(product.price, product.compareAtPrice);
   const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
   const catProductCount = products.filter((p) => p.category === product.category).length;
@@ -34,6 +51,7 @@ export default async function ProductDetailPage({
           count={catProductCount}
           activeCat={product.category}
           showSort={false}
+          categories={categories}
         />
 
         <div className="grid gap-4 sm:gap-8 md:gap-10 sm:grid-cols-2 mt-1 sm:mt-4 w-full min-w-0">
@@ -85,30 +103,30 @@ export default async function ProductDetailPage({
             </div>
 
             <p className="mt-3 text-sm leading-relaxed text-foreground/75">
-              {product.description}
+              {activeDescription}
             </p>
 
             {product.colors.length > 0 && (
               <div className="mt-4">
                 <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground mb-2">
-                  Colour
+                  Colour — <span className="normal-case capitalize">{(activeVariant?.slug ?? "").replace(/-/g, " ")}</span>
                 </p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {(product.colorVariants && product.colorVariants.length > 1
-                    ? product.colorVariants.map((v) => ({ color: v.color, slug: v.slug }))
-                    : product.colors.map((c) => ({ color: c, slug: product.slug }))
-                  ).map((item) => (
-                    <a
-                      key={item.color}
-                      href={`/shop/${item.slug}`}
-                      className={cn(
-                        "block h-7 w-7 rounded-full ring-2 ring-offset-2 transition-all hover:ring-kibana-tan",
-                        item.slug === product.slug ? "ring-kibana-ink" : "ring-transparent"
-                      )}
-                      style={{ backgroundColor: item.color }}
-                      title={item.color}
-                    />
-                  ))}
+                  {(product.colorVariants ?? []).map((v) => {
+                    const activeSlug = color ?? product.colorVariants?.[0]?.slug ?? "";
+                    return (
+                      <a
+                        key={v.color}
+                        href={`/shop/${product.slug}?color=${v.slug}`}
+                        className={cn(
+                          "block h-7 w-7 rounded-full ring-2 ring-offset-2 transition-all hover:ring-kibana-tan",
+                          v.slug === activeSlug ? "ring-kibana-ink" : "ring-transparent"
+                        )}
+                        style={{ backgroundColor: v.color }}
+                        title={v.slug.replace(/-/g, " ")}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -124,11 +142,11 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Key Features */}
-            {product.features.length > 0 && (
+            {activeFeatures.length > 0 && (
               <div className="mt-5 pt-4 border-t border-border">
                 <h3 className="text-sm font-semibold mb-3">Key Features</h3>
                 <ul className="grid grid-cols-1 gap-y-2">
-                  {product.features.map((f) => (
+                  {activeFeatures.map((f) => (
                     <li key={f} className="flex items-start gap-2">
                       <Check className="h-3.5 w-3.5 mt-0.5 shrink-0 text-kibana-camel" />
                       <span className="text-xs text-kibana-ink/70 leading-snug">{f}</span>
@@ -148,7 +166,7 @@ export default async function ProductDetailPage({
                   </svg>
                 </summary>
                 <div className="mt-1 divide-y divide-border">
-                  {Object.entries(product.specs).map(([label, value]) => (
+                  {Object.entries(activeSpecs).map(([label, value]) => (
                     <div key={label} className="flex items-start py-2.5 gap-3">
                       <span className="w-28 shrink-0 text-xs text-kibana-camel font-medium">{label}</span>
                       <span className="text-xs text-foreground/75">{value}</span>
