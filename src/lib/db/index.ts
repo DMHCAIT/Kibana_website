@@ -16,6 +16,8 @@ const client =
   postgres(connectionString ?? "postgres://invalid", {
     prepare: false,
     max: 1,
+    connect_timeout: 5,
+    idle_timeout: 10,
   });
 
 if (process.env.NODE_ENV !== "production") globalThis.__kibana_pg = client;
