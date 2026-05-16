@@ -23,11 +23,11 @@ export function BestSellers({
   const heading    = config?.heading    || "GOT YOUR BACK";
   const buttonText = config?.buttonText || "SHOP NOW";
 
-  // Resolve product slug: prefer admin config, then first assigned product, then default
+  // Resolve product slug: prefer admin config, then backpack product, then first product, then default
   const shopSlug =
     config?.productSlug ||
-    (products.find((p) => p.slug?.toLowerCase().includes("backpack")) ?? products[0])?.slug ||
-    "north-backpack";
+    (products.find((p) => p.category === "backpack" || p.slug?.toLowerCase().includes("backpack")) ?? products[0])?.slug ||
+    "orwyn-backpack";
 
   return (
     <section className="container py-6 md:py-10">
