@@ -82,8 +82,8 @@
   },
   "sectionContent": {
     "bestSellers": {
-      "leftImage": "/extracted/backpack-left.png",
-      "rightImage": "/extracted/backpack-right.png",
+      "leftImage": "/mv/best-seller-banner.jpeg",
+      "rightImage": "/mv/best-seller-banner.jpeg",
       "heading": "GOT YOUR BACK",
       "buttonText": "SHOP NOW",
       "productSlug": "north-backpack"
