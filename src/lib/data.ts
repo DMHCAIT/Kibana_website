@@ -264,7 +264,7 @@ export const products: Product[] = [
     description: "Mini structured sling bag in 100% PU leather. Compact, chic, and versatile for any occasion. Five colourways.",
     price: 4499,
     compareAtPrice: 5999,
-    image: "/extracted/img-070.jpg",
+    image: "/mv/new-3.jpg",
     gallery: ["/extracted/img-071.png", "/extracted/img-072.jpg", "/extracted/img-073.png"],
     category: "sling-bag",
     gender: "women",
@@ -292,7 +292,7 @@ export const products: Product[] = [
     description: "Full-size vegan leather backpack with multiple compartments and padded straps. Two classic colourways.",
     price: 4499,
     compareAtPrice: 5999,
-    image: "/extracted/img-051.png",
+    image: "/mv/new-4.jpg",
     gallery: ["/extracted/img-052.jpg", "/extracted/img-053.png", "/extracted/img-054.jpg", "/extracted/img-055.png"],
     category: "backpack",
     gender: "women",
@@ -316,7 +316,7 @@ export const products: Product[] = [
     description: "Crescent-shaped sling bag in vegan leather with an adjustable crossbody strap. Three colourways.",
     price: 4299,
     compareAtPrice: 5499,
-    image: "/extracted/img-060.jpg",
+    image: "/mv/new-2.jpg",
     gallery: ["/extracted/img-061.png", "/extracted/img-062.jpg", "/extracted/img-063.png"],
     category: "sling-bag",
     gender: "women",
@@ -341,7 +341,7 @@ export const products: Product[] = [
     description: "Professional PU leather laptop briefcase with a dedicated laptop compartment and organizer pockets. Two classic colourways.",
     price: 5699,
     compareAtPrice: 7499,
-    image: "/extracted/img-100.jpg",
+    image: "/mv/new-1.jpg",
     gallery: ["/extracted/img-101.png", "/extracted/img-102.jpg", "/extracted/img-103.png", "/extracted/img-104.jpg"],
     category: "laptop-bag",
     gender: "women",
@@ -359,12 +359,12 @@ export const products: Product[] = [
 ];
 
 export const categories: Category[] = [
-  { slug: "tote-bag", name: "Tote Bag", image: "/extracted/img-100.jpg" },
-  { slug: "laptop-bag", name: "Laptop Bag", image: "/extracted/img-100.jpg" },
-  { slug: "sling-bag", name: "Sling Bag", image: "/extracted/img-080.jpg" },
-  { slug: "clutch", name: "Clutch", image: "/extracted/img-060.jpg" },
-  { slug: "backpack", name: "Backpack", image: "/extracted/img-090.jpg" },
-  { slug: "wallet", name: "Wallet", image: "/extracted/img-060.jpg" },
+  { slug: "tote-bag",   name: "Tote Bag",   image: "/mv/cat-5.jpeg" },
+  { slug: "laptop-bag", name: "Laptop Bag", image: "/mv/cat-3.jpeg" },
+  { slug: "sling-bag",  name: "Sling Bag",  image: "/mv/cat-4.jpeg" },
+  { slug: "clutch",     name: "Clutch",     image: "/mv/cat-2.jpeg" },
+  { slug: "backpack",   name: "Backpack",   image: "/mv/cat-1.jpeg" },
+  { slug: "wallet",     name: "Wallet",     image: "/mv/cat-6.jpeg" },
 ];
 
 export const genderShelves = [

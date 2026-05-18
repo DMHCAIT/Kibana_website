@@ -12,7 +12,6 @@ const SectionSkeleton = () => <div className="w-full h-48 md:h-64 bg-muted/40 an
 // Lazy-load everything below the fold
 const BestSellers    = dynamicImport(() => import("@/components/home/best-sellers").then(m => ({ default: m.BestSellers })), { loading: () => <SectionSkeleton /> });
 const ShopByCategory = dynamicImport(() => import("@/components/home/shop-by-category").then(m => ({ default: m.ShopByCategory })), { loading: () => <SectionSkeleton /> });
-const ViralBags      = dynamicImport(() => import("@/components/home/viral-bags").then(m => ({ default: m.ViralBags })), { loading: () => <SectionSkeleton /> });
 const MostTrending   = dynamicImport(() => import("@/components/home/most-trending").then(m => ({ default: m.MostTrending })), { loading: () => <SectionSkeleton /> });
 const AboutUs        = dynamicImport(() => import("@/components/home/about-us").then(m => ({ default: m.AboutUs })), { loading: () => <SectionSkeleton /> });
 const StyleInMotion  = dynamicImport(() => import("@/components/home/style-in-motion").then(m => ({ default: m.StyleInMotion })), { loading: () => <SectionSkeleton /> });
@@ -55,7 +54,6 @@ export default async function HomePage() {
     "new-arrivals":     (p) => <NewArrivals products={p} />,
     "best-sellers":     (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
     "shop-by-category": (_) => <ShopByCategory categories={categories} />,
-    "viral-bags":       (p) => <ViralBags products={p} />,
     "most-trending":    (p) => <MostTrending products={p} />,
     "about-us":         (_) => <AboutUs />,
     "style-in-motion":  (p) => <StyleInMotion products={p} />,

@@ -304,7 +304,14 @@ export function ProductEditForm({ product, isNew = false }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
-  const set = (field: string, val: unknown) => setForm((f) => ({ ...f, [field]: val }));
+  const set = (field: string, val: unknown) => setForm((f) => {
+    const next = { ...f, [field]: val };
+    // Auto-generate slug from name when adding a new product and slug hasn't been manually edited
+    if (isNew && field === "name" && typeof val === "string" && f.slug === f.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) {
+      next.slug = val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+    return next;
+  });
 
   const addColorVariant = () => {
     setForm((f) => ({
@@ -325,6 +332,16 @@ export function ProductEditForm({ product, isNew = false }: Props) {
   const save = async () => {
     setSaving(true);
     setMsg(null);
+    if (!form.name.trim()) {
+      setMsg({ type: "err", text: "Product name is required." });
+      setSaving(false);
+      return;
+    }
+    if (!form.slug.trim()) {
+      setMsg({ type: "err", text: "Slug is required. Use lowercase letters and hyphens (e.g. my-product-name)." });
+      setSaving(false);
+      return;
+    }
     if (!form.image && !form.video) {
       setMsg({ type: "err", text: "Please provide at least one image or video before saving." });
       setSaving(false);
@@ -339,7 +356,8 @@ export function ProductEditForm({ product, isNew = false }: Props) {
         router.refresh();
         if (isNew) router.push("/admin/products");
       } else {
-        setMsg({ type: "err", text: "Error saving product. Please try again." });
+        const errData = await res.json().catch(() => null);
+        setMsg({ type: "err", text: errData?.error ?? "Error saving product. Please try again." });
       }
     } finally {
       setSaving(false);

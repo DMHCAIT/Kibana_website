@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-// 3 product images for the carousel
+// Hero banner images (mobile & desktop)
 const heroImages = [
-  "/extracted/img-010.jpg",
-  "/extracted/img-060.jpg",
-  "/extracted/img-070.jpg",
+  "/mv/hero-1.png",
+  "/mv/hero-2.jpg",
 ];
 
 export function HeroBanner() {
@@ -46,7 +45,15 @@ export function HeroBanner() {
   }, [currentImage, fading]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-kibana-cream h-64 sm:h-80 md:h-[480px] lg:h-[600px]">
+    <section className="relative w-full overflow-hidden bg-kibana-cream h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] xl:h-[70vh] max-h-[800px]">
+      {/* Preload all carousel images so transitions are instant */}
+      {heroImages.map((src, i) =>
+        i !== currentImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <link key={`preload-${i}`} rel="preload" as="image" href={src} />
+        ) : null
+      )}
+
       {/* Previous image (fading out) */}
       {prevImage !== null && (
         <Image
@@ -54,7 +61,8 @@ export function HeroBanner() {
           src={heroImages[prevImage]}
           alt=""
           fill
-          className="object-cover"
+          quality={85}
+          className="object-cover object-center"
           sizes="100vw"
           style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
         />
@@ -66,7 +74,8 @@ export function HeroBanner() {
         alt="Kibana Hero"
         fill
         priority
-        className="object-cover"
+        quality={85}
+        className="object-cover object-center"
         sizes="100vw"
         style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
       />
