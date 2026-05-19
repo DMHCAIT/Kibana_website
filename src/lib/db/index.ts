@@ -6,7 +6,14 @@ import * as schema from "./schema";
 // Local dev  → direct connection (port 5432): set in .env.local
 // Vercel/prod → Supabase Transaction Pooler (port 6543, pgbouncer=true): set in Vercel dashboard
 // Pooler URL format: postgresql://postgres.{ref}:{password}@aws-0-{region}.pooler.supabase.com:6543/postgres
-const connectionString = process.env.DATABASE_URL;
+//
+// IMPORTANT: On Vercel, port 5432 (direct connection) causes FUNCTION_INVOCATION_TIMEOUT
+// because TCP packets to Supabase's direct server are silently dropped.
+// We only enable DB on Vercel when the pooler URL (port 6543) is configured.
+const rawUrl = process.env.DATABASE_URL;
+const isVercel = process.env.VERCEL === "1";
+const connectionString =
+  isVercel && rawUrl && !rawUrl.includes(":6543") ? undefined : rawUrl;
 
 declare global {
   // eslint-disable-next-line no-var
