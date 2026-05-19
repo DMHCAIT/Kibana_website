@@ -8,6 +8,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 }
 
 export default async function AdminContentPage() {
-  const config = await withTimeout(getSiteConfig(), 5000, {} as Awaited<ReturnType<typeof getSiteConfig>>);
+  const config = await withTimeout(getSiteConfig(), 2500, {} as Awaited<ReturnType<typeof getSiteConfig>>);
   return <ContentEditor config={config} />;
 }
+

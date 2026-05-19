@@ -8,6 +8,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 }
 
 export default async function AdminProductsPage() {
-  const products = await withTimeout(getProducts(), 5000, []);
+  const products = await withTimeout(getProducts(), 2500, []);
   return <ProductsClient initialProducts={products} />;
 }
+

@@ -28,7 +28,7 @@ function timeAgo(date: string | Date) {
 }
 
 export default async function AdminMembersPage() {
-  const [users, orders] = await Promise.all([withTimeout(getUsers(), 5000, []), withTimeout(getOrders(), 5000, [])]);
+  const [users, orders] = await Promise.all([withTimeout(getUsers(), 2500, []), withTimeout(getOrders(), 2500, [])]);
 
   // Cross-reference orders with users by email
   const userStats = users.map((u) => {
@@ -198,3 +198,4 @@ function StatCard({
     </div>
   );
 }
+

@@ -15,8 +15,8 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
   const [product, categories] = await Promise.all([
-    withTimeout(getProduct(id), 5000, undefined),
-    withTimeout(getCategories(), 5000, []),
+    withTimeout(getProduct(id), 2500, undefined),
+    withTimeout(getCategories(), 2500, []),
   ]);
 
   if (!product) notFound();

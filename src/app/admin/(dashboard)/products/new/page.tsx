@@ -8,6 +8,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 }
 
 export default async function NewProductPage() {
-  const categories = await withTimeout(getCategories(), 5000, []);
+  const categories = await withTimeout(getCategories(), 2500, []);
   return <ProductForm isNew categories={categories} />;
 }
+

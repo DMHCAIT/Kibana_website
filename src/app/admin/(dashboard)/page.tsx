@@ -58,9 +58,9 @@ type Status = keyof typeof STATUS_CONFIG;
 
 export default async function AdminDashboardPage() {
   const [orders, users, products] = await Promise.all([
-    withTimeout(getOrders(), 5000, []),
-    withTimeout(getUsers(), 5000, []),
-    withTimeout(getProducts(), 5000, []),
+    withTimeout(getOrders(), 2500, []),
+    withTimeout(getUsers(), 2500, []),
+    withTimeout(getProducts(), 2500, []),
   ]);
 
   const now = new Date();
@@ -369,3 +369,4 @@ function StatCard({
     </div>
   );
 }
+

@@ -50,7 +50,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const config = await withTimeout(
     getSiteConfig().catch(() => FALLBACK_CONFIG),
-    3000,
+    2000,
     FALLBACK_CONFIG
   );
   return (

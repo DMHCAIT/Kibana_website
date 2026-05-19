@@ -13,9 +13,10 @@ export default async function AdminOrdersPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const { status } = await searchParams;
-  const orders = await withTimeout(getOrders(), 5000, []);
+  const orders = await withTimeout(getOrders(), 2500, []);
   const sorted = [...orders].sort(
     (a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()
   );
   return <OrdersClient orders={sorted} initialStatus={status} />;
 }
+

@@ -26,7 +26,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 }
 
 export default async function AdminMessagesPage() {
-  const messages = await withTimeout(getContactMessages(), 5000, []);
+  const messages = await withTimeout(getContactMessages(), 2500, []);
 
   const newCount = messages.filter((m) => m.status === "new").length;
   const readCount = messages.filter((m) => m.status === "read").length;
@@ -118,3 +118,4 @@ export default async function AdminMessagesPage() {
     </div>
   );
 }
+
