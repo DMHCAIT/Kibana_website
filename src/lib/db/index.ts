@@ -28,7 +28,6 @@ const client =
     connect_timeout: 2,      // Fail fast — 2s max per connection attempt
     idle_timeout: 10,
     max_lifetime: 60,
-    max_retries: 0,          // No retries — fail immediately on connection error
     ssl: "require",          // Always require SSL for Supabase
   });
 
