@@ -103,6 +103,17 @@ export const userSessions = pgTable("user_sessions", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── Contact messages ──────────────────────────────────────────────────────────
+export const contactMessages = pgTable("contact_messages", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").default(""),
+  message: text("message").notNull().default(""),
+  status: text("status").$type<"new" | "read" | "replied">().notNull().default("new"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Inferred types
 export type ProductRow = typeof products.$inferSelect;
 export type CategoryRow = typeof categories.$inferSelect;
@@ -110,3 +121,4 @@ export type OrderRow = typeof orders.$inferSelect;
 export type UserRow = typeof users.$inferSelect;
 export type OtpSessionRow = typeof otpSessions.$inferSelect;
 export type UserSessionRow = typeof userSessions.$inferSelect;
+export type ContactMessageRow = typeof contactMessages.$inferSelect;

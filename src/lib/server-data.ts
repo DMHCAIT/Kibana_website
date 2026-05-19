@@ -5,8 +5,9 @@ import {
   orders as ordersTable,
   users as usersTable,
   siteConfig as siteConfigTable,
+  contactMessages as contactMessagesTable,
 } from "@/lib/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
 import type { Product } from "@/types/product";
 import { products as localProducts } from "@/lib/data";
 import localCategories from "@/data/categories.json";
@@ -573,4 +574,37 @@ export async function getRevenueStats(): Promise<RevenueStats> {
     revenueByMonth,
     topCustomers,
   };
+}
+
+// ── Contact messages ──────────────────────────────────────────────────────────
+
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: "new" | "read" | "replied";
+  createdAt: string;
+};
+
+export async function getContactMessages(): Promise<ContactMessage[]> {
+  if (!hasDatabase) return [];
+  try {
+    const rows = await db
+      .select()
+      .from(contactMessagesTable)
+      .orderBy(desc(contactMessagesTable.createdAt));
+    return rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      email: r.email,
+      phone: r.phone ?? "",
+      message: r.message,
+      status: r.status as "new" | "read" | "replied",
+      createdAt: r.createdAt.toISOString(),
+    }));
+  } catch {
+    return [];
+  }
 }

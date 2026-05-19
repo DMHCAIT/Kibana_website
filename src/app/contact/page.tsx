@@ -1,13 +1,40 @@
-import type { Metadata } from "next";
-import { MapPin, Mail, Phone, Clock } from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Contact Us — Kibana",
-  description:
-    "Get in touch with the Kibana team. Reach us by email, phone, or fill out the contact form and we'll get back to you.",
-};
+import { useState } from "react";
+import { MapPin, Mail, Phone, Clock, CheckCircle } from "lucide-react";
 
 export default function ContactPage() {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? "Something went wrong.");
+      }
+      setSuccess(true);
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
   return (
     <main className="bg-kibana-cream text-kibana-ink">
 
@@ -116,66 +143,89 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* ── Right: Form (light card) ── */}
+          {/* ── Right: Form ── */}
           <div className="bg-white border border-kibana-ink/8 px-7 py-8 sm:px-10 sm:py-10 shadow-sm">
             <div className="flex items-center gap-3 mb-7">
               <span className="h-px w-6 bg-kibana-tan" />
               <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-kibana-tan">Send a Message</p>
             </div>
 
-            <form className="space-y-5" action="mailto:support@kibanalife.com" method="get">
-              <div>
-                <label htmlFor="name" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                  Name <span className="text-kibana-tan">*</span>
-                </label>
-                <input
-                  id="name" name="name" type="text" required
-                  placeholder="Your full name"
-                  className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
-                />
+            {success ? (
+              <div className="flex flex-col items-center text-center py-10 gap-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+                <h3 className="font-semibold text-kibana-ink text-lg">Message Sent!</h3>
+                <p className="text-sm text-kibana-ink/60">Thank you for reaching out. We&apos;ll get back to you within 24 hours.</p>
+                <button
+                  onClick={() => setSuccess(false)}
+                  className="mt-2 text-[9px] font-bold uppercase tracking-[0.3em] text-kibana-tan hover:text-kibana-camel transition-colors"
+                >
+                  Send Another Message
+                </button>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            ) : (
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
-                  <label htmlFor="email" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                    E-mail <span className="text-kibana-tan">*</span>
+                  <label htmlFor="name" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
+                    Name <span className="text-kibana-tan">*</span>
                   </label>
                   <input
-                    id="email" name="email" type="email" required
-                    placeholder="you@example.com"
+                    id="name" name="name" type="text" required
+                    value={form.name} onChange={handleChange}
+                    placeholder="Your full name"
                     className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="email" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
+                      E-mail <span className="text-kibana-tan">*</span>
+                    </label>
+                    <input
+                      id="email" name="email" type="email" required
+                      value={form.email} onChange={handleChange}
+                      placeholder="you@example.com"
+                      className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
+                      Phone No.
+                    </label>
+                    <input
+                      id="phone" name="phone" type="tel"
+                      value={form.phone} onChange={handleChange}
+                      placeholder="+91 00000 00000"
+                      className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label htmlFor="phone" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                    Phone No.
+                  <label htmlFor="message" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
+                    Message
                   </label>
-                  <input
-                    id="phone" name="phone" type="tel"
-                    placeholder="+91 00000 00000"
-                    className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                  <textarea
+                    id="message" name="message" rows={5}
+                    value={form.message} onChange={handleChange}
+                    placeholder="How can we help you?"
+                    className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors resize-none"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label htmlFor="message" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                  Message
-                </label>
-                <textarea
-                  id="message" name="message" rows={5}
-                  placeholder="How can we help you?"
-                  className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors resize-none"
-                />
-              </div>
+                {error && (
+                  <p className="text-xs text-red-500">{error}</p>
+                )}
 
-              <button
-                type="submit"
-                className="w-full bg-kibana-ink text-kibana-cream text-[10px] font-bold uppercase tracking-[0.3em] py-4 hover:bg-kibana-tan hover:text-kibana-ink transition-colors"
-              >
-                Send Message
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-kibana-ink text-kibana-cream text-[10px] font-bold uppercase tracking-[0.3em] py-4 hover:bg-kibana-tan hover:text-kibana-ink transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Sending…" : "Send Message"}
+                </button>
+              </form>
+            )}
           </div>
 
         </div>
