@@ -18,9 +18,9 @@ export async function GET() {
 export async function POST(req: Request) {
   // Public endpoint — called when a user logs in on the storefront
   const body = await req.json();
-  if (!body.id || !body.phone) {
-    return NextResponse.json({ error: "id and phone required" }, { status: 400 });
+  if (!body.id || !body.email) {
+    return NextResponse.json({ error: "id and email required" }, { status: 400 });
   }
-  await recordUserLogin({ id: body.id, name: body.name ?? "—", phone: body.phone });
+  await recordUserLogin({ id: body.id, name: body.name ?? "—", email: body.email });
   return NextResponse.json({ success: true });
 }

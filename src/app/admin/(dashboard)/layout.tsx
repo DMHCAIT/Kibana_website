@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/sidebar";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +17,9 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-gray-50">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          {children}
-        </main>
-      </div>
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }

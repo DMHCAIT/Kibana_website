@@ -2,9 +2,10 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import superjson from "superjson";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/store/auth-store";
 
 function getBaseUrl() {
   if (typeof window !== "undefined") return "";
@@ -13,6 +14,12 @@ function getBaseUrl() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const hydrateUser = useAuth((s) => s.hydrateUser);
+
+  // Hydrate user from server session cookie on mount
+  useEffect(() => {
+    hydrateUser();
+  }, [hydrateUser]);
   const [queryClient] = useState(
     () =>
       new QueryClient({

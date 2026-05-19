@@ -1,56 +1,148 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { X, Mail, RefreshCw } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+type Step = "email" | "otp";
+
 export function AuthModal() {
-  const { showAuthModal, authModalMessage, closeAuthModal, login, signup } = useAuth();
+  const { showAuthModal, authModalMessage, closeAuthModal, sendOtp, verifyOtp } = useAuth();
+
+  const [step, setStep] = useState<Step>("email");
   const [tab, setTab] = useState<"login" | "signup">("login");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+
+  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     if (showAuthModal) {
-      setPhone("");
-      setPassword("");
+      setStep("email");
+      setEmail("");
       setName("");
+      setOtp(["", "", "", "", "", ""]);
       setError("");
-      setTab("login");
+      setLoading(false);
+      setIsNewUser(false);
+      setResendCooldown(0);
     }
   }, [showAuthModal]);
 
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
   if (!showAuthModal) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    let result: { error?: string };
-    if (tab === "login") {
-      result = await login(phone, password);
-    } else {
-      if (!name.trim()) {
-        setError("Please enter your name.");
-        setLoading(false);
-        return;
-      }
-      result = await signup(phone, password, name);
+
+    const cleaned = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+      setError("Please enter a valid email address.");
+      return;
     }
+    if (tab === "signup" && !name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+
+    setLoading(true);
+    const result = await sendOtp(cleaned, tab);
     setLoading(false);
-    if (result.error) setError(result.error);
+
+    if (result.error === "not_found") {
+      setError("No account found with this email. Please sign up first.");
+      setTab("signup");
+      return;
+    }
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    setIsNewUser(result.isNewUser ?? false);
+    setStep("otp");
+    setResendCooldown(30);
+    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const otpString = otp.join("");
+    if (otpString.length !== 6) {
+      setError("Please enter the complete 6-digit code.");
+      return;
+    }
+
+    setLoading(true);
+    const result = await verifyOtp(email, otpString, isNewUser ? name.trim() : undefined);
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      setOtp(["", "", "", "", "", ""]);
+      setTimeout(() => otpRefs.current[0]?.focus(), 50);
+    }
+  };
+
+  const handleOtpChange = (i: number, value: string) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    const next = [...otp];
+    next[i] = digit;
+    setOtp(next);
+    if (digit && i < 5) otpRefs.current[i + 1]?.focus();
+    if (next.every((d) => d !== "")) {
+      setTimeout(() => document.getElementById("otp-submit-btn")?.click(), 80);
+    }
+  };
+
+  const handleOtpKeyDown = (i: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[i] && i > 0) otpRefs.current[i - 1]?.focus();
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (digits.length === 6) {
+      setOtp(digits.split(""));
+      setTimeout(() => document.getElementById("otp-submit-btn")?.click(), 80);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    setError("");
+    setOtp(["", "", "", "", "", ""]);
+    setLoading(true);
+    const result = await sendOtp(email, tab);
+    setLoading(false);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setResendCooldown(30);
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4 bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
-        {/* Close */}
         <button
           onClick={closeAuthModal}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-700 transition-colors z-10"
@@ -60,12 +152,11 @@ export function AuthModal() {
         </button>
 
         <div className="px-8 pt-8 pb-6">
-          {/* Brand */}
           <p className="font-display text-center tracking-[0.3em] text-sm text-gray-500 mb-1">KIBANA</p>
-
-          {/* Title */}
           <h2 className="text-center font-display text-2xl tracking-wide mb-1">
-            {tab === "login" ? "Welcome Back" : "Create Account"}
+            {step === "email"
+              ? tab === "login" ? "Welcome Back" : "Create Account"
+              : "Check Your Email"}
           </h2>
 
           {authModalMessage && (
@@ -74,116 +165,164 @@ export function AuthModal() {
             </p>
           )}
 
-          {/* Tabs */}
-          <div className="flex border-b border-gray-200 mb-6 mt-4">
-            <button
-              onClick={() => { setTab("login"); setError(""); }}
-              className={cn(
-                "flex-1 pb-2 text-sm font-medium tracking-wide transition-colors",
-                tab === "login"
-                  ? "border-b-2 border-gray-900 text-gray-900"
-                  : "text-gray-400 hover:text-gray-600"
-              )}
-            >
-              LOGIN
-            </button>
-            <button
-              onClick={() => { setTab("signup"); setError(""); }}
-              className={cn(
-                "flex-1 pb-2 text-sm font-medium tracking-wide transition-colors",
-                tab === "signup"
-                  ? "border-b-2 border-gray-900 text-gray-900"
-                  : "text-gray-400 hover:text-gray-600"
-              )}
-            >
-              SIGN UP
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {tab === "signup" && (
-              <div>
-                <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
-                  Full Name
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Jane Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="h-11"
-                />
+          {step === "email" && (
+            <>
+              <div className="flex border-b border-gray-200 mb-6 mt-4">
+                {(["login", "signup"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => { setTab(t); setError(""); }}
+                    className={cn(
+                      "flex-1 pb-2 text-sm font-medium tracking-wide transition-colors",
+                      tab === t
+                        ? "border-b-2 border-gray-900 text-gray-900"
+                        : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {t === "login" ? "LOGIN" : "SIGN UP"}
+                  </button>
+                ))}
               </div>
-            )}
 
-            <div>
-              <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
-                Mobile Number
-              </label>
-              <div className="flex gap-2">
-                <span className="inline-flex items-center px-3 h-11 border border-input bg-muted text-sm text-muted-foreground rounded-none select-none">
-                  +91
-                </span>
-                <Input
-                  type="tel"
-                  inputMode="numeric"
-                  placeholder="10-digit mobile number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  required
-                  className="h-11 flex-1"
-                />
-              </div>
-            </div>
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+                {tab === "signup" && (
+                  <div>
+                    <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                      Full Name
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Jane Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="h-11"
+                    />
+                  </div>
+                )}
 
-            <div>
-              <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
-                Password
-              </label>
-              <Input
-                type="password"
-                placeholder={tab === "signup" ? "Min. 6 characters" : "••••••••"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
+                <div>
+                  <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                    Email Address
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    className="h-11"
+                  />
+                </div>
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2">
-                {error}
+                {error && (
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2">{error}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-1 h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase flex items-center justify-center gap-2"
+                >
+                  <Mail className="h-4 w-4" />
+                  {loading ? "Sending code..." : "Send verification code"}
+                </Button>
+              </form>
+
+              <p className="mt-4 text-center text-xs text-gray-400">
+                {tab === "login" ? (
+                  <>
+                    Don&apos;t have an account?{" "}
+                    <button onClick={() => { setTab("signup"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
+                      Sign up
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button onClick={() => { setTab("login"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
+                      Log in
+                    </button>
+                  </>
+                )}
               </p>
-            )}
+            </>
+          )}
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="mt-1 h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
-            >
-              {loading ? "Please wait…" : tab === "login" ? "Login" : "Create Account"}
-            </Button>
-          </form>
+          {step === "otp" && (
+            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5 mt-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-500">We sent a 6-digit code to</p>
+                <p className="font-semibold text-gray-800 mt-0.5">{email}</p>
+                <button
+                  type="button"
+                  onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
+                  className="mt-1 text-xs underline text-gray-400 hover:text-gray-600"
+                >
+                  Change email
+                </button>
+              </div>
 
-          <p className="mt-4 text-center text-xs text-gray-400">
-            {tab === "login" ? (
-              <>
-                Don&apos;t have an account?{" "}
-                <button onClick={() => { setTab("signup"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
-                  Sign up
+              <p className="text-center text-xs text-gray-400">
+                Check your inbox (and spam folder). The code expires in 10 minutes.
+              </p>
+
+              <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => { otpRefs.current[i] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(i, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                    className="w-11 h-12 text-center text-lg font-semibold border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-colors"
+                    aria-label={`Code digit ${i + 1}`}
+                  />
+                ))}
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 text-center">{error}</p>
+              )}
+
+              <Button
+                id="otp-submit-btn"
+                type="submit"
+                disabled={loading || otp.join("").length < 6}
+                className="h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
+              >
+                {loading ? "Verifying..." : isNewUser ? "Create Account" : "Verify & Login"}
+              </Button>
+
+              <div className="text-center text-xs text-gray-400">
+                Didn&apos;t receive the code?{" "}
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendCooldown > 0 || loading}
+                  className={cn(
+                    "underline transition-colors",
+                    resendCooldown > 0
+                      ? "text-gray-300 cursor-not-allowed"
+                      : "text-gray-600 hover:text-gray-900"
+                  )}
+                >
+                  {resendCooldown > 0 ? (
+                    <span className="inline-flex items-center gap-1">
+                      <RefreshCw className="h-3 w-3" />
+                      Resend in {resendCooldown}s
+                    </span>
+                  ) : (
+                    "Resend code"
+                  )}
                 </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button onClick={() => { setTab("login"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
-                  Log in
-                </button>
-              </>
-            )}
-          </p>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

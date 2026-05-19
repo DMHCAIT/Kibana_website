@@ -47,7 +47,7 @@ export const categories = pgTable("categories", {
 // ── Orders ────────────────────────────────────────────────────────────────────
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(),
-  user: jsonb("user").$type<{ name: string; phone: string; email?: string } | null>(),
+  user: jsonb("user").$type<{ name: string; phone?: string; email?: string; id?: string } | null>(),
   items: jsonb("items")
     .$type<{ productId: string; name: string; price: number; quantity: number; image: string; color?: string }[]>()
     .notNull()
@@ -68,8 +68,8 @@ export const orders = pgTable("orders", {
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull().default(""),
-  phone: text("phone").notNull(),
-  email: text("email"),
+  email: text("email"),           // nullable — legacy phone-only rows have no email
+  phone: text("phone"),           // nullable — kept for legacy/order data
   loginAt: timestamp("login_at", { withTimezone: true }).defaultNow().notNull(),
   loginCount: integer("login_count").notNull().default(1),
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow().notNull(),
@@ -82,8 +82,31 @@ export const siteConfig = pgTable("site_config", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── OTP sessions (phone → pending OTP verification) ───────────────────────────
+export const otpSessions = pgTable("otp_sessions", {
+  phone: text("phone").primaryKey(),
+  // session ID returned by 2Factor.in (used to verify OTP via their API)
+  twoFactorSessionId: text("two_factor_session_id"),
+  // fallback OTP stored locally when no API key is configured (dev/test mode)
+  devOtp: text("dev_otp"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ── User login sessions (cookie-based, stored server-side) ────────────────────
+export const userSessions = pgTable("user_sessions", {
+  token: text("token").primaryKey(),
+  userId: text("user_id").notNull(),
+  phone: text("phone").notNull(),
+  name: text("name").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Inferred types
 export type ProductRow = typeof products.$inferSelect;
 export type CategoryRow = typeof categories.$inferSelect;
 export type OrderRow = typeof orders.$inferSelect;
 export type UserRow = typeof users.$inferSelect;
+export type OtpSessionRow = typeof otpSessions.$inferSelect;
+export type UserSessionRow = typeof userSessions.$inferSelect;

@@ -48,7 +48,9 @@ export async function getProducts(): Promise<Product[]> {
       .select()
       .from(productsTable)
       .orderBy(asc(productsTable.sortOrder));
-    return rows.length ? rows.map(rowToProduct) : localProducts;
+    // Always return DB rows when connected — even if empty.
+    // Fall back to local JSON ONLY on connection error.
+    return rows.map(rowToProduct);
   } catch {
     return localProducts;
   }
@@ -82,7 +84,7 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   }
 }
 
-export async function saveProduct(product: Product & { order?: number; video?: string }): Promise<void> {
+export async function saveProduct(product: Product & { order?: number; video?: string; inStock?: boolean }): Promise<void> {
   const row = {
     id: product.id,
     slug: product.slug,
@@ -97,6 +99,7 @@ export async function saveProduct(product: Product & { order?: number; video?: s
     isNew: product.isNew ?? false,
     isBestSeller: product.isBestSeller ?? false,
     isTrending: product.isTrending ?? false,
+    inStock: product.inStock ?? true,
     colors: product.colors as string[],
     colorVariants: product.colorVariants as unknown[],
     features: product.features as string[],
@@ -343,8 +346,8 @@ export async function saveSiteConfig(config: SiteConfig): Promise<void> {
 export type AdminUser = {
   id: string;
   name: string;
-  phone: string;
   email?: string;
+  phone?: string;
   loginAt: string;
   loginCount: number;
   registeredAt?: string;
@@ -354,8 +357,8 @@ function rowToUser(row: typeof usersTable.$inferSelect): AdminUser {
   return {
     id: row.id,
     name: row.name,
-    phone: row.phone,
     email: row.email ?? undefined,
+    phone: row.phone ?? undefined,
     loginAt: row.loginAt.toISOString(),
     loginCount: row.loginCount,
     registeredAt: row.registeredAt.toISOString(),
@@ -375,10 +378,9 @@ export async function getUsers(): Promise<AdminUser[]> {
 export async function recordUserLogin(user: {
   id: string;
   name: string;
-  phone: string;
+  email: string;
 }): Promise<void> {
   const now = new Date();
-  // Try insert first, then update count on conflict
   const [existing] = await db
     .select({ loginCount: usersTable.loginCount })
     .from(usersTable)
@@ -387,13 +389,13 @@ export async function recordUserLogin(user: {
   if (existing) {
     await db
       .update(usersTable)
-      .set({ loginAt: now, loginCount: existing.loginCount + 1 })
+      .set({ loginAt: now, loginCount: existing.loginCount + 1, name: user.name })
       .where(eq(usersTable.id, user.id));
   } else {
     await db.insert(usersTable).values({
       id: user.id,
       name: user.name,
-      phone: user.phone,
+      email: user.email,
       loginAt: now,
       loginCount: 1,
       registeredAt: now,
@@ -405,7 +407,7 @@ export async function recordUserLogin(user: {
 
 export type AdminOrder = {
   id: string;
-  user: { name: string; phone: string; email?: string } | null;
+  user: { name: string; phone?: string; email?: string; id?: string } | null;
   items: {
     productId: string;
     name: string;
@@ -487,7 +489,7 @@ export type RevenueStats = {
   revenueByMonth: { month: string; revenue: number; orders: number }[];
   topCustomers: {
     name: string;
-    phone: string;
+    email?: string;
     totalSpent: number;
     orderCount: number;
   }[];
@@ -541,15 +543,15 @@ export async function getRevenueStats(): Promise<RevenueStats> {
 
   const customerMap: Record<
     string,
-    { name: string; phone: string; totalSpent: number; orderCount: number }
+    { name: string; email?: string; totalSpent: number; orderCount: number }
   > = {};
   delivered.forEach((o) => {
     if (!o.user) return;
-    const key = o.user.phone;
+    const key = o.user.email ?? o.user.id ?? o.user.name;
     if (!customerMap[key])
       customerMap[key] = {
         name: o.user.name,
-        phone: o.user.phone,
+        email: o.user.email,
         totalSpent: 0,
         orderCount: 0,
       };

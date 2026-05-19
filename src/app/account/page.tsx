@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Phone, LogOut } from "lucide-react";
+import { User, Mail, LogOut } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 
@@ -52,8 +52,8 @@ export default function AccountPage() {
         {/* Details */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3 text-sm">
-            <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span>+91 {user.phone}</span>
+            <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span>{user.email}</span>
           </div>
         </div>
 

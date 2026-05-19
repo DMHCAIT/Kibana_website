@@ -20,6 +20,7 @@ const buckets = [
   { name: "product-videos", public: true },
   { name: "category-images", public: true },
   { name: "site-assets", public: true },
+  { name: "site-media", public: true },
 ];
 
 async function main() {

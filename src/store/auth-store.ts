@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export type AuthUser = {
   id: string;
-  phone: string;
+  email: string;
   name: string;
 };
 
@@ -14,115 +14,143 @@ type AuthState = {
   _hasHydrated: boolean;
   showAuthModal: boolean;
   authModalMessage: string;
+
   setHasHydrated: (v: boolean) => void;
   openAuthModal: (message?: string) => void;
   closeAuthModal: () => void;
-  login: (phone: string, password: string) => Promise<{ error?: string }>;
-  signup: (phone: string, password: string, name: string) => Promise<{ error?: string }>;
-  logout: () => void;
+
+  /** Hydrate user from Supabase session cookie on app mount */
+  hydrateUser: () => Promise<void>;
+
+  /**
+   * Send OTP to email via Supabase Auth.
+   * mode="login"  â†’ only works if the email already has an account
+   * mode="signup" â†’ creates account if new, sends OTP
+   */
+  sendOtp: (
+    email: string,
+    mode: "login" | "signup"
+  ) => Promise<{ error?: string; isNewUser?: boolean }>;
+
+  /** Verify OTP returned by Supabase. For new users also saves name. */
+  verifyOtp: (
+    email: string,
+    otp: string,
+    name?: string
+  ) => Promise<{ error?: string }>;
+
+  logout: () => Promise<void>;
 };
 
-type CredStore = Record<string, { passwordHash: string; name: string; id: string }>;
+export const useAuth = create<AuthState>()((set) => ({
+  user: null,
+  _hasHydrated: false,
+  showAuthModal: false,
+  authModalMessage: "",
 
-function simpleHash(str: string): string {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
-  }
-  return h.toString(16);
-}
+  setHasHydrated: (v) => set({ _hasHydrated: v }),
 
-const CRED_KEY = "kibana-creds";
+  openAuthModal: (message = "") =>
+    set({ showAuthModal: true, authModalMessage: message }),
 
-function getCredStore(): CredStore {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(CRED_KEY) ?? "{}");
-  } catch {
-    return {};
-  }
-}
+  closeAuthModal: () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("kibana-auth-dismissed", "1");
+    }
+    set({ showAuthModal: false, authModalMessage: "" });
+  },
 
-function saveCredStore(store: CredStore) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(CRED_KEY, JSON.stringify(store));
-}
+  hydrateUser: async () => {
+    try {
+      const sb = createSupabaseBrowserClient();
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session?.user) {
+        set({ _hasHydrated: true });
+        return;
+      }
+      const u = session.user;
+      const name = (u.user_metadata?.name as string | undefined) || u.email!.split("@")[0];
+      set({ user: { id: u.id, email: u.email!, name }, _hasHydrated: true });
+    } catch {
+      set({ _hasHydrated: true });
+    }
+  },
 
-export const useAuth = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      _hasHydrated: false,
-      showAuthModal: false,
-      authModalMessage: "",
+  sendOtp: async (email, mode) => {
+    try {
+      const sb = createSupabaseBrowserClient();
 
-      setHasHydrated: (v: boolean) => set({ _hasHydrated: v }),
+      const { error } = await sb.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: {
+          // login-only: don't create a new account if email not found
+          shouldCreateUser: mode === "signup",
+        },
+      });
 
-      openAuthModal: (message = "") =>
-        set({ showAuthModal: true, authModalMessage: message }),
-
-      closeAuthModal: () => {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("kibana-auth-dismissed", "1");
+      if (error) {
+        // Supabase returns this when shouldCreateUser=false and email not found
+        if (
+          error.message.toLowerCase().includes("signups not allowed") ||
+          error.message.toLowerCase().includes("not found") ||
+          error.status === 422
+        ) {
+          return { error: "not_found" };
         }
-        set({ showAuthModal: false, authModalMessage: "" });
-      },
+        return { error: error.message };
+      }
 
-      login: async (phone, password) => {
-        const creds = getCredStore();
-        const normalized = phone.replace(/\D/g, "");
-        const entry = creds[normalized];
-        if (!entry) {
-          return { error: "No account found with this number. Please sign up first." };
-        }
-        if (entry.passwordHash !== simpleHash(password)) {
-          return { error: "Incorrect password. Please try again." };
-        }
-        const user: AuthUser = { id: entry.id, phone: normalized, name: entry.name };
-        set({ user, showAuthModal: false });
-        // Track login for admin users panel
-        fetch("/api/admin/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(user),
-        }).catch(() => {});
-        return {};
-      },
+      return { isNewUser: mode === "signup" };
+    } catch {
+      return { error: "Network error. Please try again." };
+    }
+  },
 
-      signup: async (phone, password, name) => {
-        const creds = getCredStore();
-        const normalized = phone.replace(/\D/g, "");
-        if (!/^\d{10}$/.test(normalized)) {
-          return { error: "Please enter a valid 10-digit mobile number." };
-        }
-        if (creds[normalized]) {
-          return { error: "An account with this number already exists. Please log in." };
-        }
-        if (password.length < 6) {
-          return { error: "Password must be at least 6 characters." };
-        }
-        const id = `u_${Date.now()}`;
-        creds[normalized] = { passwordHash: simpleHash(password), name: name.trim(), id };
-        saveCredStore(creds);
-        const user: AuthUser = { id, phone: normalized, name: name.trim() };
-        set({ user, showAuthModal: false });
-        // Track signup for admin users panel
-        fetch("/api/admin/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(user),
-        }).catch(() => {});
-        return {};
-      },
+  verifyOtp: async (email, otp, name) => {
+    try {
+      const sb = createSupabaseBrowserClient();
 
-      logout: () => set({ user: null }),
-    }),
-    {
-      name: "kibana-auth",
-      partialize: (state) => ({ user: state.user }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
-    },
-  ),
-);
+      const { data, error } = await sb.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token: otp.trim(),
+        type: "email",
+      });
+
+      if (error) return { error: error.message };
+
+      const sbUser = data.user!;
+
+      // If a name was provided (signup), save it to Supabase user_metadata
+      const displayName =
+        name?.trim() ||
+        (sbUser.user_metadata?.name as string | undefined) ||
+        sbUser.email!.split("@")[0];
+
+      if (name?.trim()) {
+        await sb.auth.updateUser({ data: { name: name.trim() } });
+      }
+
+      const user: AuthUser = { id: sbUser.id, email: sbUser.email!, name: displayName };
+      set({ user, showAuthModal: false, authModalMessage: "" });
+
+      // Record login in admin users panel (fire-and-forget)
+      fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      }).catch(() => {});
+
+      return {};
+    } catch {
+      return { error: "Verification failed. Please try again." };
+    }
+  },
+
+  logout: async () => {
+    const sb = createSupabaseBrowserClient();
+    await sb.auth.signOut().catch(() => {});
+    set({ user: null });
+  },
+}));
+
+
