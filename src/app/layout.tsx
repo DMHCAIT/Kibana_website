@@ -39,7 +39,7 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const config = await getSiteConfig();
+  const config = await getSiteConfig().catch(() => ({ announcementBar: "" }));
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-dvh flex flex-col">
