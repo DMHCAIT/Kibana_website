@@ -70,6 +70,11 @@ export function AuthModal() {
       setTab("signup");
       return;
     }
+    if (result.error === "already_exists") {
+      setError("An account with this email already exists. Please sign in instead.");
+      setTab("login");
+      return;
+    }
     if (result.error) {
       setError(result.error);
       return;

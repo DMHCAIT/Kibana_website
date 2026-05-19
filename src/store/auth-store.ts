@@ -2,6 +2,8 @@
 
 import { create } from "zustand";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useWishlist } from "@/store/wishlist-store";
+import { useCart } from "@/store/cart-store";
 
 export type AuthUser = {
   id: string;
@@ -71,6 +73,9 @@ export const useAuth = create<AuthState>()((set) => ({
       const u = session.user;
       const name = (u.user_metadata?.name as string | undefined) || u.email!.split("@")[0];
       set({ user: { id: u.id, email: u.email!, name }, _hasHydrated: true });
+      // Restore this user's wishlist and cart from their scoped localStorage
+      useWishlist.getState().loadForUser(u.id);
+      useCart.getState().loadForUser(u.id);
     } catch {
       set({ _hasHydrated: true });
     }
@@ -79,6 +84,23 @@ export const useAuth = create<AuthState>()((set) => ({
   sendOtp: async (email, mode) => {
     try {
       const sb = createSupabaseBrowserClient();
+
+      // On signup, check if the email is already registered
+      if (mode === "signup") {
+        try {
+          const res = await fetch("/api/auth/check-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email.trim().toLowerCase() }),
+          });
+          const data = await res.json() as { exists?: boolean };
+          if (data.exists) {
+            return { error: "already_exists" };
+          }
+        } catch {
+          // If check fails, allow signup to proceed
+        }
+      }
 
       const { error } = await sb.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
@@ -133,6 +155,10 @@ export const useAuth = create<AuthState>()((set) => ({
       const user: AuthUser = { id: sbUser.id, email: sbUser.email!, name: displayName };
       set({ user, showAuthModal: false, authModalMessage: "" });
 
+      // Load this user's wishlist and cart from their scoped localStorage
+      useWishlist.getState().loadForUser(sbUser.id);
+      useCart.getState().loadForUser(sbUser.id);
+
       // Record login in admin users panel (fire-and-forget)
       fetch("/api/admin/users", {
         method: "POST",
@@ -149,6 +175,9 @@ export const useAuth = create<AuthState>()((set) => ({
   logout: async () => {
     const sb = createSupabaseBrowserClient();
     await sb.auth.signOut().catch(() => {});
+    // Clear user-scoped wishlist and cart so guest sees empty state
+    useWishlist.getState().clearForUser();
+    useCart.getState().clearForUser();
     set({ user: null });
   },
 }));
