@@ -3,6 +3,10 @@ import { Users, Mail, Calendar, TrendingUp, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([p, new Promise<T>((res) => setTimeout(() => res(fallback), ms))]);
+}
+
 function formatINR(n: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -24,7 +28,7 @@ function timeAgo(date: string | Date) {
 }
 
 export default async function AdminMembersPage() {
-  const [users, orders] = await Promise.all([getUsers(), getOrders()]);
+  const [users, orders] = await Promise.all([withTimeout(getUsers(), 5000, []), withTimeout(getOrders(), 5000, [])]);
 
   // Cross-reference orders with users by email
   const userStats = users.map((u) => {

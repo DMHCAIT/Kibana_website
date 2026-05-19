@@ -14,6 +14,10 @@ import type { ElementType } from "react";
 
 export const dynamic = "force-dynamic";
 
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([p, new Promise<T>((res) => setTimeout(() => res(fallback), ms))]);
+}
+
 function formatINR(amount: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -54,9 +58,9 @@ type Status = keyof typeof STATUS_CONFIG;
 
 export default async function AdminDashboardPage() {
   const [orders, users, products] = await Promise.all([
-    getOrders(),
-    getUsers(),
-    getProducts(),
+    withTimeout(getOrders(), 5000, []),
+    withTimeout(getUsers(), 5000, []),
+    withTimeout(getProducts(), 5000, []),
   ]);
 
   const now = new Date();

@@ -21,8 +21,12 @@ const STATUS_STYLES = {
   replied: "bg-green-100 text-green-700",
 };
 
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([p, new Promise<T>((res) => setTimeout(() => res(fallback), ms))]);
+}
+
 export default async function AdminMessagesPage() {
-  const messages = await getContactMessages();
+  const messages = await withTimeout(getContactMessages(), 5000, []);
 
   const newCount = messages.filter((m) => m.status === "new").length;
   const readCount = messages.filter((m) => m.status === "read").length;
