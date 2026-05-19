@@ -38,8 +38,21 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const FALLBACK_CONFIG = { announcementBar: "" };
+
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const config = await getSiteConfig().catch(() => ({ announcementBar: "" }));
+  const config = await withTimeout(
+    getSiteConfig().catch(() => FALLBACK_CONFIG),
+    3000,
+    FALLBACK_CONFIG
+  );
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-dvh flex flex-col">

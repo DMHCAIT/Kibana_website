@@ -18,8 +18,9 @@ const client =
   postgres(connectionString ?? "postgres://invalid", {
     prepare: false,          // Required for serverless
     max: 1,                  // Keep connections low on serverless
-    connect_timeout: 5,      // Fail fast during build if DB unreachable
-    idle_timeout: 20,
+    connect_timeout: 3,      // Fail fast during build if DB unreachable
+    idle_timeout: 10,
+    max_lifetime: 60,
     ssl: "require",          // Always require SSL for Supabase
   });
 
