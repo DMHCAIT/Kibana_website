@@ -8,7 +8,7 @@ type Cat = { slug: string; name: string; image: string };
 export function ShopByCategory({ categories }: { categories?: Cat[] }) {
   const cats = categories ?? staticCategories;
   return (
-    <section className="container py-4 md:py-8">
+    <section className="container py-2 md:py-6">
       <SectionHeading title="Shop by Category" />
       {/* 2 per row on mobile, 3 per row on tablet and desktop */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

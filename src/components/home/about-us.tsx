@@ -5,7 +5,7 @@ export function AboutUs() {
   return (
     <section className="bg-kibana-cream overflow-hidden">
       {/* Mobile: container with stacked layout (text first, image second) */}
-      <div className="sm:hidden container py-8">
+      <div className="sm:hidden container py-4">
         <div className="flex flex-col gap-5">
           {/* Text */}
           <div className="flex flex-col gap-3">

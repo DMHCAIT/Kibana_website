@@ -5,7 +5,7 @@ import type { Product } from "@/types/product";
 export function ViralBags({ products }: { products: Product[] }) {
   const items = products.filter((p) => p.isTrending).slice(0, 3);
   return (
-    <section className="container py-4 md:py-8">
+    <section className="container py-2 md:py-6">
       <SectionHeading title="Viral Bag" />
       <div className="grid grid-cols-3 gap-2">
         {items.map((p) => (

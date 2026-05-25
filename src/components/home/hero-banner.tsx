@@ -45,7 +45,7 @@ export function HeroBanner() {
   }, [currentImage, fading]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-kibana-cream h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] xl:h-[70vh] max-h-[800px]">
+    <section className="relative w-full overflow-hidden bg-kibana-cream h-[38vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] xl:h-[70vh] max-h-[800px]">
       {/* Preload non-visible images */}
       {heroImages.map((src, i) =>
         i !== currentImage ? (

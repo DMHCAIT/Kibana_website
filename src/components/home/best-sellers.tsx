@@ -28,7 +28,7 @@ export function BestSellers({
     "orwyn-backpack";
 
   return (
-    <section className="container py-4 md:py-8">
+    <section className="container py-2 md:py-6">
       <SectionHeading title="Best Sellers" />
 
       {/* Full-width banner */}
