@@ -82,8 +82,6 @@ export function Header({ announcementText }: { announcementText?: string }) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background">
-      {/* Announcement Banner */}
-      <AnnouncementBanner text={announcementText} />
       <div className="container relative flex h-14 items-center gap-3 md:h-16 lg:h-18">
         <button
           aria-label="Open menu"
