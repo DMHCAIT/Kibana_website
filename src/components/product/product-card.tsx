@@ -15,9 +15,10 @@ type Props = {
   product: Product;
   variant?: "compact" | "full" | "minimal";
   className?: string;
+  imageClassName?: string;
 };
 
-export function ProductCard({ product, variant = "compact", className }: Props) {
+export function ProductCard({ product, variant = "compact", className, imageClassName }: Props) {
   const add = useCart((s) => s.add);
   const { has: isInWishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
   const { user, openAuthModal } = useAuth();
@@ -48,7 +49,7 @@ export function ProductCard({ product, variant = "compact", className }: Props) 
     <div className={cn("group flex flex-col", className)}>
       <Link
         href={`/shop/${product.slug}`}
-        className="relative block aspect-[5/6] overflow-hidden bg-kibana-cream"
+        className={cn("relative block overflow-hidden bg-kibana-cream", imageClassName ?? "aspect-[5/6]")}
       >
         <Image
           src={product.image}
