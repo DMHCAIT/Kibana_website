@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 
 const mainMenu = [
   { label: "Shop", submenu: null },
@@ -48,7 +47,7 @@ const desktopNav = [
   { label: "Wallets", href: "/shop?cat=wallet" },
 ];
 
-export function Header({ announcementText }: { announcementText?: string }) {
+export function Header() {
   const [open, setOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");

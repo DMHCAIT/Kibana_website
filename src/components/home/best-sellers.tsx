@@ -18,7 +18,7 @@ export function BestSellers({
   products?: Product[];
   config?: BestSellersConfig;
 }) {
-  const bannerImage = config?.leftImage || "/mv/best-seller-banner.jpeg";
+  const bannerImage = config?.leftImage || "/mv/Best seller Banner 2.jpg.jpeg";
   const buttonText  = config?.buttonText || "SHOP NOW";
 
   // Resolve product slug: prefer admin config, then backpack product, then first product, then default
@@ -31,21 +31,28 @@ export function BestSellers({
     <section className="container py-2 md:py-6">
       <SectionHeading title="Best Sellers" />
 
-      {/* Full-width banner */}
-      <div className="relative h-64 sm:h-80 md:h-[420px] lg:h-[520px] xl:h-[580px] overflow-hidden">
+      {/* Full-width banner — shows the entire image at natural aspect ratio */}
+      <div className="relative w-full">
         <Image
           src={bannerImage}
           alt="Best Sellers"
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
+          width={1280}
+          height={854}
+          sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
+          quality={75}
           priority
+          style={{ width: "100%", height: "auto", display: "block" }}
         />
-        {/* Functional Shop Now button overlaid at bottom-center */}
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 flex justify-center z-10">
+        {/* Shop Now button overlaid at bottom-center — scales with image width */}
+        <div className="absolute inset-x-0 bottom-[6%] flex justify-center z-10">
           <Link
             href={`/shop/${shopSlug}`}
-            className="bg-white text-kibana-ink text-[9px] sm:text-[10px] font-normal tracking-[0.25em] uppercase px-5 sm:px-7 py-2 hover:bg-kibana-ink hover:text-white transition-colors"
+            style={{
+              fontSize: "clamp(6px, 0.8vw, 11px)",
+              padding: "clamp(3px, 0.45vw, 7px) clamp(8px, 1.6vw, 24px)",
+              letterSpacing: "0.2em",
+            }}
+            className="bg-white text-kibana-ink font-normal uppercase hover:bg-kibana-ink hover:text-white transition-colors whitespace-nowrap"
           >
             {buttonText}
           </Link>

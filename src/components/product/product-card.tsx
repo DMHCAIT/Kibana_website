@@ -77,7 +77,7 @@ export function ProductCard({ product, variant = "compact", className, imageClas
             fill={inWishlist ? "currentColor" : "none"}
           />
         </button>
-        {product.colors.length > 0 && variant !== "minimal" && (
+        {product.colors.length > 0 && variant === "full" && (
           <div className="absolute bottom-2 left-2 flex gap-1">
             {product.colors.slice(0, 4).map((c) => (
               <span

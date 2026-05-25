@@ -7,14 +7,24 @@ import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
 import type { Product } from "@/types/product";
 
+const TREND_IMAGES = [
+  "/mv/Trend1.png",
+  "/mv/Trend2.png",
+  "/mv/Trend3.png",
+  "/mv/Trend4.png",
+];
+
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const trendingProducts = (propProducts ?? staticProducts).filter((p) => p.isTrending).slice(0, 6);
+  const trendingProducts = (propProducts ?? staticProducts)
+    .filter((p) => p.isTrending)
+    .slice(0, 4)
+    .map((p, i) => ({ ...p, image: TREND_IMAGES[i] ?? p.image }));
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const card = scrollRef.current.querySelector("[data-card]") as HTMLElement | null;
-    const amount = card ? (card.offsetWidth + 12) * 2 : 600;
+    const amount = card ? (card.offsetWidth + 8) * 2 : 600;
     scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   };
 
@@ -31,9 +41,9 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
             <div
               key={p.id}
               data-card
-              className="flex-shrink-0 w-[75%] sm:w-[calc(50%-6px)]"
+              className="flex-shrink-0 w-[calc(50%-4px)] sm:w-[calc(50%-6px)]"
             >
-              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4]" />
+              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4] sm:aspect-[3/4]" />
             </div>
           ))}
         </div>
@@ -42,7 +52,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("left")}
           aria-label="Previous"
-          className="hidden sm:block absolute left-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:flex absolute left-0 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronLeft className="h-8 w-8" />
         </button>
@@ -51,7 +61,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("right")}
           aria-label="Next"
-          className="hidden sm:block absolute right-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:flex absolute right-0 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronRight className="h-8 w-8" />
         </button>

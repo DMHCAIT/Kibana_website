@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-dvh flex flex-col">
         <Providers>
-          <Header announcementText={config.announcementBar} />
+          <Header />
           <AuthModal />
           <AuthAutoPopup />
           <CookiesBanner />

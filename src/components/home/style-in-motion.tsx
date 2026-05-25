@@ -53,7 +53,7 @@ function TileCard({ tile }: { tile: Tile }) {
     <Link
       href={tile.href}
       data-card
-      className="relative flex-shrink-0 w-[calc(50%-6px)] lg:w-[calc(20%-10px)] aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
+      className="relative flex-shrink-0 w-[calc(50%-6px)] lg:flex-1 lg:min-w-0 aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -103,32 +103,30 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     <section className="container py-2 md:py-6">
       <SectionHeading title="Style in Motion" />
       <div className="relative">
-        {/* Carousel — clips overflow so no partial cards bleed out */}
-        <div className="overflow-hidden">
-          <div ref={scrollContainerRef} className="flex overflow-x-auto pb-2 gap-2 mb-8 scrollbar-hide">
-            {tiles.map((t, i) => (
-              <TileCard key={`${t.label}-${i}`} tile={t} />
-            ))}
-          </div>
-        </div>
-
-        {/* Left Arrow — inside the left fade zone */}
+        {/* Left Arrow — overlays on top of the cards */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-1 top-[calc(50%-1rem)] -translate-y-1/2 z-10 text-foreground/60 hover:text-foreground transition-colors"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-6 w-6 text-gray-400 hover:text-gray-600" />
         </button>
 
-        {/* Right Arrow — inside the right fade zone */}
+        {/* Right Arrow — overlays on top of the cards */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-1 top-[calc(50%-1rem)] -translate-y-1/2 z-10 text-foreground/60 hover:text-foreground transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-6 w-6 text-gray-400 hover:text-gray-600" />
         </button>
+
+        {/* Carousel */}
+        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-2 mb-8 scrollbar-hide">
+          {tiles.map((t, i) => (
+            <TileCard key={`${t.label}-${i}`} tile={t} />
+          ))}
+        </div>
       </div>
 
       {/* Trust Badges */}
