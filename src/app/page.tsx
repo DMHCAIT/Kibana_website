@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import dynamicImport from "next/dynamic";
 import { HeroBanner } from "@/components/home/hero-banner";
+import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
 import { getProducts, getSiteConfig, getCategories } from "@/lib/server-data";
 import type { Product } from "@/types/product";
@@ -64,6 +65,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroBanner />
+      <AnnouncementBanner text={config.announcementBar} />
       {sections.map((s) => {
         const render = SECTION_COMPONENTS[s.id];
         if (!render) return null;
