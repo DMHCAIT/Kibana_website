@@ -317,6 +317,13 @@ export async function getSiteConfig(): Promise<SiteConfig> {
         }
       }
       cfg.sections.sort((a: { order: number }, b: { order: number }) => a.order - b.order);
+      // Enforce: about-us must always appear after style-in-motion
+      const simSection = cfg.sections.find((s: { id: string }) => s.id === "style-in-motion");
+      const ausSection = cfg.sections.find((s: { id: string }) => s.id === "about-us");
+      if (simSection && ausSection && ausSection.order <= simSection.order) {
+        ausSection.order = simSection.order + 1;
+        cfg.sections.sort((a: { order: number }, b: { order: number }) => a.order - b.order);
+      }
     } else {
       cfg.sections = fallback.sections;
     }
