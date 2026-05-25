@@ -25,7 +25,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         {/* Scrollable row — 2 cards visible at a time */}
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-hidden scroll-smooth"
+          className="flex gap-3 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
         >
           {trendingProducts.map((p) => (
             <div
@@ -42,7 +42,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("left")}
           aria-label="Previous"
-          className="absolute left-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:block absolute left-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronLeft className="h-8 w-8" />
         </button>
@@ -51,7 +51,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("right")}
           aria-label="Next"
-          className="absolute right-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:block absolute right-1 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronRight className="h-8 w-8" />
         </button>
