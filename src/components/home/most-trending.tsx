@@ -33,7 +33,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               data-card
               className="flex-shrink-0 w-[75%] sm:w-[calc(50%-6px)]"
             >
-              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4] sm:aspect-[1/1.7]" />
+              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4]" />
             </div>
           ))}
         </div>

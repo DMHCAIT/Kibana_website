@@ -11,7 +11,7 @@ export function ShopByPrice() {
   return (
     <section className="container py-4 md:py-8">
       <SectionHeading title="Shop by Price" />
-      <div className="grid grid-cols-3 gap-3 sm:gap-5 md:gap-6">
+      <div className="grid grid-cols-3 gap-2">
         {items.map((p) => (
           <ProductCard key={p.id} product={p} variant="full" />
         ))}

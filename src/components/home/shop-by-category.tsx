@@ -11,7 +11,7 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
     <section className="container py-4 md:py-8">
       <SectionHeading title="Shop by Category" />
       {/* 2 per row on mobile, 3 per row on tablet and desktop */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {cats.map((c) => (
           <Link
             key={c.slug}

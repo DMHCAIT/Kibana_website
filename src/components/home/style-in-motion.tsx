@@ -105,7 +105,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
       <div className="relative">
         {/* Carousel — clips overflow so no partial cards bleed out */}
         <div className="overflow-hidden">
-          <div ref={scrollContainerRef} className="flex overflow-x-auto pb-2 gap-3 sm:gap-4 md:gap-6 mb-8 scrollbar-hide">
+          <div ref={scrollContainerRef} className="flex overflow-x-auto pb-2 gap-2 mb-8 scrollbar-hide">
             {tiles.map((t, i) => (
               <TileCard key={`${t.label}-${i}`} tile={t} />
             ))}
