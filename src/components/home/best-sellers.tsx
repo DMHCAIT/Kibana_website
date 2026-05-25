@@ -18,7 +18,7 @@ export function BestSellers({
   products?: Product[];
   config?: BestSellersConfig;
 }) {
-  const bannerImage = config?.leftImage || "/mv/Best seller Banner 2.jpg.jpeg";
+  const bannerImage = config?.leftImage || "/mv/best-seller-banner-2.jpeg";
   const buttonText  = config?.buttonText || "SHOP NOW";
 
   // Resolve product slug: prefer admin config, then backpack product, then first product, then default
