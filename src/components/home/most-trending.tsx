@@ -25,7 +25,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         {/* Scrollable row — 2 cards visible at a time */}
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
+          className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
         >
           {trendingProducts.map((p) => (
             <div
