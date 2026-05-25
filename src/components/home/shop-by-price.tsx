@@ -9,7 +9,7 @@ export function ShopByPrice() {
     .slice(0, 3);
 
   return (
-    <section className="container py-6 md:py-10">
+    <section className="container py-4 md:py-8">
       <SectionHeading title="Shop by Price" />
       <div className="grid grid-cols-3 gap-3 sm:gap-5 md:gap-6">
         {items.map((p) => (

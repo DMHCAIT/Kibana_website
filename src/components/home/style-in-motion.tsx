@@ -100,7 +100,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     : FALLBACK_TILES;
 
   return (
-    <section className="container py-6 md:py-10">
+    <section className="container py-4 md:py-8">
       <SectionHeading title="Style in Motion" />
       <div className="relative">
         {/* Carousel — clips overflow so no partial cards bleed out */}

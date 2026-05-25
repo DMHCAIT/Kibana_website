@@ -19,13 +19,13 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   };
 
   return (
-    <section className="container py-6 md:py-10">
+    <section className="container py-4 md:py-8">
       <SectionHeading title="Most Trending" />
       <div className="relative">
         {/* Scrollable row — 2 cards visible at a time */}
         <div
           ref={scrollRef}
-          className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
+          className="flex gap-2 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
         >
           {trendingProducts.map((p) => (
             <div
