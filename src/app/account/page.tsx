@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, LogOut } from "lucide-react";
+import { User, Mail, LogOut, ShoppingBag, Heart, Package } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 
@@ -11,16 +11,14 @@ export default function AccountPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (_hasHydrated && !user) {
-      openAuthModal("Please log in to view your account.");
-    }
+    if (_hasHydrated && !user) openAuthModal("Please log in to view your account.");
   }, [_hasHydrated, user, openAuthModal]);
 
   if (!_hasHydrated) return null;
 
   if (!user) {
     return (
-      <section className="container py-20 flex flex-col items-center text-center">
+      <section className="container py-20 flex flex-col items-center text-center px-4">
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
           <User className="h-7 w-7 text-muted-foreground" />
         </span>
@@ -32,61 +30,43 @@ export default function AccountPage() {
   }
 
   return (
-    <section className="container max-w-lg py-16">
-      <h1 className="font-display text-3xl mb-8">My Account</h1>
-
-      <div className="border border-border p-6 flex flex-col gap-5">
-        {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-gray-900 text-white text-xl font-semibold">
-            {user.name.charAt(0).toUpperCase()}
-          </span>
-          <div>
-            <p className="font-semibold text-lg">{user.name}</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">Member</p>
+    <div className="min-h-screen bg-muted/30 pb-24 md:pb-12">
+      <div className="container max-w-2xl py-6 px-4 sm:px-6">
+        <h1 className="font-display text-2xl sm:text-3xl mb-5">My Account</h1>
+        <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-gray-900 px-5 py-5 flex items-center gap-4">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-white/10 text-white text-2xl font-bold shrink-0 border-2 border-white/30">
+              {user.name.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="font-semibold text-white text-lg truncate">{user.name}</p>
+              <p className="text-xs text-white/60 uppercase tracking-widest">Member</p>
+            </div>
           </div>
-        </div>
-
-        <hr className="border-border" />
-
-        {/* Details */}
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-border text-sm">
             <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span>{user.email}</span>
+            <span className="truncate text-muted-foreground">{user.email}</span>
           </div>
+          <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
+            <button onClick={() => router.push("/wishlist")} className="flex flex-col items-center gap-1.5 py-4 hover:bg-muted/50 transition-colors text-sm font-medium">
+              <Heart className="h-5 w-5 text-red-400" />
+              Wishlist
+            </button>
+            <button onClick={() => router.push("/cart")} className="flex flex-col items-center gap-1.5 py-4 hover:bg-muted/50 transition-colors text-sm font-medium">
+              <ShoppingBag className="h-5 w-5 text-foreground/70" />
+              My Cart
+            </button>
+            <button onClick={() => router.push("/orders")} className="flex flex-col items-center gap-1.5 py-4 hover:bg-muted/50 transition-colors text-sm font-medium">
+              <Package className="h-5 w-5 text-foreground/70" />
+              My Orders
+            </button>
+          </div>
+          <button onClick={() => { logout(); router.push("/"); }} className="w-full flex items-center gap-2.5 px-5 py-3.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
         </div>
-
-        <hr className="border-border" />
-
-        {/* Actions */}
-        <div className="flex flex-col gap-2">
-          <Button
-            variant="outline"
-            className="rounded-none justify-start gap-2"
-            onClick={() => router.push("/wishlist")}
-          >
-            My Wishlist
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-none justify-start gap-2"
-            onClick={() => router.push("/cart")}
-          >
-            My Cart
-          </Button>
-        </div>
-
-        <hr className="border-border" />
-
-        <button
-          onClick={() => { logout(); router.push("/"); }}
-          className="flex items-center gap-2 text-sm text-red-600 hover:text-red-800 transition-colors"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
       </div>
-    </section>
+    </div>
   );
 }

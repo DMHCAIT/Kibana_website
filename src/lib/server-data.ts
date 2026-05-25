@@ -15,6 +15,14 @@ import localSiteConfig from "@/data/site-config.json";
 
 const hasDatabase = !!process.env.DATABASE_URL;
 
+/** Races a DB promise against a timeout; resolves with null on timeout/error. */
+function withTimeout<T>(promise: Promise<T>, ms = 3000): Promise<T | null> {
+  return Promise.race([
+    promise.catch(() => null),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+  ]);
+}
+
 // ── Products ─────────────────────────────────────────────────────────────────
 
 function rowToProduct(row: typeof productsTable.$inferSelect): Product {
@@ -44,17 +52,10 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 
 export async function getProducts(): Promise<Product[]> {
   if (!hasDatabase) return localProducts;
-  try {
-    const rows = await db
-      .select()
-      .from(productsTable)
-      .orderBy(asc(productsTable.sortOrder));
-    // Always return DB rows when connected — even if empty.
-    // Fall back to local JSON ONLY on connection error.
-    return rows.map(rowToProduct);
-  } catch {
-    return localProducts;
-  }
+  const rows = await withTimeout(
+    db.select().from(productsTable).orderBy(asc(productsTable.sortOrder))
+  );
+  return rows ? rows.map(rowToProduct) : localProducts;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
@@ -147,15 +148,10 @@ function rowToCategory(row: typeof categoriesTable.$inferSelect): AdminCategory 
 
 export async function getCategories(): Promise<AdminCategory[]> {
   if (!hasDatabase) return localCategories as AdminCategory[];
-  try {
-    const rows = await db
-      .select()
-      .from(categoriesTable)
-      .orderBy(asc(categoriesTable.sortOrder));
-    return rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
-  } catch {
-    return localCategories as AdminCategory[];
-  }
+  const rows = await withTimeout(
+    db.select().from(categoriesTable).orderBy(asc(categoriesTable.sortOrder))
+  );
+  return rows && rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
 }
 
 export async function saveCategory(cat: AdminCategory): Promise<void> {
@@ -287,10 +283,11 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   const fallback = localSiteConfig as unknown as SiteConfig;
   if (!hasDatabase) return fallback;
   try {
-    const [row] = await db
-      .select()
-      .from(siteConfigTable)
-      .where(eq(siteConfigTable.key, "config"));
+    const result = await withTimeout(
+      db.select().from(siteConfigTable).where(eq(siteConfigTable.key, "config"))
+    );
+    if (!result) return fallback;
+    const [row] = result;
     if (!row) return fallback;
     const cfg = row.value as unknown as SiteConfig & {
       pages?: {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Menu, Search, ShoppingBag, User, X, ChevronRight, ChevronLeft, LogOut } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X, ChevronRight, ChevronLeft, LogOut, Package } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/store/cart-store";
@@ -204,19 +204,41 @@ export function Header({ announcementText }: { announcementText?: string }) {
               </button>
             )}
             {showUserMenu && user && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border shadow-lg z-50">
-                <div className="px-4 py-3 border-b border-border">
-                  <p className="text-sm font-medium truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowUserMenu(false)}
+                />
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-border shadow-lg z-50">
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-sm font-semibold truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  </div>
+                  <Link
+                    href="/account"
+                    onClick={() => setShowUserMenu(false)}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors"
+                  >
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    My Account
+                  </Link>
+                  <Link
+                    href="/orders"
+                    onClick={() => setShowUserMenu(false)}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors border-b border-border"
+                  >
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    My Orders
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setShowUserMenu(false); }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors text-left text-red-600"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
                 </div>
-                <button
-                  onClick={() => { logout(); setShowUserMenu(false); }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted transition-colors text-left"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </button>
-              </div>
+              </>
             )}
           </div>
 

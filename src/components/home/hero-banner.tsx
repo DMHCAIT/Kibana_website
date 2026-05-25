@@ -5,8 +5,8 @@ import Image from "next/image";
 
 // Hero banner images (mobile & desktop)
 const heroImages = [
-  "/mv/hero-1.png",
-  "/mv/hero-2.jpg",
+  "/mv/hero1.jpg.jpeg",
+  "/mv/hero2.jpg.jpeg",
 ];
 
 export function HeroBanner() {
@@ -46,7 +46,7 @@ export function HeroBanner() {
 
   return (
     <section className="relative w-full overflow-hidden bg-kibana-cream h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] xl:h-[70vh] max-h-[800px]">
-      {/* Preload all carousel images so transitions are instant */}
+      {/* Preload non-visible images */}
       {heroImages.map((src, i) =>
         i !== currentImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -61,12 +61,14 @@ export function HeroBanner() {
           src={heroImages[prevImage]}
           alt=""
           fill
+          priority={false}
           quality={85}
-          className="object-cover object-center"
           sizes="100vw"
+          className="object-cover object-top"
           style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
         />
       )}
+
       {/* Current image (fading in) */}
       <Image
         key={`curr-${currentImage}`}
@@ -75,11 +77,12 @@ export function HeroBanner() {
         fill
         priority
         quality={85}
-        className="object-cover object-center"
         sizes="100vw"
+        className="object-cover object-top"
         style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
       />
-      {/* Clickable pagination dots */}
+
+      {/* Pagination dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
         {heroImages.map((_, index) => (
           <button

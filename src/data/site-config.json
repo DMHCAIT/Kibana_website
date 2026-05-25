@@ -45,13 +45,13 @@
       "id": "about-us",
       "label": "About Us",
       "visible": true,
-      "order": 6
+      "order": 8
     },
     {
       "id": "style-in-motion",
       "label": "Style in Motion",
       "visible": true,
-      "order": 7
+      "order": 6
     },
     {
       "id": "craftsmanship",

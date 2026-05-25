@@ -11,19 +11,11 @@ export function DeliveryCheck() {
       setResult({ ok: false, msg: "Please enter a valid 6-digit pincode." });
       return;
     }
-    // Mock — in production this would call a real serviceability API
-    const serviceable = Number(pincode) % 3 !== 0; // simple mock rule
-    if (serviceable) {
-      setResult({
-        ok: true,
-        msg: `Delivery available to ${pincode}. Estimated 3–5 business days.`,
-      });
-    } else {
-      setResult({
-        ok: false,
-        msg: `Sorry, we don't deliver to ${pincode} yet.`,
-      });
-    }
+    // Delivery available across all India for any valid 6-digit pincode
+    setResult({
+      ok: true,
+      msg: `We deliver to ${pincode}! Estimated delivery: 3–5 business days across India.`,
+    });
   }
 
   return (

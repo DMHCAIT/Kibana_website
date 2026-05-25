@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 import dynamicImport from "next/dynamic";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
-import { Craftsmanship } from "@/components/home/craftsmanship";
 import { getProducts, getSiteConfig, getCategories } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
@@ -42,9 +41,11 @@ function sectionProducts(
 }
 
 export default async function HomePage() {
-  const products = await getProducts();
-  const config   = await getSiteConfig();
-  const categories = await getCategories();
+  const [products, config, categories] = await Promise.all([
+    getProducts(),
+    getSiteConfig(),
+    getCategories(),
+  ]);
   const pinned   = config.sectionProducts ?? {};
   const sections = config.sections
     .filter((s) => s.visible)
@@ -57,7 +58,6 @@ export default async function HomePage() {
     "most-trending":    (p) => <MostTrending products={p} />,
     "about-us":         (_) => <AboutUs />,
     "style-in-motion":  (p) => <StyleInMotion products={p} />,
-    "craftsmanship":    (_) => <Craftsmanship config={config.sectionContent?.craftsmanship} />,
     "customer-review":  (_) => <CustomerReview />,
   };
 
