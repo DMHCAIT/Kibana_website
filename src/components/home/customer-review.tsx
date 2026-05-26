@@ -12,7 +12,7 @@ export function CustomerReview() {
   if (!r) return null;
 
   return (
-    <section className="container">
+    <section className="container sm:pt-10 md:pt-16">
       {/* Black top section with heading */}
       <div className="bg-kibana-ink text-kibana-cream py-8 md:py-12 pb-20 md:pb-28">
         <div className="text-center">

@@ -53,7 +53,7 @@ function TileCard({ tile }: { tile: Tile }) {
     <Link
       href={tile.href}
       data-card
-      className="relative flex-shrink-0 w-[calc(50%-6px)] lg:flex-1 lg:min-w-0 aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
+      className="relative flex-shrink-0 w-[75vw] sm:w-[calc(50%-6px)] lg:flex-1 lg:min-w-0 aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -103,19 +103,19 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     <section className="container py-2 md:py-6">
       <SectionHeading title="Style in Motion" />
       <div className="relative">
-        {/* Left Arrow — overlays on top of the cards */}
+        {/* Left Arrow — hidden on mobile, visible on sm+ */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6 text-gray-400 hover:text-gray-600" />
         </button>
 
-        {/* Right Arrow — overlays on top of the cards */}
+        {/* Right Arrow — hidden on mobile, visible on sm+ */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6 text-gray-400 hover:text-gray-600" />
