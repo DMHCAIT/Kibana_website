@@ -29,8 +29,8 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   };
 
   return (
-    <section className="container py-2 md:py-6">
-      <SectionHeading title="Most Trending" />
+    <section className="py-2 md:py-8 md:container">
+      <SectionHeading title="Most Trending" className="px-4 md:px-0" />
       <div className="relative">
         {/* Scrollable row — 2 cards visible at a time */}
         <div
@@ -41,9 +41,9 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
             <div
               key={p.id}
               data-card
-              className="flex-shrink-0 w-[calc(50%-4px)] sm:w-[calc(50%-6px)]"
+              className="flex-shrink-0 w-[75%] sm:w-[calc(50%-4px)]"
             >
-              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4] sm:aspect-[3/4]" />
+              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4] sm:aspect-[4/3]" />
             </div>
           ))}
         </div>
