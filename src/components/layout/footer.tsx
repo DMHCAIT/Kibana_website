@@ -46,7 +46,7 @@ export function Footer() {
 
         {/* Logo + Nav columns */}
         <div className="mb-4">
-          <div className="flex flex-col md:flex-row md:items-start gap-0 md:gap-12">
+          <div className="flex flex-col md:grid md:grid-cols-4 md:gap-12 md:items-start md:pt-6">
 
             {/* Logo */}
             <div className="md:flex-shrink-0 md:pl-8">
@@ -55,13 +55,13 @@ export function Footer() {
                 <img
                   src="/extracted/kibana logo_white.png"
                   alt="Kibana"
-                  className="h-28 sm:h-28 md:h-32 w-auto -mt-6 md:mt-0"
+                  className="h-28 sm:h-28 md:h-44 w-auto -mt-6 md:-mt-4"
                 />
               </Link>
             </div>
 
-            {/* Nav columns — 3-col grid on mobile, flex row on desktop */}
-            <div className="flex-1 grid grid-cols-3 md:flex md:flex-row md:justify-around gap-4 md:gap-0 -mt-4 md:mt-0">
+            {/* Nav columns — 3-col grid on mobile, each in own col on desktop */}
+            <div className="flex-1 grid grid-cols-3 md:contents gap-4 md:gap-0 -mt-4 md:mt-0">
               {columns.map((col) => (
                 <div key={col.title}>
                   <h4 className="text-xs font-bold tracking-[0.2em] text-kibana-cream mb-3 uppercase">
