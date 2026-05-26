@@ -328,6 +328,22 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       cfg.sections = fallback.sections;
     }
 
+    // Merge sectionContent from local fallback so renamed/updated asset paths
+    // in the JSON always take precedence over stale values stored in the DB.
+    if (fallback.sectionContent) {
+      cfg.sectionContent = {
+        ...fallback.sectionContent,
+        ...(cfg.sectionContent ?? {}),
+        bestSellers: {
+          ...fallback.sectionContent.bestSellers,
+          ...(cfg.sectionContent?.bestSellers ?? {}),
+          // Always use the local image paths — they are the files actually in git
+          leftImage: fallback.sectionContent.bestSellers?.leftImage,
+          rightImage: fallback.sectionContent.bestSellers?.rightImage,
+        },
+      };
+    }
+
     return cfg as unknown as SiteConfig;
   } catch {
     return fallback;
