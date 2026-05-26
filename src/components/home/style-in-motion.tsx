@@ -53,7 +53,7 @@ function TileCard({ tile }: { tile: Tile }) {
     <Link
       href={tile.href}
       data-card
-      className="relative flex-shrink-0 w-[75vw] sm:w-[calc(50%-6px)] lg:flex-1 lg:min-w-0 aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
+      className="relative flex-shrink-0 w-[48vw] sm:w-[calc(33%-6px)] md:w-[calc(25%-6px)] lg:flex-1 lg:min-w-0 aspect-[2/3] sm:aspect-[1/1.5] md:aspect-[1/1.6] lg:aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

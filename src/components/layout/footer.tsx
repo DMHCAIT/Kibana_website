@@ -36,7 +36,7 @@ const columns = [
 export function Footer() {
   return (
     <footer className="bg-kibana-ink text-kibana-cream pb-16 md:pb-0">
-      <div className="px-5 sm:px-8 md:container py-5 md:py-10">
+      <div className="px-5 sm:px-8 md:container py-5 md:py-6">
 
         {/* Newsletter section */}
         <div className="mb-4 pb-4 border-b border-kibana-cream/10">
@@ -46,22 +46,22 @@ export function Footer() {
 
         {/* Logo + Nav columns */}
         <div className="mb-4">
-          <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-16">
+<div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-12">
 
             {/* Logo */}
-            <div className="md:flex-shrink-0">
+            <div className="md:flex-shrink-0 md:pl-8">
               <Link href="/" className="inline-block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/extracted/kibana logo_white.png"
                   alt="Kibana"
-                  className="h-28 sm:h-32 md:h-44 w-auto"
+                  className="h-28 sm:h-32 md:h-32 w-auto"
                 />
               </Link>
             </div>
 
-            {/* Nav columns — left-aligned, even columns */}
-            <div className="flex-1 grid grid-cols-3 gap-6 md:gap-12">
+            {/* Nav columns — evenly spaced */}
+            <div className="flex-1 flex flex-col md:flex-row md:justify-around gap-6 md:gap-0">
               {columns.map((col) => (
                 <div key={col.title}>
                   <h4 className="text-xs font-bold tracking-[0.2em] text-kibana-cream mb-3 uppercase">
