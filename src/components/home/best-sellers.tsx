@@ -36,7 +36,7 @@ export function BestSellers({
           className="object-cover object-left-top sm:object-center"
         />
         {/* Shop Now overlay — stays inside the left text panel at every breakpoint */}
-        <div className="absolute left-[8%] top-[58%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
+        <div className="absolute left-[12%] top-[50%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
           <Link
             href="/shop"
             className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-widest uppercase
