@@ -71,6 +71,12 @@ export function ContentEditor({ config: initialConfig }: Props) {
     return data.url!;
   }
 
+  /** Delete a file from Supabase Storage via the upload API (best-effort) */
+  async function deleteStorageFile(url: string) {
+    if (!url || !url.includes(".supabase.co/storage")) return;
+    await fetch(`/api/admin/upload?url=${encodeURIComponent(url)}`, { method: "DELETE" }).catch(() => {/* non-fatal */});
+  }
+
   async function uploadHeroImage(file: File) {
     setUploading(true);
     try {
@@ -89,6 +95,9 @@ export function ContentEditor({ config: initialConfig }: Props) {
   }
 
   function removeHeroImage(i: number) {
+    const url = config.hero.images[i];
+    // Delete from Supabase Storage (best-effort)
+    deleteStorageFile(url);
     setConfig((c) => ({
       ...c,
       hero: { ...c.hero, images: c.hero.images.filter((_, idx) => idx !== i) },

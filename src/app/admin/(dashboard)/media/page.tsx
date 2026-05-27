@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Upload,
   Image as ImageIcon,
@@ -11,15 +11,19 @@ import {
   Loader2,
   X,
   Link as LinkIcon,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 
-interface UploadedFile {
+interface MediaFile {
   id: string;
   url: string;
   name: string;
   type: "image" | "video";
-  size: string;
-  uploadedAt: Date;
+  size: number;
+  bucket: string;
+  path: string;
+  uploadedAt: string;
 }
 
 const BUCKETS = [
@@ -28,12 +32,20 @@ const BUCKETS = [
   { value: "site-media", label: "Site Media (Hero, Banners)" },
 ];
 
+function formatSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function AdminMediaPage() {
   const [bucket, setBucket] = useState("product-images");
   const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [files, setFiles] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,11 +54,24 @@ export default function AdminMediaPage() {
     setTimeout(() => setToast(null), 4000);
   }
 
-  function formatSize(bytes: number) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
+  const fetchFiles = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/media");
+      if (res.ok) {
+        const data = (await res.json()) as MediaFile[];
+        setFiles(data);
+      }
+    } catch {
+      showToast("error", "Failed to load media files");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchFiles();
+  }, [fetchFiles]);
 
   async function uploadFile(file: File) {
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -59,20 +84,11 @@ export default function AdminMediaPage() {
     fd.append("path", path);
 
     const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const data = (await res.json()) as { url?: string; error?: string };
+    const data = (await res.json()) as { url?: string; id?: string; error?: string };
 
     if (!res.ok) throw new Error(data.error ?? "Upload failed");
 
-    const newFile: UploadedFile = {
-      id: path,
-      url: data.url!,
-      name: file.name,
-      type: isVideo ? "video" : "image",
-      size: formatSize(file.size),
-      uploadedAt: new Date(),
-    };
-
-    setFiles((prev) => [newFile, ...prev]);
+    await fetchFiles();
     return data.url!;
   }
 
@@ -100,6 +116,23 @@ export default function AdminMediaPage() {
       showToast("error", errors[0]);
     }
     if (inputRef.current) inputRef.current.value = "";
+  }
+
+  async function deleteFile(id: string) {
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/admin/media?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const data = (await res.json()) as { success?: boolean; error?: string };
+      if (!res.ok) throw new Error(data.error ?? "Delete failed");
+      setFiles((prev) => prev.filter((f) => f.id !== id));
+      showToast("success", "File deleted from storage and database");
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeleting(null);
+    }
   }
 
   async function copyUrl(url: string) {
@@ -134,11 +167,20 @@ export default function AdminMediaPage() {
       )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Media Manager</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Upload images and videos — they auto-update on the website
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Media Manager</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            All uploads are stored in Supabase and tracked in the database
+          </p>
+        </div>
+        <button
+          onClick={() => void fetchFiles()}
+          className="flex items-center gap-2 text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors"
+        >
+          <RefreshCw size={14} />
+          Refresh
+        </button>
       </div>
 
       {/* Upload Area */}
@@ -199,13 +241,25 @@ export default function AdminMediaPage() {
         />
       </div>
 
-      {/* Uploaded Files */}
-      {files.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">Session Uploads</h2>
-            <span className="text-sm text-gray-400">{files.length} file(s)</span>
+      {/* All Media Files from DB */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="font-semibold text-gray-900">All Media Files</h2>
+          <span className="text-sm text-gray-400">
+            {loading ? "Loading…" : `${files.length} file(s)`}
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={28} className="animate-spin text-gray-300" />
           </div>
+        ) : files.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <ImageIcon size={36} className="mb-3 opacity-40" />
+            <p className="text-sm">No files uploaded yet</p>
+          </div>
+        ) : (
           <div className="p-4 grid grid-cols-1 gap-3">
             {files.map((file) => (
               <div
@@ -237,7 +291,7 @@ export default function AdminMediaPage() {
                     ) : (
                       <Video size={11} className="inline mr-1" />
                     )}
-                    {file.type} · {file.size}
+                    {file.type} · {formatSize(file.size)} · {file.bucket}
                   </p>
                   <div className="flex items-center gap-1 mt-1.5">
                     <LinkIcon size={11} className="text-gray-400 shrink-0" />
@@ -245,9 +299,9 @@ export default function AdminMediaPage() {
                   </div>
                 </div>
 
-                {/* Copy button */}
+                {/* Copy URL */}
                 <button
-                  onClick={() => copyUrl(file.url)}
+                  onClick={() => void copyUrl(file.url)}
                   className={`shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-colors ${
                     copied === file.url
                       ? "bg-green-50 border-green-200 text-green-700"
@@ -255,28 +309,31 @@ export default function AdminMediaPage() {
                   }`}
                 >
                   {copied === file.url ? (
-                    <>
-                      <CheckCircle size={13} /> Copied!
-                    </>
+                    <><CheckCircle size={13} /> Copied!</>
                   ) : (
-                    <>
-                      <Copy size={13} /> Copy URL
-                    </>
+                    <><Copy size={13} /> Copy URL</>
                   )}
                 </button>
 
-                {/* Remove from list */}
+                {/* Delete */}
                 <button
-                  onClick={() => setFiles((f) => f.filter((ff) => ff.id !== file.id))}
-                  className="shrink-0 p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                  onClick={() => void deleteFile(file.id)}
+                  disabled={deleting === file.id}
+                  className="shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                  title="Delete from storage and database"
                 >
-                  <X size={16} />
+                  {deleting === file.id ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={13} />
+                  )}
+                  Delete
                 </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 text-sm text-blue-800">
@@ -285,10 +342,9 @@ export default function AdminMediaPage() {
           <li>Copy the URL after upload and paste it into any product image/video field</li>
           <li>For hero banners and homepage content, go to <strong>Content</strong></li>
           <li>For product images, go to <strong>Products → Edit Product</strong></li>
-          <li>All changes automatically reflect on the live website</li>
+          <li>Deleting a file removes it from both Supabase Storage and the database</li>
         </ul>
       </div>
     </div>
   );
 }
-

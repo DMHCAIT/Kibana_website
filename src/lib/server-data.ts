@@ -464,7 +464,8 @@ function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
 export async function getOrders(): Promise<AdminOrder[]> {
   if (!hasDatabase) return [];
   try {
-    const rows = await db.select().from(ordersTable);
+    const rows = await withTimeout(db.select().from(ordersTable));
+    if (!rows) return [];
     return rows.map(rowToOrder);
   } catch {
     return [];

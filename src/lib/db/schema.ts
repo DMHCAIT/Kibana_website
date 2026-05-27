@@ -114,6 +114,18 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── Media files (uploaded to Supabase Storage, tracked in DB) ─────────────────
+export const mediaFiles = pgTable("media_files", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
+  bucket: text("bucket").notNull(),
+  path: text("path").notNull(),
+  type: text("type").$type<"image" | "video">().notNull().default("image"),
+  size: integer("size").notNull().default(0),
+  uploadedAt: timestamp("uploaded_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Inferred types
 export type ProductRow = typeof products.$inferSelect;
 export type CategoryRow = typeof categories.$inferSelect;
@@ -122,3 +134,4 @@ export type UserRow = typeof users.$inferSelect;
 export type OtpSessionRow = typeof otpSessions.$inferSelect;
 export type UserSessionRow = typeof userSessions.$inferSelect;
 export type ContactMessageRow = typeof contactMessages.$inferSelect;
+export type MediaFileRow = typeof mediaFiles.$inferSelect;

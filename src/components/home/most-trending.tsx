@@ -7,19 +7,25 @@ import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
 import type { Product } from "@/types/product";
 
-const TREND_IMAGES = [
-  "/mv/Trend1.png",
-  "/mv/Trend2.png",
-  "/mv/Trend3.png",
-  "/mv/Trend4.png",
-];
+const TREND_IMAGES: Record<string, string> = {
+  p1:  "/mv/Trend1.png",
+  p2:  "/mv/Trend2.png",
+  p7:  "/mv/Trend3.png",
+  p9:  "/mv/Trend4.png",
+  p10: "/mv/Trend5.png",
+  p11: "/mv/Trend6.png",
+};
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const trendingProducts = (propProducts ?? staticProducts)
     .filter((p) => p.isTrending)
-    .slice(0, 4)
-    .map((p, i) => ({ ...p, image: TREND_IMAGES[i] ?? p.image }));
+    .sort((a, b) => {
+      const n = (id: string) => parseInt(id.replace(/\D/g, ""), 10) || 0;
+      return n(a.id) - n(b.id);
+    })
+    .slice(0, 6)
+    .map((p) => ({ ...p, image: TREND_IMAGES[p.id] ?? p.image }));
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;

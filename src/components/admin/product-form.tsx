@@ -103,13 +103,22 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
     return data.url!;
   }
 
+  /** Delete a file from Supabase Storage via the upload API (best-effort, non-fatal) */
+  async function deleteStorageFile(url: string) {
+    if (!url || !url.includes(".supabase.co/storage")) return;
+    await fetch(`/api/admin/upload?url=${encodeURIComponent(url)}`, { method: "DELETE" }).catch(() => {/* non-fatal */});
+  }
+
   async function handleMainImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading("image");
     try {
       const ext = file.name.split(".").pop();
+      const oldUrl = form.image;
       const url = await uploadFile(file, `products/${form.id}/main.${ext}`);
+      // Delete old image from storage if it was previously uploaded
+      if (oldUrl) await deleteStorageFile(oldUrl);
       update("image", url);
       showToast("success", "Main image uploaded");
     } catch (err) {
@@ -126,11 +135,14 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
     setUploading("video");
     try {
       const ext = file.name.split(".").pop();
+      const oldUrl = form.video;
       const url = await uploadFile(
         file,
         `products/${form.id}/video.${ext}`,
         "product-videos"
       );
+      // Delete old video from storage if it was previously uploaded
+      if (oldUrl) await deleteStorageFile(oldUrl);
       update("video", url);
       showToast("success", "Video uploaded");
     } catch (err) {
@@ -167,6 +179,9 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
   }
 
   function removeGalleryImage(index: number) {
+    const url = form.gallery[index];
+    // Delete from Supabase Storage (best-effort)
+    deleteStorageFile(url);
     update(
       "gallery",
       form.gallery.filter((_, i) => i !== index)
