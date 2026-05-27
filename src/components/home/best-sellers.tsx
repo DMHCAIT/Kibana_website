@@ -24,8 +24,8 @@ export function BestSellers({
     <section className="container py-2 md:py-6">
       <SectionHeading title="Best Sellers" />
 
-      {/* Full-width banner — controlled height per breakpoint */}
-      <div className="relative w-full aspect-[3/2] sm:aspect-[16/9] md:aspect-[16/7] overflow-hidden">
+      {/* Full-width banner — aspect matches image's natural 1816×866 ratio on mobile */}
+      <div className="relative w-full aspect-[21/10] sm:aspect-[16/9] md:aspect-[16/7] overflow-hidden">
         <Image
           src={bannerImage}
           alt="Best Sellers"
@@ -36,7 +36,7 @@ export function BestSellers({
           className="object-cover object-left-top sm:object-center"
         />
         {/* Shop Now overlay — stays inside the left text panel at every breakpoint */}
-        <div className="absolute left-[8%] top-[60%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
+        <div className="absolute left-[8%] top-[58%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
           <Link
             href="/shop"
             className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-widest uppercase
