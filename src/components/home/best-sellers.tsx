@@ -33,14 +33,14 @@ export function BestSellers({
           sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
           quality={75}
           priority
-          className="object-cover object-top sm:object-center"
+          className="object-cover object-left-top sm:object-center"
         />
-        {/* Shop Now overlay button — positioned right below the "LUXURY MEET" text */}
-        <div className="absolute left-[12%] top-[52%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
+        {/* Shop Now overlay — stays inside the left text panel at every breakpoint */}
+        <div className="absolute left-[8%] top-[60%] sm:left-[13%] sm:top-[50%] md:left-[14%] md:top-[52%]">
           <Link
             href="/shop"
             className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-widest uppercase
-                       text-[10px] px-4 py-2
+                       text-[9px] px-3 py-1.5
                        sm:text-xs sm:px-5 sm:py-2.5
                        md:text-sm md:px-7 md:py-3
                        transition-colors duration-200"
