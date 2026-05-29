@@ -11,7 +11,7 @@ export function AnnouncementBanner({ text }: { text?: string }) {
     : DEFAULT_PHRASES;
 
   return (
-    <div className="w-full bg-black text-white overflow-hidden py-2 mb-6 md:mb-10">
+    <div className="w-full bg-black text-white overflow-hidden py-2">
       <div className="flex whitespace-nowrap animate-marquee">
         {[...Array(3)].map((_, i) => (
           <span key={i} className="flex items-center gap-0 shrink-0">

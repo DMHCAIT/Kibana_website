@@ -3,10 +3,18 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-// Hero banner images (mobile & desktop)
-const heroImages = [
-  "/mv/hero1.jpg.jpeg",
-  "/mv/hero2.jpg.jpeg",
+// Hero banner images — mobile and desktop versions per slide
+const heroSlides = [
+  {
+    mobile:  "/mv/hero1.jpg.jpeg",
+    desktop: "/mv/women-hero-desktop.jpg.jpeg",
+    alt:     "Women collection",
+  },
+  {
+    mobile:  "/mv/hero2.jpg.jpeg",
+    desktop: "/mv/men-hero-desktop.jpg.jpeg",
+    alt:     "Men collection",
+  },
 ];
 
 export function HeroBanner() {
@@ -32,7 +40,7 @@ export function HeroBanner() {
   useEffect(() => {
     if (fading) return;
     const timer = setInterval(() => {
-      const next = (currentImage + 1) % heroImages.length;
+      const next = (currentImage + 1) % heroSlides.length;
       setPrevImage(currentImage);
       setFading(true);
       setCurrentImage(next);
@@ -47,54 +55,83 @@ export function HeroBanner() {
   return (
     <section className="relative w-full bg-kibana-cream">
       {/* Preload non-visible images */}
-      {heroImages.map((src, i) =>
+      {heroSlides.map((slide, i) =>
         i !== currentImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <link key={`preload-${i}`} rel="preload" as="image" href={src} />
+          <>
+            <link key={`preload-mob-${i}`} rel="preload" as="image" href={slide.mobile} media="(max-width: 767px)" />
+            <link key={`preload-desk-${i}`} rel="preload" as="image" href={slide.desktop} media="(min-width: 768px)" />
+          </>
         ) : null
       )}
 
-      {/* Responsive container: natural 4:5 on mobile, capped height on desktop */}
-      <div className="relative w-full aspect-[4/5] md:aspect-auto md:h-[80vh] md:max-h-[800px]">
-        {/* Previous image (fading out) */}
+      {/* ── MOBILE container (hidden on md+) — matches 1122×1402 image ratio ── */}
+      <div className="relative w-full block md:hidden" style={{ aspectRatio: "1122/1402" }}>
         {prevImage !== null && (
           <Image
-            key={`prev-${prevImage}`}
-            src={heroImages[prevImage]}
+            key={`prev-mob-${prevImage}`}
+            src={heroSlides[prevImage].mobile}
             alt=""
             fill
             priority={false}
-            quality={75}
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
-            className="object-contain md:object-cover object-center"
+            quality={80}
+            sizes="100vw"
+            className="object-cover object-center"
             style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
           />
         )}
-
-        {/* Current image (fading in) */}
         <Image
-          key={`curr-${currentImage}`}
-          src={heroImages[currentImage]}
-          alt="Kibana Hero"
+          key={`curr-mob-${currentImage}`}
+          src={heroSlides[currentImage].mobile}
+          alt={heroSlides[currentImage].alt}
           fill
           priority
-          quality={75}
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
-          className="object-contain md:object-cover object-center"
+          quality={80}
+          sizes="100vw"
+          className="object-cover object-center"
           style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
         />
+        {/* Dots */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+          {heroSlides.map((_, index) => (
+            <button key={index} onClick={() => goTo(index)}
+              className={`h-2 w-2 transition-all cursor-pointer ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
+              aria-label={`View image ${index + 1}`} />
+          ))}
+        </div>
+      </div>
 
-        {/* Pagination dots */}
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
-          {heroImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goTo(index)}
-              className={`h-2 w-2 transition-all cursor-pointer ${
-                index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"
-              }`}
-              aria-label={`View image ${index + 1}`}
-            />
+      {/* ── DESKTOP / TABLET container (hidden below md) — matches 2172×724 image ratio ── */}
+      <div className="relative w-full hidden md:block" style={{ aspectRatio: "2172/724" }}>
+        {prevImage !== null && (
+          <Image
+            key={`prev-desk-${prevImage}`}
+            src={heroSlides[prevImage].desktop}
+            alt=""
+            fill
+            priority={false}
+            quality={80}
+            sizes="100vw"
+            className="object-cover object-center"
+            style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
+          />
+        )}
+        <Image
+          key={`curr-desk-${currentImage}`}
+          src={heroSlides[currentImage].desktop}
+          alt={heroSlides[currentImage].alt}
+          fill
+          priority
+          quality={80}
+          sizes="100vw"
+          className="object-cover object-center"
+          style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
+        />
+        {/* Dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+          {heroSlides.map((_, index) => (
+            <button key={index} onClick={() => goTo(index)}
+              className={`h-2 w-2 transition-all cursor-pointer ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
+              aria-label={`View image ${index + 1}`} />
           ))}
         </div>
       </div>

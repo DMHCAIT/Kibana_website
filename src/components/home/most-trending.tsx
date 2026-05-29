@@ -35,7 +35,8 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   };
 
   return (
-    <section className="py-2 md:py-8 md:container">
+    <section className="bg-[#eef4f0] w-full py-2 md:py-8">
+    <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
       <div className="relative">
         {/* Scrollable row — 2 cards visible at a time */}
@@ -72,6 +73,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
           <ChevronRight className="h-8 w-8" />
         </button>
       </div>
+    </div>
     </section>
   );
 }

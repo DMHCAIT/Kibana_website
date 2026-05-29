@@ -5,13 +5,15 @@ import type { Product } from "@/types/product";
 export function NewArrivals({ products }: { products: Product[] }) {
   const items = products.filter((p) => p.isNew).slice(0, 4);
   return (
-    <section className="container py-2 md:py-6">
-      <SectionHeading title="Shop by New Arrivals" className="pt-6 sm:pt-10" />
+    <section className="bg-[#f5f0e8] w-full">
+    <div className="container py-2 md:py-6">
+      <SectionHeading title="Shop by New Arrivals" className="pt-2 sm:pt-4" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {items.map((p) => (
           <ProductCard key={p.id} product={p} variant="minimal" />
         ))}
       </div>
+    </div>
     </section>
   );
 }

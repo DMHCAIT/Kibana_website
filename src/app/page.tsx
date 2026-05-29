@@ -66,11 +66,16 @@ export default async function HomePage() {
     <>
       <HeroBanner />
       <AnnouncementBanner text={config.announcementBar} />
-      {sections.map((s) => {
+      {sections.map((s, i) => {
         const render = SECTION_COMPONENTS[s.id];
         if (!render) return null;
         const sectionProds = sectionProducts(products, s.id, pinned);
-        return <div key={s.id}>{render(sectionProds)}</div>;
+        const bg = i % 2 === 0 ? "bg-white" : "bg-[#fdf8f3]";
+        return (
+          <div key={s.id} className={`${bg} border-t border-stone-100`}>
+            {render(sectionProds)}
+          </div>
+        );
       })}
     </>
   );
