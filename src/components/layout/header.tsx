@@ -80,7 +80,7 @@ export function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background">
+    <header className="sticky top-0 z-40 w-full bg-background">
       <div className="container relative flex h-14 items-center gap-3 md:h-16 lg:h-18">
         <button
           aria-label="Open menu"
