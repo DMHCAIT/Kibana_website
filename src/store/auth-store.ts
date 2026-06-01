@@ -143,6 +143,7 @@ export const useAuth = create<AuthState>()((set) => ({
 
       return { isNewUser: mode === "signup" };
     } catch (_error) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return { error: "Network error. Please try again." };
     }
   },
@@ -190,6 +191,7 @@ export const useAuth = create<AuthState>()((set) => ({
 
       return {};
     } catch (_error) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return { error: "Verification failed. Please try again." };
     }
   },

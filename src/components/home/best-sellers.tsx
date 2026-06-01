@@ -12,12 +12,13 @@ type BestSellersConfig = {
 };
 
 export function BestSellers({
-  _products = [],
+  products = [],
   config,
 }: {
   products?: Product[];
   config?: BestSellersConfig;
 }) {
+  // products parameter is not currently used in this component
   const bannerImage = config?.leftImage || "/mv/best-seller-B.jpg.jpeg";
 
   return (

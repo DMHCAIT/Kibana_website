@@ -35,6 +35,7 @@ export async function GET() {
 }
 
 // Function to invalidate cache when products change (internal use only)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function invalidateProductsCache() {
   cachedProducts = null;
   cacheTime = 0;
