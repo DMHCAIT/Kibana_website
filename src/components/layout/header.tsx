@@ -91,23 +91,27 @@ export function Header() {
         </button>
 
         {/* Mobile: centered logo image */}
-        <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2">
+        <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
             width={280}
             height={112}
-            className="h-24 w-auto"
+            className="h-12 sm:h-14 w-auto object-contain"
+            priority
+            quality={100}
           />
         </Link>
         {/* Desktop: logo */}
-        <Link href="/" className="hidden md:flex items-center">
+        <Link href="/" className="hidden md:flex items-center justify-center">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
             width={280}
             height={112}
-            className="md:h-24 w-auto"
+            className="h-14 lg:h-16 w-auto object-contain"
+            priority
+            quality={100}
           />
         </Link>
 

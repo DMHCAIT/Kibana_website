@@ -50,12 +50,12 @@ export function Footer() {
 
             {/* Logo */}
             <div className="md:flex-shrink-0 md:pl-8">
-              <Link href="/" className="inline-block">
+              <Link href="/" className="inline-block flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/extracted/kibana logo_white.png"
                   alt="Kibana"
-                  className="h-28 sm:h-28 md:h-44 w-auto -mt-6 md:-mt-4"
+                  className="h-20 sm:h-24 md:h-32 w-auto object-contain"
                 />
               </Link>
             </div>
