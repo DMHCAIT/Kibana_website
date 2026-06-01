@@ -90,26 +90,14 @@ export function Header() {
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Mobile: centered logo image */}
-        <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+        {/* Logo: consistent size on all screens */}
+        <Link href="/" className="absolute md:static left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 flex items-center justify-center">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
             width={280}
             height={112}
-            className="h-12 sm:h-14 w-auto object-contain"
-            priority
-            quality={100}
-          />
-        </Link>
-        {/* Desktop: logo */}
-        <Link href="/" className="hidden md:flex items-center justify-center">
-          <Image
-            src="/extracted/kibana logo black.png"
-            alt="Kibana"
-            width={280}
-            height={112}
-            className="h-14 lg:h-16 w-auto object-contain"
+            className="h-20 w-auto object-contain"
             priority
             quality={100}
           />
