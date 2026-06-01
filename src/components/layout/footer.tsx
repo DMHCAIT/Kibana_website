@@ -55,7 +55,7 @@ export function Footer() {
                 <img
                   src="/extracted/kibana logo_white.png"
                   alt="Kibana"
-                  className="h-28 w-auto object-contain"
+                  className="h-32 w-auto object-contain"
                 />
               </Link>
             </div>

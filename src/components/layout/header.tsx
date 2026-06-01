@@ -97,7 +97,7 @@ export function Header() {
             alt="Kibana"
             width={280}
             height={112}
-            className="h-20 w-auto object-contain"
+            className="h-28 w-auto object-contain"
             priority
             quality={100}
           />
