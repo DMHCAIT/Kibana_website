@@ -46,11 +46,13 @@ export function useDebounce<T extends (...args: any[]) => Promise<any>>(
   callback: T,
   delay: number
 ) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   return useCallback(
     (...args: Parameters<T>) => {
-      clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       timeoutRef.current = setTimeout(() => {
         callback(...args);
       }, delay);
@@ -131,10 +133,10 @@ export function useOptimisticUpdate<T>(
       // 2. Make request in background
       try {
         const result = await updateFn();
-        if (typeof result === "object" && "error" in result) {
+        if (!result || (typeof result === "object" && "error" in result)) {
           // Revert on error
           setCurrentValue(currentValue);
-          return result;
+          return result || { error: "Update failed" };
         } else {
           // Confirm with server response
           setCurrentValue(result as T);

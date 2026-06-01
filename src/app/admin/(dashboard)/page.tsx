@@ -247,7 +247,7 @@ export default async function AdminDashboardPage() {
             title="Items in Carts"
             value={cartItems.reduce((sum, item) => sum + item.quantity, 0).toString()}
             icon={ShoppingCart}
-            color="amber"
+            color="yellow"
             sub={`${new Set(cartItems.map((item) => item.userId)).size} customers`}
           />
         </div>

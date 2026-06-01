@@ -27,7 +27,7 @@ export async function GET() {
     return NextResponse.json({
       id: user.id,
       email: user.email,
-      name: user.name || user.email.split("@")[0],
+      name: user.name || (user.email ? user.email.split("@")[0] : "User"),
       phone: user.phone,
     });
   } catch (error) {
