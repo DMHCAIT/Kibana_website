@@ -317,11 +317,22 @@ export async function sendOtpEmail(options: OtpEmailOptions): Promise<boolean> {
       html: getEmailTemplate(options.type, options.otp, options.name),
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log(`✓ ${options.type.toUpperCase()} email sent to ${options.email} from ${process.env.SMTP_EMAIL}`);
+    console.log(`📧 sendOtpEmail: Preparing to send to ${options.email}`);
+    console.log(`📧 From: ${process.env.SMTP_EMAIL}, Type: ${options.type}`);
+    
+    // Create a promise with timeout
+    const sendPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("Email send timeout after 10 seconds")), 10000)
+    );
+    
+    console.log(`📧 Awaiting transporter.sendMail...`);
+    await Promise.race([sendPromise, timeoutPromise]);
+    
+    console.log(`✓ Email successfully sent to ${options.email}`);
     return true;
   } catch (error) {
-    console.error(`✗ Failed to send ${options.type} email:`, error);
+    console.error(`❌ Exception while sending email to ${options.email}:`, error);
     return false;
   }
 }
