@@ -1,14 +1,15 @@
 ﻿"use client";
 
 import { create } from "zustand";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useWishlist } from "@/store/wishlist-store";
 import { useCart } from "@/store/cart-store";
+import { useProductCache } from "@/store/product-cache";
 
 export type AuthUser = {
   id: string;
   email: string;
   name: string;
+  phone?: string;
 };
 
 type AuthState = {
@@ -21,24 +22,26 @@ type AuthState = {
   openAuthModal: (message?: string) => void;
   closeAuthModal: () => void;
 
-  /** Hydrate user from Supabase session cookie on app mount */
+  /** Hydrate user from cookie-based session on app mount */
   hydrateUser: () => Promise<void>;
 
   /**
-   * Send OTP to email via Supabase Auth.
-   * mode="login"  â†’ only works if the email already has an account
-   * mode="signup" â†’ creates account if new, sends OTP
+   * Send OTP to email via SMTP.
+   * mode="login"  → only works if the email already has an account
+   * mode="signup" → creates account if new, sends OTP
    */
   sendOtp: (
     email: string,
-    mode: "login" | "signup"
+    mode: "login" | "signup",
+    phone?: string,
+    name?: string
   ) => Promise<{ error?: string; isNewUser?: boolean }>;
 
-  /** Verify OTP returned by Supabase. For new users also saves name. */
+  /** Verify OTP from email. For new users also saves name and phone. */
   verifyOtp: (
     email: string,
     otp: string,
-    name?: string
+    signupData?: { name: string; phone: string }
   ) => Promise<{ error?: string }>;
 
   logout: () => Promise<void>;
@@ -64,26 +67,31 @@ export const useAuth = create<AuthState>()((set) => ({
 
   hydrateUser: async () => {
     try {
-      const sb = createSupabaseBrowserClient();
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session?.user) {
-        set({ _hasHydrated: true });
-        return;
+      // Get user from server-side cookie auth
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const userData = await res.json();
+        if (userData.id) {
+          set({ user: userData, _hasHydrated: true });
+          // Pre-cache products and restore user's cart/wishlist in parallel
+          await Promise.all([
+            useProductCache.getState().fetch(),
+            useWishlist.getState().loadForUser(userData.id),
+            useCart.getState().loadForUser(userData.id),
+          ]);
+          return;
+        }
       }
-      const u = session.user;
-      const name = (u.user_metadata?.name as string | undefined) || u.email!.split("@")[0];
-      set({ user: { id: u.id, email: u.email!, name }, _hasHydrated: true });
-      // Restore this user's wishlist and cart from their scoped localStorage
-      useWishlist.getState().loadForUser(u.id);
-      useCart.getState().loadForUser(u.id);
     } catch {
-      set({ _hasHydrated: true });
+      // Cookie auth failed, user is not logged in
     }
+
+    set({ _hasHydrated: true });
   },
 
-  sendOtp: async (email, mode) => {
+  sendOtp: async (email, mode, phone, name) => {
     try {
-      const sb = createSupabaseBrowserClient();
+      const cleanEmail = email.trim().toLowerCase();
 
       // On signup, check if the email is already registered
       if (mode === "signup") {
@@ -91,7 +99,7 @@ export const useAuth = create<AuthState>()((set) => ({
           const res = await fetch("/api/auth/check-email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email.trim().toLowerCase() }),
+            body: JSON.stringify({ email: cleanEmail }),
           });
           const data = await res.json() as { exists?: boolean };
           if (data.exists) {
@@ -100,81 +108,100 @@ export const useAuth = create<AuthState>()((set) => ({
         } catch {
           // If check fails, allow signup to proceed
         }
+      } else if (mode === "login") {
+        // For login, check if email exists
+        try {
+          const res = await fetch("/api/auth/check-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: cleanEmail }),
+          });
+          const data = await res.json() as { exists?: boolean };
+          if (!data.exists) {
+            return { error: "not_found" };
+          }
+        } catch {
+          // If check fails, allow login to proceed
+        }
       }
 
-      const { error } = await sb.auth.signInWithOtp({
-        email: email.trim().toLowerCase(),
-        options: {
-          // login-only: don't create a new account if email not found
-          shouldCreateUser: mode === "signup",
-        },
+      // Send OTP via SMTP
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: cleanEmail,
+          type: mode,
+          name: name || undefined,
+        }),
       });
 
-      if (error) {
-        // Supabase returns this when shouldCreateUser=false and email not found
-        if (
-          error.message.toLowerCase().includes("signups not allowed") ||
-          error.message.toLowerCase().includes("not found") ||
-          error.status === 422
-        ) {
-          return { error: "not_found" };
-        }
-        return { error: error.message };
+      const data = await res.json() as { error?: string };
+      if (!res.ok || data.error) {
+        return { error: data.error || "Failed to send verification code" };
       }
 
       return { isNewUser: mode === "signup" };
-    } catch {
+    } catch (error) {
       return { error: "Network error. Please try again." };
     }
   },
 
-  verifyOtp: async (email, otp, name) => {
+  verifyOtp: async (email, otp, signupData) => {
     try {
-      const sb = createSupabaseBrowserClient();
+      const cleanEmail = email.trim().toLowerCase();
 
-      const { data, error } = await sb.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: otp.trim(),
-        type: "email",
-      });
-
-      if (error) return { error: error.message };
-
-      const sbUser = data.user!;
-
-      // If a name was provided (signup), save it to Supabase user_metadata
-      const displayName =
-        name?.trim() ||
-        (sbUser.user_metadata?.name as string | undefined) ||
-        sbUser.email!.split("@")[0];
-
-      if (name?.trim()) {
-        await sb.auth.updateUser({ data: { name: name.trim() } });
-      }
-
-      const user: AuthUser = { id: sbUser.id, email: sbUser.email!, name: displayName };
-      set({ user, showAuthModal: false, authModalMessage: "" });
-
-      // Load this user's wishlist and cart from their scoped localStorage
-      useWishlist.getState().loadForUser(sbUser.id);
-      useCart.getState().loadForUser(sbUser.id);
-
-      // Record login in admin users panel (fire-and-forget)
-      fetch("/api/admin/users", {
+      // Send OTP verification directly to server
+      // Let the server handle all OTP validation
+      const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
-      }).catch(() => {});
+        body: JSON.stringify({
+          email: cleanEmail,
+          otp: otp.trim(),
+          signupData: signupData ? {
+            name: signupData.name.trim(),
+            phone: signupData.phone.trim()
+          } : undefined
+        }),
+      });
+
+      const data = await response.json() as { error?: string; user?: AuthUser };
+      if (!response.ok || data.error) {
+        return { error: data.error || "Verification failed" };
+      }
+
+      if (data.user) {
+        set({ user: data.user, showAuthModal: false, authModalMessage: "" });
+        // Pre-cache products and restore user's cart/wishlist in parallel
+        await Promise.all([
+          useProductCache.getState().fetch(),
+          useWishlist.getState().loadForUser(data.user.id),
+          useCart.getState().loadForUser(data.user.id),
+        ]);
+
+        // Record login in admin users panel (fire-and-forget)
+        fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data.user),
+        }).catch(() => {});
+      }
 
       return {};
-    } catch {
+    } catch (error) {
       return { error: "Verification failed. Please try again." };
     }
   },
 
   logout: async () => {
-    const sb = createSupabaseBrowserClient();
-    await sb.auth.signOut().catch(() => {});
+    // Call server logout to clear kibana-user-id cookie
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Ignore errors
+    }
+    
     // Clear user-scoped wishlist and cart so guest sees empty state
     useWishlist.getState().clearForUser();
     useCart.getState().clearForUser();

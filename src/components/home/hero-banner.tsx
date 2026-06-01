@@ -57,10 +57,10 @@ export function HeroBanner() {
       {/* Preload non-visible images */}
       {heroSlides.map((slide, i) =>
         i !== currentImage ? (
-          <>
-            <link key={`preload-mob-${i}`} rel="preload" as="image" href={slide.mobile} media="(max-width: 767px)" />
-            <link key={`preload-desk-${i}`} rel="preload" as="image" href={slide.desktop} media="(min-width: 768px)" />
-          </>
+          <div key={`preload-${i}`} style={{ display: "none" }}>
+            <link rel="preload" as="image" href={slide.mobile} media="(max-width: 767px)" />
+            <link rel="preload" as="image" href={slide.desktop} media="(min-width: 768px)" />
+          </div>
         ) : null
       )}
 

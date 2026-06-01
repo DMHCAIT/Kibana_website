@@ -126,12 +126,32 @@ export const mediaFiles = pgTable("media_files", {
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── User Cart (persisted per user) ─────────────────────────────────────────────
+export const userCart = pgTable("user_cart", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  productId: text("product_id").notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  color: text("color"),
+  addedAt: timestamp("added_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ── User Wishlist (persisted per user) ────────────────────────────────────────
+export const userWishlist = pgTable("user_wishlist", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  productId: text("product_id").notNull(),
+  addedAt: timestamp("added_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Inferred types
 export type ProductRow = typeof products.$inferSelect;
 export type CategoryRow = typeof categories.$inferSelect;
 export type OrderRow = typeof orders.$inferSelect;
 export type UserRow = typeof users.$inferSelect;
 export type OtpSessionRow = typeof otpSessions.$inferSelect;
+export type UserCartRow = typeof userCart.$inferSelect;
+export type UserWishlistRow = typeof userWishlist.$inferSelect;
 export type UserSessionRow = typeof userSessions.$inferSelect;
 export type ContactMessageRow = typeof contactMessages.$inferSelect;
 export type MediaFileRow = typeof mediaFiles.$inferSelect;

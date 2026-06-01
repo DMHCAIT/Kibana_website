@@ -1,4 +1,4 @@
-import { getOrders, getUsers, getProducts } from "@/lib/server-data";
+import { getOrders, getUsers, getProducts, getCartItems } from "@/lib/server-data";
 import {
   TrendingUp,
   Users,
@@ -8,6 +8,7 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import type { ElementType } from "react";
@@ -57,10 +58,11 @@ const STATUS_CONFIG = {
 type Status = keyof typeof STATUS_CONFIG;
 
 export default async function AdminDashboardPage() {
-  const [orders, users, products] = await Promise.all([
+  const [orders, users, products, cartItems] = await Promise.all([
     withTimeout(getOrders(), 2500, []),
     withTimeout(getUsers(), 2500, []),
     withTimeout(getProducts(), 2500, []),
+    withTimeout(getCartItems(), 2500, []),
   ]);
 
   const now = new Date();
@@ -241,6 +243,13 @@ export default async function AdminDashboardPage() {
             color="gray"
             sub={`${products.filter((p) => (p as { inStock?: boolean }).inStock !== false).length} in stock`}
           />
+          <StatCard
+            title="Items in Carts"
+            value={cartItems.reduce((sum, item) => sum + item.quantity, 0).toString()}
+            icon={ShoppingCart}
+            color="amber"
+            sub={`${new Set(cartItems.map((item) => item.userId)).size} customers`}
+          />
         </div>
 
         {/* Revenue Chart */}
@@ -266,6 +275,60 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Customer Cart Items */}
+      <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900">Customer Cart Items</h3>
+          <Link
+            href="/admin/cart"
+            className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            View all →
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500">Customer</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500">Product</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500">Qty</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500">Total</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500">Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cartItems.slice(0, 5).map((item) => {
+                const itemTotal = item.productPrice * item.quantity;
+                return (
+                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50/50">
+                    <td className="px-6 py-3">
+                      <div className="flex flex-col">
+                        <p className="font-medium text-gray-900">{item.customerName}</p>
+                        <p className="text-xs text-gray-500">{item.customerEmail}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3 text-gray-600">{item.productName}</td>
+                    <td className="px-6 py-3 font-medium text-gray-900">{item.quantity}</td>
+                    <td className="px-6 py-3 font-semibold text-gray-900">{formatINR(itemTotal)}</td>
+                    <td className="px-6 py-3 text-gray-500 text-xs">
+                      {new Date(item.addedAt).toLocaleDateString("en-IN")}
+                    </td>
+                  </tr>
+                );
+              })}
+              {cartItems.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
+                    No items in customer carts
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {/* Recent Orders */}
       <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden">

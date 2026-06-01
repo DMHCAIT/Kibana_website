@@ -17,6 +17,7 @@ export function AuthModal() {
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
   const [error, setError] = useState("");
@@ -31,6 +32,7 @@ export function AuthModal() {
       setStep("email");
       setEmail("");
       setName("");
+      setPhone("");
       setOtp(["", "", "", "", "", ""]);
       setError("");
       setLoading(false);
@@ -60,30 +62,49 @@ export function AuthModal() {
       setError("Please enter your full name.");
       return;
     }
+    if (tab === "signup" && !phone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
 
+    // Show visual feedback immediately
     setLoading(true);
-    const result = await sendOtp(cleaned, tab);
+    
+    // Move to OTP step immediately (optimistic update)
+    setIsNewUser(tab === "signup");
+    setStep("otp");
+    setResendCooldown(30);
+    
+    // Send OTP in background
+    const result = await sendOtp(
+      cleaned, 
+      tab, 
+      tab === "signup" ? phone.trim() : undefined,
+      tab === "signup" ? name.trim() : undefined
+    );
+    
     setLoading(false);
 
     if (result.error === "not_found") {
       setError("No account found with this email. Please sign up first.");
+      setStep("email");
       setTab("signup");
       return;
     }
     if (result.error === "already_exists") {
       setError("An account with this email already exists. Please sign in instead.");
+      setStep("email");
       setTab("login");
       return;
     }
     if (result.error) {
       setError(result.error);
+      setStep("email");
       return;
     }
 
-    setIsNewUser(result.isNewUser ?? false);
-    setStep("otp");
-    setResendCooldown(30);
-    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    // Success - OTP form is already showing from optimistic update
+    setTimeout(() => otpRefs.current[0]?.focus(), 50);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -96,15 +117,23 @@ export function AuthModal() {
       return;
     }
 
+    // Show visual feedback immediately
     setLoading(true);
-    const result = await verifyOtp(email, otpString, isNewUser ? name.trim() : undefined);
+
+    // Verify OTP
+    const result = await verifyOtp(email, otpString, isNewUser ? { name: name.trim(), phone: phone.trim() } : undefined);
     setLoading(false);
 
     if (result.error) {
       setError(result.error);
       setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 50);
+      return;
     }
+
+    // Success! Modal will close automatically via auth state update
+    setStep("email");
+    setEmail("");
   };
 
   const handleOtpChange = (i: number, value: string) => {
@@ -135,7 +164,12 @@ export function AuthModal() {
     setError("");
     setOtp(["", "", "", "", "", ""]);
     setLoading(true);
-    const result = await sendOtp(email, tab);
+    const result = await sendOtp(
+      email, 
+      tab, 
+      tab === "signup" ? phone.trim() : undefined,
+      tab === "signup" ? name.trim() : undefined
+    );
     setLoading(false);
     if (result.error) {
       setError(result.error);
@@ -191,19 +225,34 @@ export function AuthModal() {
 
               <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
                 {tab === "signup" && (
-                  <div>
-                    <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
-                      Full Name
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Jane Doe"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      className="h-11"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                        Full Name
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="Jane Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="h-11"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                        Phone Number
+                      </label>
+                      <Input
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        className="h-11"
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div>

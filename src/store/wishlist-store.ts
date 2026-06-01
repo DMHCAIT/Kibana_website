@@ -2,58 +2,80 @@
 
 import { create } from "zustand";
 
-// Current logged-in user ID — updated by auth store on login/logout
 let _userId: string | null = null;
-
-const storageKey = (uid: string) => `kibana-wishlist-${uid}`;
-
-function loadItems(uid: string): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(storageKey(uid)) ?? "[]") as string[];
-  } catch {
-    return [];
-  }
-}
-
-function saveItems(uid: string, items: string[]) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(storageKey(uid), JSON.stringify(items));
-  } catch {}
-}
 
 type WishlistState = {
   items: string[];
-  add: (productId: string) => void;
-  remove: (productId: string) => void;
+  isLoading: boolean;
+  add: (productId: string) => Promise<void>;
+  remove: (productId: string) => Promise<void>;
   has: (productId: string) => boolean;
   clear: () => void;
-  /** Called by auth store after login — loads this user's saved wishlist */
-  loadForUser: (userId: string) => void;
-  /** Called by auth store on logout — clears state (data already persisted per-add/remove) */
+  /** Called by auth store after login — loads this user's saved wishlist from API */
+  loadForUser: (userId: string) => Promise<void>;
+  /** Called by auth store on logout — clears state */
   clearForUser: () => void;
 };
 
 export const useWishlist = create<WishlistState>()((set, get) => ({
   items: [],
-  add: (productId) => {
+  isLoading: false,
+
+  add: async (productId) => {
     if (get().items.includes(productId)) return;
+
+    // OPTIMISTIC UPDATE: Add immediately
     const next = [...get().items, productId];
     set({ items: next });
-    if (_userId) saveItems(_userId, next);
+
+    // SYNC WITH SERVER in background
+    if (_userId) {
+      fetch("/api/wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      }).catch((error) => {
+        console.error("Failed to sync wishlist to server:", error);
+      });
+    }
   },
-  remove: (productId) => {
+
+  remove: async (productId) => {
+    // OPTIMISTIC UPDATE: Remove immediately
     const next = get().items.filter((id) => id !== productId);
     set({ items: next });
-    if (_userId) saveItems(_userId, next);
+
+    // SYNC WITH SERVER in background
+    if (_userId) {
+      fetch(`/api/wishlist?productId=${productId}`, { method: "DELETE" }).catch(
+        (error) => {
+          console.error("Failed to sync wishlist to server:", error);
+        }
+      );
+    }
   },
+
   has: (productId) => get().items.includes(productId),
+
   clear: () => set({ items: [] }),
-  loadForUser: (userId) => {
+
+  loadForUser: async (userId) => {
     _userId = userId;
-    set({ items: loadItems(userId) });
+    set({ isLoading: true });
+
+    try {
+      const res = await fetch("/api/wishlist");
+      if (res.ok) {
+        const data = await res.json();
+        set({ items: data || [] });
+      }
+    } catch (error) {
+      console.error("Failed to load wishlist from API:", error);
+    } finally {
+      set({ isLoading: false });
+    }
   },
+
   clearForUser: () => {
     _userId = null;
     set({ items: [] });

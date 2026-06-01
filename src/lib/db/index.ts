@@ -24,10 +24,10 @@ const client =
   globalThis.__kibana_pg ??
   postgres(connectionString ?? "postgres://invalid", {
     prepare: false,          // Required for serverless
-    max: 1,                  // Keep connections low on serverless
-    connect_timeout: 2,      // Fail fast — 2s max per connection attempt
-    idle_timeout: 10,
-    max_lifetime: 60,
+    max: 5,                  // Increased from 1 to allow concurrent operations
+    connect_timeout: 5,      // Increased timeout to 5s for better reliability
+    idle_timeout: 60,        // Increased from 10s to prevent premature disconnects
+    max_lifetime: 300,       // Increased from 60s for longer connection reuse
     ssl: "require",          // Always require SSL for Supabase
   });
 

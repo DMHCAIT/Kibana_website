@@ -6,6 +6,7 @@ import { getSiteConfig } from "@/lib/server-data";
 import { Footer } from "@/components/layout/footer";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { CookiesBanner } from "@/components/layout/cookies-banner";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthAutoPopup } from "@/components/auth/auth-auto-popup";
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <AuthModal />
           <AuthAutoPopup />
           <CookiesBanner />
+          <WhatsAppButton />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <MobileBottomNav />
           <Footer />

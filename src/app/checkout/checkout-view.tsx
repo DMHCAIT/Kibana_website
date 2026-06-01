@@ -18,6 +18,7 @@ import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatINR } from "@/lib/utils";
+import { RazorpayCheckout } from "@/components/payment/razorpay-checkout";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Address = {
@@ -74,10 +75,6 @@ export function CheckoutView() {
   const [address, setAddress] = useState<Address>(emptyAddress());
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [upiId, setUpiId] = useState("");
-  const [cardNum, setCardNum] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
   const [placing, setPlacing] = useState(false);
   const [errors, setErrors] = useState<Partial<Address>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -90,7 +87,13 @@ export function CheckoutView() {
 
   const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
   const shipping = subtotal === 0 ? 0 : subtotal >= 1499 ? 0 : 99;
-  const total = subtotal + shipping;
+  const subtotalWithShipping = subtotal + shipping;
+  
+  // Cashback/Discount or Extra charges based on payment method
+  const discount = payment === "card" ? 50 : payment === "upi" ? 50 : 0;
+  const discountLabel = payment === "card" ? "💳 Cashback" : payment === "upi" ? "📱 Cashback" : "";
+  const codExtraCharge = payment === "cod" ? 50 : 0;
+  const total = Math.max(0, subtotalWithShipping - discount + codExtraCharge);
 
   // Empty cart redirect
   if (items.length === 0 && !orderId) {
@@ -208,6 +211,55 @@ export function CheckoutView() {
       setOrderId(id);
     } catch {
       alert("Something went wrong. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
+  }
+
+  // ── Handle Razorpay payment success ────────────────────────────────────────
+  async function handleRazorpaySuccess(paymentId: string) {
+    if (!user) {
+      openAuthModal("Please log in to complete your order.");
+      return;
+    }
+
+    try {
+      setPlacing(true);
+      const id = `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+      const shippingText = `${address.fullName}, ${address.addressLine1}${address.addressLine2 ? ", " + address.addressLine2 : ""}, ${address.city}, ${address.state} - ${address.pincode}, Phone: ${address.phone}`;
+      
+      const body = {
+        id,
+        user: { name: user.name, email: user.email, id: user.id },
+        items: items.map((i) => ({
+          productId: i.product.id,
+          name: i.product.name,
+          price: i.product.price,
+          quantity: i.quantity,
+          image: i.product.image,
+        })),
+        total,
+        status: "confirmed",
+        shippingAddress: shippingText,
+        paymentMethod: "Razorpay - Debit/Credit Card",
+        paymentStatus: "paid",
+        paymentId: paymentId,
+        placedAt: new Date().toISOString(),
+      };
+
+      const res = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error("Failed to save order");
+
+      clearCart();
+      setOrderId(id);
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert("Order saved but could not record in system. Please contact support with Payment ID: " + paymentId);
     } finally {
       setPlacing(false);
     }
@@ -398,14 +450,17 @@ export function CheckoutView() {
               </div>
               <div className="px-5 py-5 space-y-3">
                 {/* COD */}
-                <PaymentOption
-                  id="cod"
-                  selected={payment === "cod"}
-                  onSelect={() => setPayment("cod")}
-                  icon={<Banknote className="h-5 w-5 text-emerald-700" />}
-                  title="Cash on Delivery"
-                  subtitle="Pay when your order arrives"
-                />
+                <div>
+                  <PaymentOption
+                    id="cod"
+                    selected={payment === "cod"}
+                    onSelect={() => setPayment("cod")}
+                    icon={<Banknote className="h-5 w-5 text-emerald-700" />}
+                    title="Cash on Delivery"
+                    subtitle="Pay when your order arrives"
+                  />
+                  {payment === "cod" && <p className="text-xs text-orange-600 ml-9 mt-1">🚚 COD handling charge: +₹50</p>}
+                </div>
                 {/* UPI */}
                 <PaymentOption
                   id="upi"
@@ -416,7 +471,8 @@ export function CheckoutView() {
                   subtitle="Pay via any UPI app (GPay, PhonePe, Paytm…)"
                 />
                 {payment === "upi" && (
-                  <div className="ml-8 mt-1">
+                  <div className="ml-8 mt-1 space-y-1">
+                    <p className="text-xs text-blue-600 font-medium">📱 Get ₹50 cashback!</p>
                     <input
                       type="text"
                       className={inputCls(false)}
@@ -436,57 +492,34 @@ export function CheckoutView() {
                   subtitle="Visa, Mastercard, RuPay"
                 />
                 {payment === "card" && (
-                  <div className="ml-8 mt-1 space-y-3">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={19}
-                      className={inputCls(false)}
-                      placeholder="Card number"
-                      value={cardNum}
-                      onChange={(e) => {
-                        const v = e.target.value.replace(/\D/g, "").slice(0, 16);
-                        setCardNum(v.replace(/(.{4})/g, "$1 ").trim());
+                  <div className="ml-8 mt-1 space-y-1">
+                    <p className="text-xs text-purple-600 font-medium">💳 Get ₹50 cashback!</p>
+                    <RazorpayCheckout
+                      amount={total}
+                      email={user?.email || ""}
+                      name={address.fullName || user?.name || ""}
+                      phone={address.phone || user?.phone || ""}
+                      description="Kibana Premium Vegan Leather Handbags"
+                      onSuccess={(paymentId) => {
+                        handleRazorpaySuccess(paymentId);
                       }}
+                      onError={(error) => {
+                        alert(`Payment failed: ${error}`);
+                      }}
+                      disabled={!user}
                     />
-                    <input
-                      type="text"
-                      className={inputCls(false)}
-                      placeholder="Name on card"
-                      value={cardName}
-                      onChange={(e) => setCardName(e.target.value)}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        maxLength={5}
-                        className={inputCls(false)}
-                        placeholder="MM / YY"
-                        value={cardExpiry}
-                        onChange={(e) => {
-                          let v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                          if (v.length > 2) v = v.slice(0, 2) + " / " + v.slice(2);
-                          setCardExpiry(v);
-                        }}
-                      />
-                      <input
-                        type="password"
-                        maxLength={4}
-                        inputMode="numeric"
-                        className={inputCls(false)}
-                        placeholder="CVV"
-                        value={cardCvv}
-                        onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                      />
-                    </div>
                   </div>
                 )}
               </div>
               <div className="px-5 pb-5">
-                <Button size="lg" className="w-full" onClick={placeOrder} disabled={placing}>
-                  {placing ? "Placing order…" : `Place Order · ${formatINR(total)}`}
-                  {!placing && <Check className="h-4 w-4" />}
-                </Button>
+                {payment === "card" ? (
+                  <p className="text-sm text-muted-foreground mb-3">Click the payment button above to complete your purchase with Razorpay</p>
+                ) : (
+                  <Button size="lg" className="w-full" onClick={placeOrder} disabled={placing}>
+                    {placing ? "Placing order…" : `Place Order · ${formatINR(total)}`}
+                    {!placing && <Check className="h-4 w-4" />}
+                  </Button>
+                )}
               </div>
             </div>
           )}
@@ -517,6 +550,18 @@ export function CheckoutView() {
               <dt className="text-muted-foreground">Shipping</dt>
               <dd>{shipping === 0 ? "Free" : formatINR(shipping)}</dd>
             </div>
+            {discount > 0 && step >= 2 && (
+              <div className="flex justify-between">
+                <dt className="text-emerald-700 font-medium">{discountLabel}</dt>
+                <dd className="text-emerald-700 font-medium">-{formatINR(discount)}</dd>
+              </div>
+            )}
+            {codExtraCharge > 0 && step >= 2 && (
+              <div className="flex justify-between">
+                <dt className="text-orange-600 font-medium">🚚 COD Extra Charge</dt>
+                <dd className="text-orange-600 font-medium">+{formatINR(codExtraCharge)}</dd>
+              </div>
+            )}
             <Separator className="my-3" />
             <div className="flex justify-between text-base font-semibold">
               <dt>Total</dt>

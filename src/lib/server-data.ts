@@ -6,6 +6,7 @@ import {
   users as usersTable,
   siteConfig as siteConfigTable,
   contactMessages as contactMessagesTable,
+  userCart as userCartTable,
 } from "@/lib/db/schema";
 import { eq, asc, desc } from "drizzle-orm";
 import type { Product } from "@/types/product";
@@ -15,8 +16,34 @@ import localSiteConfig from "@/data/site-config.json";
 
 const hasDatabase = !!process.env.DATABASE_URL;
 
+// In-memory cache for frequently accessed data
+const dataCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+
+function getCached(key: string): any | null {
+  const entry = dataCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > entry.ttl) {
+    dataCache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCached(key: string, data: any, ttlMs: number = 60000) {
+  dataCache.set(key, { data, timestamp: Date.now(), ttl: ttlMs });
+}
+
+// Export function to invalidate cache
+export function invalidateCache(key?: string) {
+  if (key) {
+    dataCache.delete(key);
+  } else {
+    dataCache.clear();
+  }
+}
+
 /** Races a DB promise against a timeout; resolves with null on timeout/error. */
-function withTimeout<T>(promise: Promise<T>, ms = 3000): Promise<T | null> {
+function withTimeout<T>(promise: Promise<T>, ms = 2000): Promise<T | null> {
   return Promise.race([
     promise.catch(() => null),
     new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
@@ -51,11 +78,21 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  if (!hasDatabase) return localProducts;
+  // Check cache first (60 second TTL)
+  const cached = getCached("products");
+  if (cached) return cached;
+
+  if (!hasDatabase) {
+    setCached("products", localProducts, 60000);
+    return localProducts;
+  }
+
   const rows = await withTimeout(
     db.select().from(productsTable).orderBy(asc(productsTable.sortOrder))
   );
-  return rows ? rows.map(rowToProduct) : localProducts;
+  const result = rows ? rows.map(rowToProduct) : localProducts;
+  setCached("products", result, 60000); // Cache for 1 minute
+  return result;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
@@ -387,11 +424,26 @@ function rowToUser(row: typeof usersTable.$inferSelect): AdminUser {
 }
 
 export async function getUsers(): Promise<AdminUser[]> {
-  if (!hasDatabase) return [];
+  // Check cache first (30 second TTL)
+  const cached = getCached("users");
+  if (cached) return cached;
+
+  if (!hasDatabase) {
+    setCached("users", [], 30000);
+    return [];
+  }
+
   try {
-    const rows = await db.select().from(usersTable);
-    return rows.map(rowToUser);
+    const rows = await withTimeout(db.select().from(usersTable));
+    if (!rows) {
+      setCached("users", [], 30000);
+      return [];
+    }
+    const result = rows.map(rowToUser);
+    setCached("users", result, 30000); // Cache for 30 seconds
+    return result;
   } catch {
+    setCached("users", [], 30000);
     return [];
   }
 }
@@ -422,6 +474,9 @@ export async function recordUserLogin(user: {
       registeredAt: now,
     });
   }
+  
+  // Invalidate cache
+  dataCache.delete("users");
 }
 
 // ── Orders ────────────────────────────────────────────────────────────────────
@@ -462,12 +517,26 @@ function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
 }
 
 export async function getOrders(): Promise<AdminOrder[]> {
-  if (!hasDatabase) return [];
+  // Check cache first (30 second TTL for frequently changing data)
+  const cached = getCached("orders");
+  if (cached) return cached;
+
+  if (!hasDatabase) {
+    setCached("orders", [], 30000);
+    return [];
+  }
+
   try {
     const rows = await withTimeout(db.select().from(ordersTable));
-    if (!rows) return [];
-    return rows.map(rowToOrder);
+    if (!rows) {
+      setCached("orders", [], 30000);
+      return [];
+    }
+    const result = rows.map(rowToOrder);
+    setCached("orders", result, 30000); // Cache for 30 seconds
+    return result;
   } catch {
+    setCached("orders", [], 30000);
     return [];
   }
 }
@@ -489,6 +558,9 @@ export async function saveOrder(order: AdminOrder): Promise<void> {
     .insert(ordersTable)
     .values(row)
     .onConflictDoUpdate({ target: ordersTable.id, set: row });
+  
+  // Invalidate cache
+  dataCache.delete("orders");
 }
 
 export async function updateOrderStatus(
@@ -496,6 +568,87 @@ export async function updateOrderStatus(
   status: AdminOrder["status"]
 ): Promise<void> {
   await db.update(ordersTable).set({ status }).where(eq(ordersTable.id, id));
+  
+  // Invalidate cache
+  dataCache.delete("orders");
+}
+
+// ── Cart Items ────────────────────────────────────────────────────────────────
+
+export type AdminCartItem = {
+  id: string;
+  userId: string;
+  productId: string;
+  quantity: number;
+  color?: string;
+  addedAt: string;
+  customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  productName: string;
+  productPrice: number;
+  productImage: string;
+};
+
+export async function getCartItems(): Promise<AdminCartItem[]> {
+  // Check cache first (30 second TTL)
+  const cached = getCached("cartItems");
+  if (cached) return cached;
+
+  if (!hasDatabase) {
+    setCached("cartItems", [], 30000);
+    return [];
+  }
+
+  try {
+    const rows = await withTimeout(
+      db
+        .select({
+          id: userCartTable.id,
+          userId: userCartTable.userId,
+          productId: userCartTable.productId,
+          quantity: userCartTable.quantity,
+          color: userCartTable.color,
+          addedAt: userCartTable.addedAt,
+          customerName: usersTable.name,
+          customerEmail: usersTable.email,
+          customerPhone: usersTable.phone,
+          productName: productsTable.name,
+          productPrice: productsTable.price,
+          productImage: productsTable.image,
+        })
+        .from(userCartTable)
+        .innerJoin(usersTable, eq(userCartTable.userId, usersTable.id))
+        .innerJoin(productsTable, eq(userCartTable.productId, productsTable.id))
+        .orderBy(desc(userCartTable.addedAt))
+    );
+
+    if (!rows) {
+      setCached("cartItems", [], 30000);
+      return [];
+    }
+
+    const result = rows.map((row) => ({
+      id: row.id,
+      userId: row.userId,
+      productId: row.productId,
+      quantity: row.quantity,
+      color: row.color ?? undefined,
+      addedAt: (row.addedAt as Date).toISOString(),
+      customerName: row.customerName,
+      customerEmail: row.customerEmail ?? undefined,
+      customerPhone: row.customerPhone ?? undefined,
+      productName: row.productName,
+      productPrice: row.productPrice,
+      productImage: row.productImage,
+    }));
+
+    setCached("cartItems", result, 30000); // Cache for 30 seconds
+    return result;
+  } catch {
+    setCached("cartItems", [], 30000);
+    return [];
+  }
 }
 
 // ── Revenue helpers ───────────────────────────────────────────────────────────

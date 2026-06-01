@@ -14,13 +14,13 @@ export function DeliveryCheck() {
     // Delivery available across all India for any valid 6-digit pincode
     setResult({
       ok: true,
-      msg: `We deliver to ${pincode}! Estimated delivery: 3–5 business days across India.`,
+      msg: `We deliver to ${pincode}! Estimated delivery: 3–5 business days.`,
     });
   }
 
   return (
     <div>
-      <h3 className="text-sm font-semibold mb-3">Delivery Details</h3>
+      <h3 className="text-xs font-semibold mb-2 uppercase tracking-[0.2em] text-muted-foreground">Delivery Details</h3>
       <div className="flex w-full">
         <input
           type="text"
@@ -29,15 +29,15 @@ export function DeliveryCheck() {
           onChange={(e) =>
             setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))
           }
-          placeholder="Enter your Pincode"
-          className="min-w-0 flex-1 border border-border border-r-0 px-3 py-2 text-sm outline-none focus:border-foreground placeholder:text-muted-foreground bg-background"
+          placeholder="Enter pincode"
+          className="min-w-0 flex-1 border border-border border-r-0 px-3 py-2 text-xs outline-none focus:border-foreground placeholder:text-muted-foreground bg-background"
           maxLength={6}
           onKeyDown={(e) => e.key === "Enter" && check()}
         />
         <button
           type="button"
           onClick={check}
-          className="bg-foreground text-background text-xs font-semibold tracking-[0.12em] px-5 py-2 hover:bg-foreground/90 transition-colors"
+          className="bg-foreground text-background text-xs font-semibold px-4 py-2 hover:bg-foreground/90 transition-colors"
         >
           CHECK
         </button>

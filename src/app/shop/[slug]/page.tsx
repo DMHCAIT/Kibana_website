@@ -8,6 +8,7 @@ import { ProductGrid } from "@/components/product/product-grid";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
+import { WhatsAppShare } from "./whatsapp-share";
 import { ShopHeader } from "@/components/shop/shop-header";
 
 export default async function ProductDetailPage({
@@ -134,9 +135,13 @@ export default async function ProductDetailPage({
               <AddToCartButton product={product} />
             </div>
 
-            {/* Delivery check */}
-            <div className="mt-5 pt-4 border-t border-border">
+            {/* Delivery & Share */}
+            <div className="mt-5 pt-4 border-t border-border space-y-4">
               <DeliveryCheck />
+              <div>
+                <h3 className="text-xs font-semibold mb-2 uppercase tracking-[0.2em] text-muted-foreground">Share Product</h3>
+                <WhatsAppShare product={product} price={product.price} />
+              </div>
             </div>
 
             {/* Key Features */}

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { db } from "@/lib/db";
+import { users as usersTable } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: Request) {
   try {
@@ -8,24 +10,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    const cleanEmail = email.trim().toLowerCase();
 
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
-    if (error) {
-      // If we can't check, allow signup to proceed
+    // Check if user exists in our PostgreSQL database
+    try {
+      const existingUser = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, cleanEmail))
+        .limit(1);
+
+      const exists = existingUser.length > 0;
+      console.log(`📧 Email check for ${cleanEmail}: exists=${exists}`);
+      
+      return NextResponse.json({ exists });
+    } catch (err) {
+      console.error(`❌ Error checking email in database:`, err);
+      // Default to false if there's an error
       return NextResponse.json({ exists: false });
     }
-
-    const exists = data.users.some(
-      (u) => u.email?.toLowerCase() === email.trim().toLowerCase()
-    );
-
-    return NextResponse.json({ exists });
-  } catch {
+  } catch (err) {
+    console.error(`❌ Error in check-email route:`, err);
     return NextResponse.json({ exists: false });
   }
 }
