@@ -26,12 +26,14 @@ export function RazorpayCheckout({
   email,
   name,
   phone,
-  _orderId,
+  orderId,
   description,
   onSuccess,
   onError,
   disabled = false,
 }: RazorpayCheckoutProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  void orderId; // Not used in this implementation
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
