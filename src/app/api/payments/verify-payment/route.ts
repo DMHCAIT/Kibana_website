@@ -2,19 +2,9 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import Razorpay from "razorpay";
 
-// Validate environment variables
-if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  console.error("❌ Razorpay environment variables not configured");
-}
-
-const razorpay = new Razorpay({
-  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-});
-
 export async function POST(request: Request) {
   try {
-    // Validate configuration
+    // Validate configuration at runtime
     if (!process.env.RAZORPAY_KEY_SECRET) {
       console.error("❌ Razorpay secret key not configured");
       return NextResponse.json(
@@ -22,6 +12,12 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
+
+    // Initialize Razorpay at runtime only
+    const razorpay = new Razorpay({
+      key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
 
     const { 
       razorpay_order_id, 
