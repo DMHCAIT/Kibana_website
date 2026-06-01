@@ -90,14 +90,14 @@ export function Header() {
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Logo: consistent size on all screens */}
+        {/* Logo: responsive size across all screens */}
         <Link href="/" className="absolute md:static left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 flex items-center justify-center">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
             width={280}
             height={112}
-            className="h-28 w-auto object-contain"
+            className="h-28 md:h-40 lg:h-44 w-auto object-contain"
             priority
             quality={100}
           />
