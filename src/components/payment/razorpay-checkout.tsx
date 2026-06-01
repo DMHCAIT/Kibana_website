@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   loadRazorpayScript,
   openRazorpayCheckout,
-  createPaymentOrder,
   verifyPayment,
 } from "@/lib/razorpay-service";
 
@@ -27,7 +26,7 @@ export function RazorpayCheckout({
   email,
   name,
   phone,
-  orderId,
+  _orderId,
   description,
   onSuccess,
   onError,

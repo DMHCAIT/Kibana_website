@@ -12,7 +12,7 @@ type BestSellersConfig = {
 };
 
 export function BestSellers({
-  products = [],
+  _products = [],
   config,
 }: {
   products?: Product[];

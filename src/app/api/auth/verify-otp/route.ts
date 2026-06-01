@@ -6,6 +6,15 @@ import { users as usersTable } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { invalidateCache } from "@/lib/server-data";
 
+interface UserData {
+  id: string;
+  email: string;
+  user_metadata: {
+    name: string;
+    phone: string;
+  };
+}
+
 export async function POST(request: Request) {
   const startTime = Date.now();
   try {
@@ -94,7 +103,7 @@ export async function POST(request: Request) {
             name: signupData.name?.trim() || "",
             phone: signupData.phone?.trim() || "",
           },
-        } as any;
+        } as UserData;
       } catch (err) {
         console.error("❌ Signup error:", err);
         return NextResponse.json(
@@ -131,7 +140,7 @@ export async function POST(request: Request) {
             name: existingUser.name || "",
             phone: existingUser.phone || "",
           },
-        } as any;
+        } as UserData;
       } catch (err) {
         console.error("❌ Login lookup error:", err);
         return NextResponse.json(
@@ -141,11 +150,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update user metadata and record login in parallel for speed
-    const updatePromises = [];
-    
-    // Note: User creation already includes metadata in database, no need for separate update
-    
     // Build response user object
     const displayName = signupData?.name?.trim() ||
       (user?.user_metadata?.name as string | undefined) ||

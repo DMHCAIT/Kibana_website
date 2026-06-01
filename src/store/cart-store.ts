@@ -105,7 +105,7 @@ export const useCart = create<CartState>()((set, get) => ({
 
   subtotal: () => get().items.reduce((acc, i) => acc + i.product.price * i.quantity, 0),
 
-  loadForUser: async (userId) => {
+  loadForUser: async (_userId) => {
     set({ isLoading: true });
 
     try {

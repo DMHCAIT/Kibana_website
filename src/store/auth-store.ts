@@ -142,7 +142,7 @@ export const useAuth = create<AuthState>()((set) => ({
       }
 
       return { isNewUser: mode === "signup" };
-    } catch (error) {
+    } catch (_error) {
       return { error: "Network error. Please try again." };
     }
   },
@@ -189,7 +189,7 @@ export const useAuth = create<AuthState>()((set) => ({
       }
 
       return {};
-    } catch (error) {
+    } catch (_error) {
       return { error: "Verification failed. Please try again." };
     }
   },

@@ -34,8 +34,8 @@ export async function GET() {
   });
 }
 
-// Export function to invalidate cache when products change
-export function invalidateProductsCache() {
+// Function to invalidate cache when products change (internal use only)
+function invalidateProductsCache() {
   cachedProducts = null;
   cacheTime = 0;
 }
