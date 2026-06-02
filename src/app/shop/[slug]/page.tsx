@@ -121,7 +121,7 @@ export default async function ProductDetailPage({
                           "block h-7 w-7 rounded-full ring-2 ring-offset-2 transition-all hover:ring-kibana-tan",
                           v.slug === activeSlug ? "ring-kibana-ink" : "ring-transparent"
                         )}
-                        style={{ backgroundColor: v.color }}
+                        style={{ backgroundColor: v.hex || v.color }}
                         title={v.slug.replace(/-/g, " ")}
                       />
                     );
