@@ -724,18 +724,27 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500">Hex (optional)</label>
-                          <input
-                            type="text"
-                            value={v.hex ?? ""}
-                            onChange={(e) => {
-                              const updated = [...form.colorVariants];
-                              updated[vi] = { ...updated[vi], hex: e.target.value };
-                              update("colorVariants", updated);
-                            }}
-                            placeholder="#ffffff"
-                            className={inputClass}
-                          />
+                          <label className="text-xs text-gray-500">Hex Color (optional)</label>
+                          <div className="flex gap-2 items-end">
+                            <input
+                              type="text"
+                              value={v.hex ?? ""}
+                              onChange={(e) => {
+                                const updated = [...form.colorVariants];
+                                updated[vi] = { ...updated[vi], hex: e.target.value };
+                                update("colorVariants", updated);
+                              }}
+                              placeholder="#ffffff"
+                              className={inputClass}
+                            />
+                            {v.hex && (
+                              <div
+                                className="w-10 h-10 rounded-full border-2 border-gray-300 flex-shrink-0"
+                                style={{ backgroundColor: v.hex }}
+                                title={v.hex}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
 
