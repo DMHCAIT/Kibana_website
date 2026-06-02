@@ -54,6 +54,7 @@ export function openRazorpayCheckout(options: RazorpayCheckoutOptions) {
   } = options;
 
   // Ensure Razorpay script is loaded
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const razorpayWindow = window as any;
   if (!razorpayWindow.Razorpay) {
     const error = new Error("Razorpay script not loaded");
@@ -61,6 +62,7 @@ export function openRazorpayCheckout(options: RazorpayCheckoutOptions) {
     return;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const checkout = new razorpayWindow.Razorpay({
     key: keyId,
     order_id: orderId,

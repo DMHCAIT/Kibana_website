@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { mediaFiles } from "@/lib/db/schema";
@@ -78,6 +79,34 @@ export async function POST(req: NextRequest) {
     .from(bucket)
     .getPublicUrl(path);
 
+  // If image, generate resized variants (best-effort). We'll create multiple widths.
+  const variants: Array<{ width: number; url: string }> = [];
+  try {
+    const isImageType = isImage && !isVideo;
+    if (isImageType) {
+      const widths = [320, 640, 1280];
+      const ext = path.split(".").pop() ?? "jpg";
+      const base = path.replace(/\.[^/.]+$/, "");
+      for (const w of widths) {
+        try {
+          const resized = await sharp(buffer).resize({ width: w }).toBuffer();
+          const resizedPath = `${base}-${w}.${ext}`;
+          const { error: re } = await supabase.storage.from(bucket).upload(resizedPath, resized, {
+            contentType: file.type,
+            upsert: true,
+          });
+          if (re) continue;
+          const { data: rdata } = supabase.storage.from(bucket).getPublicUrl(resizedPath);
+          variants.push({ width: w, url: rdata.publicUrl });
+        } catch {
+          // ignore per-variant errors
+        }
+      }
+    }
+  } catch {
+    // non-fatal
+  }
+
   // Save file metadata to database
   const fileId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   try {
@@ -94,7 +123,7 @@ export async function POST(req: NextRequest) {
     // Non-fatal: file is already uploaded to storage; DB record can be re-synced
   }
 
-  return NextResponse.json({ url: publicUrl, id: fileId });
+  return NextResponse.json({ url: publicUrl, id: fileId, variants });
 }
 
 // DELETE /api/admin/upload?url=<publicUrl>

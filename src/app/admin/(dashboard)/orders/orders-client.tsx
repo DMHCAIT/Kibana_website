@@ -13,6 +13,7 @@ import {
   X,
   Package,
 } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { AdminOrder } from "@/lib/server-data";
 
 const STATUS_OPTIONS = [
@@ -228,8 +229,7 @@ export function OrdersClient({ orders: initialOrders, initialStatus }: Props) {
                       {items?.map((item, i) => (
                         <div key={i} className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
                           {item.image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={item.image} alt={item.name} className="w-10 h-10 object-cover rounded-lg border border-gray-200 shrink-0" />
+                            <ResponsiveImage src={item.image} alt={item.name} width={40} height={40} className="rounded-lg border border-gray-200 shrink-0" />
                           ) : (
                             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                               <Package size={16} className="text-gray-400" />

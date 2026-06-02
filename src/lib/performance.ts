@@ -42,7 +42,7 @@ export const apiCache = new ResponseCache();
 /**
  * Debounce hook to prevent rapid consecutive calls
  */
-export function useDebounce<T extends (...args: any[]) => Promise<any>>(
+export function useDebounce<T extends (...args: unknown[]) => Promise<unknown>>(
   callback: T,
   delay: number
 ) {
@@ -65,7 +65,7 @@ export function useDebounce<T extends (...args: any[]) => Promise<any>>(
  * Hook for cached API calls with request deduplication
  */
 export function useCachedFetch() {
-  const pendingRequests = useRef(new Map<string, Promise<any>>());
+  const pendingRequests = useRef(new Map<string, Promise<unknown>>());
 
   const cachedFetch = useCallback(
     async <T,>(
@@ -81,7 +81,7 @@ export function useCachedFetch() {
 
       // Check if request is already in flight
       if (pendingRequests.current.has(key)) {
-        return pendingRequests.current.get(key)!;
+        return pendingRequests.current.get(key)! as Promise<T>;
       }
 
       // Create new request

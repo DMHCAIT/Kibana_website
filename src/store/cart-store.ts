@@ -123,7 +123,7 @@ export const useCart = create<CartState>()((set, get) => ({
 
         // Map cart items to CartItem format
         const mappedItems: CartItem[] = cartData
-          .map((cartItem: any) => {
+          .map((cartItem: { productId: string; quantity: number }) => {
             const product = products.find((p: Product) => p.id === cartItem.productId);
             if (!product) return null;
             return {

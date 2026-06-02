@@ -13,6 +13,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { Product } from "@/types/product";
 
 type Category = { slug: string; name: string };
@@ -38,13 +39,38 @@ function slugify(str: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+function slugToName(slug: string): string {
+  return slug
+    .split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function ProductForm({ product, categories, isNew = false }: Props) {
   const router = useRouter();
   const imgInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const variantImageRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const variantGalleryRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const productId = product?.id ?? generateId();
+
+  // Extract color variants with proper names
+  const extractColorVariants = () => {
+    const variants = (product?.colorVariants as Array<{ color: string; slug: string; image: string; gallery: string[]; hex?: string }>) ?? [];
+    return variants.map(v => {
+      // If color looks like a hex code (starts with #), use slug to get the display name
+      const isHexCode = v.color.startsWith("#");
+      const displayName = isHexCode ? slugToName(v.slug) : v.color;
+      const hexValue = isHexCode ? v.color : (v.hex ?? "");
+      return {
+        ...v,
+        color: displayName,
+        hex: hexValue
+      };
+    });
+  };
 
   const [form, setForm] = useState({
     id: productId,
@@ -55,6 +81,8 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
     compareAtPrice: product?.compareAtPrice ?? "",
     image: product?.image ?? "",
     gallery: (product?.gallery as string[]) ?? [],
+    colors: (product?.colors as string[]) ?? [],
+    colorVariants: extractColorVariants(),
     video: product?.video ?? "",
     category: product?.category ?? "",
     gender: (product?.gender as string) ?? "women",
@@ -74,6 +102,7 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
   const [uploading, setUploading] = useState<string | null>(null); // 'image' | 'video' | 'gallery'
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [saved, setSaved] = useState(false);
 
   function showToast(type: "success" | "error", msg: string) {
     setToast({ type, msg });
@@ -121,6 +150,8 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
       if (oldUrl) await deleteStorageFile(oldUrl);
       update("image", url);
       showToast("success", "Main image uploaded");
+      // Persist immediately so website reflects change
+      await autoSave();
     } catch (err) {
       showToast("error", err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -170,11 +201,106 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
       }
       update("gallery", [...form.gallery, ...urls]);
       showToast("success", `${urls.length} image(s) added to gallery`);
+      // Persist immediately so website reflects change
+      await autoSave();
     } catch (err) {
       showToast("error", err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(null);
       if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  }
+
+  async function handleVariantImageUpload(variantIndex: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const v = form.colorVariants[variantIndex];
+    if (!v) return;
+    setUploading(`variant-${variantIndex}`);
+    try {
+      const ext = file.name.split(".").pop();
+      const oldUrl = v.image;
+      const url = await uploadFile(file, `products/${form.id}/variants/${v.slug}/image.${ext}`);
+      if (oldUrl) await deleteStorageFile(oldUrl);
+      const updated = [...form.colorVariants];
+      updated[variantIndex] = { ...v, image: url };
+      update("colorVariants", updated);
+      showToast("success", `Variant image uploaded`);
+      await autoSave();
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(null);
+      const ref = variantImageRefs.current[form.colorVariants[variantIndex]?.slug];
+      if (ref) ref.value = "";
+    }
+  }
+
+  async function handleVariantGalleryUpload(variantIndex: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const v = form.colorVariants[variantIndex];
+    if (!v) return;
+    setUploading(`variant-gallery-${variantIndex}`);
+    try {
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split(".").pop();
+        const url = await uploadFile(
+          file,
+          `products/${form.id}/variants/${v.slug}/gallery-${Date.now()}-${i}.${ext}`
+        );
+        urls.push(url);
+      }
+      const updated = [...form.colorVariants];
+      const prevGallery = updated[variantIndex].gallery ?? [];
+      updated[variantIndex] = { ...updated[variantIndex], gallery: [...prevGallery, ...urls] };
+      update("colorVariants", updated);
+      showToast("success", `${urls.length} image(s) added to variant gallery`);
+      await autoSave();
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(null);
+      const ref = variantGalleryRefs.current[form.colorVariants[variantIndex]?.slug];
+      if (ref) ref.value = "";
+    }
+  }
+
+  // Persist current form state to DB (used after uploads to make images live immediately)
+  async function autoSave() {
+    // Require name and slug to save
+    if (!form.name.trim() || !form.slug.trim()) return;
+    try {
+      const payload = {
+        ...form,
+        price: Number(form.price),
+        compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
+        rating: Number(form.rating),
+        reviewCount: Number(form.reviewCount),
+        colors: form.colors,
+        colorVariants: form.colorVariants,
+      };
+
+      const url = isNew ? "/api/admin/products" : `/api/admin/products/${form.id}`;
+      const method = isNew ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? "Auto-save failed");
+      }
+      // silent success indicator
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Auto-save failed");
     }
   }
 
@@ -186,6 +312,17 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
       "gallery",
       form.gallery.filter((_, i) => i !== index)
     );
+  }
+
+  function removeVariantGalleryImage(variantIndex: number, idx: number) {
+    const v = form.colorVariants[variantIndex];
+    if (!v) return;
+    const url = (v.gallery ?? [])[idx];
+    if (url) deleteStorageFile(url);
+    const updated = [...form.colorVariants];
+    const g = (updated[variantIndex].gallery ?? []).filter((_: string, i: number) => i !== idx);
+    updated[variantIndex] = { ...updated[variantIndex], gallery: g };
+    update("colorVariants", updated);
   }
 
   function addFeature() {
@@ -227,8 +364,8 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
         rating: Number(form.rating),
         reviewCount: Number(form.reviewCount),
-        colors: [],
-        colorVariants: [],
+        colors: form.colors,
+        colorVariants: form.colorVariants,
       };
 
       const url = isNew ? "/api/admin/products" : `/api/admin/products/${form.id}`;
@@ -287,6 +424,11 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
           >
             Cancel
           </button>
+          {saved && (
+            <div className="flex items-center px-3 py-2 bg-green-50 text-green-700 rounded-xl text-sm font-medium">
+              Saved
+            </div>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -425,11 +567,12 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
         <div className="space-y-4">
           {form.image ? (
             <div className="relative inline-block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <ResponsiveImage
                 src={form.image}
                 alt="Product"
-                className="w-48 h-48 object-cover rounded-xl border border-gray-200"
+                width={192}
+                height={192}
+                className="rounded-xl border border-gray-200"
               />
               <button
                 onClick={() => update("image", "")}
@@ -481,12 +624,7 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
             <div className="grid grid-cols-4 gap-3">
               {form.gallery.map((url, i) => (
                 <div key={i} className="relative group">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt={`Gallery ${i + 1}`}
-                    className="w-full h-24 object-cover rounded-xl border border-gray-200"
-                  />
+                  <ResponsiveImage src={url} alt={`Gallery ${i + 1}`} width={320} height={160} className="rounded-xl border border-gray-200" />
                   <button
                     onClick={() => removeGalleryImage(i)}
                     className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow"
@@ -520,6 +658,154 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
             onChange={handleGalleryUpload}
             className="hidden"
           />
+        </div>
+      </Card>
+
+      {/* Color Variants */}
+      <Card title="Color Variants">
+        <div className="space-y-4">
+          {form.colorVariants.length > 0 && (
+            <div className="space-y-4">
+              {form.colorVariants.map((v, vi) => (
+                <div key={vi} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-36">
+                      {v.image ? (
+                        <div className="relative inline-block">
+                          <ResponsiveImage src={v.image} alt={v.color} width={128} height={128} className="rounded-xl border border-gray-200" />
+                          <button
+                            onClick={() => {
+                              const updated = [...form.colorVariants];
+                              updated[vi] = { ...updated[vi], image: "" };
+                              update("colorVariants", updated);
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer"
+                          onClick={() => variantImageRefs.current[v.slug]?.click?.()}
+                        >
+                          {uploading === `variant-${vi}` ? (
+                            <Loader2 size={20} className="animate-spin text-gray-400" />
+                          ) : (
+                            <ImageIcon size={20} className="text-gray-400" />
+                          )}
+                        </div>
+                      )}
+                      <input
+                        ref={(el) => { variantImageRefs.current[v.slug] = el; }}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleVariantImageUpload(vi, e)}
+                        className="hidden"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-500">Color Name</label>
+                          <input
+                            type="text"
+                            value={v.color}
+                            onChange={(e) => {
+                              const name = e.target.value;
+                              const updated = [...form.colorVariants];
+                              updated[vi] = { ...updated[vi], color: name, slug: slugify(name) };
+                              update("colorVariants", updated);
+                              update("colors", updated.map((u) => u.color));
+                            }}
+                            placeholder="e.g., Teal, Brown, Mint Green"
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500">Hex (optional)</label>
+                          <input
+                            type="text"
+                            value={v.hex ?? ""}
+                            onChange={(e) => {
+                              const updated = [...form.colorVariants];
+                              updated[vi] = { ...updated[vi], hex: e.target.value };
+                              update("colorVariants", updated);
+                            }}
+                            placeholder="#ffffff"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-3">
+                        <label className="text-xs text-gray-500">Variant Gallery</label>
+                        {v.gallery && v.gallery.length > 0 && (
+                          <div className="grid grid-cols-4 gap-2 mt-2">
+                            {v.gallery.map((g: string, gi: number) => (
+                              <div key={gi} className="relative group">
+                                <ResponsiveImage src={g} alt={`${v.color} ${gi}`} width={160} height={80} className="rounded-md border border-gray-200" />
+                                <button
+                                  onClick={() => removeVariantGalleryImage(vi, gi)}
+                                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="mt-2 flex items-center gap-2">
+                          <div
+                            className="px-3 py-2 border border-gray-300 rounded-xl text-sm cursor-pointer"
+                            onClick={() => variantGalleryRefs.current[v.slug]?.click?.()}
+                          >
+                            {uploading === `variant-gallery-${vi}` ? "Uploading..." : "Add images"}
+                          </div>
+                          <input
+                            ref={(el) => { variantGalleryRefs.current[v.slug] = el; }}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => handleVariantGalleryUpload(vi, e)}
+                            className="hidden"
+                          />
+                          <button
+                            onClick={() => {
+                              const updated = form.colorVariants.filter((_, i) => i !== vi);
+                              update("colorVariants", updated);
+                              update("colors", updated.map((u) => u.color));
+                            }}
+                            className="ml-auto text-red-500 hover:text-red-600"
+                          >
+                            Remove variant
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const name = `Color ${form.colorVariants.length + 1}`;
+                const slug = slugify(name);
+                const updated = [...form.colorVariants, { color: name, slug, image: "", gallery: [] }];
+                update("colorVariants", updated);
+                update("colors", updated.map((u) => u.color));
+              }}
+              className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm hover:bg-gray-800"
+            >
+              Add Variant
+            </button>
+            <p className="text-xs text-gray-500 self-center">Each variant can have its own image and gallery.</p>
+          </div>
         </div>
       </Card>
 

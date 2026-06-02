@@ -43,14 +43,14 @@ export const RequestOptimizations = {
    * Deduplicate identical concurrent requests
    */
   deduplicateRequests: (() => {
-    const pendingRequests = new Map<string, Promise<any>>();
+    const pendingRequests = new Map<string, Promise<unknown>>();
 
     return async <T,>(
       key: string,
       fetcher: () => Promise<T>
     ): Promise<T> => {
       if (pendingRequests.has(key)) {
-        return pendingRequests.get(key)!;
+        return pendingRequests.get(key)! as Promise<T>;
       }
 
       const promise = fetcher().finally(() => {
@@ -67,7 +67,7 @@ export const RequestOptimizations = {
    */
   batchRequests: async <T,>(
     requests: Array<() => Promise<T>>,
-    batchSize = 5
+    batchSize: number = 5
   ): Promise<T[]> => {
     const results: T[] = [];
     for (let i = 0; i < requests.length; i += batchSize) {
@@ -84,7 +84,7 @@ export const RequestOptimizations = {
   withTimeout: async <T,>(
     promise: Promise<T>,
     ms: number,
-    fallback?: T
+    fallback?: T | undefined
   ): Promise<T> => {
     return Promise.race([
       promise,
@@ -111,20 +111,20 @@ export const ResponseOptimizations = {
   /**
    * Compress response data
    */
-  compressJSON: (data: any): string => {
+  compressJSON: (data: unknown): string => {
     return JSON.stringify(data);
   },
 
   /**
    * Optimize JSON response size
    */
-  minifyJSON: (data: any): any => {
+  minifyJSON: (data: unknown): unknown => {
     // Remove null values
     if (Array.isArray(data)) {
       return data.map(item => ResponseOptimizations.minifyJSON(item));
     }
     if (typeof data === "object" && data !== null) {
-      const minimized: any = {};
+      const minimized: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(data)) {
         if (value !== null && value !== undefined) {
           minimized[key] = ResponseOptimizations.minifyJSON(value);

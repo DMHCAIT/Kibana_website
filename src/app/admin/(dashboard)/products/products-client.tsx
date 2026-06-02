@@ -14,6 +14,7 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { Product } from "@/types/product";
 
 interface Props {
@@ -154,12 +155,7 @@ export function ProductsClient({ initialProducts }: Props) {
                   <tr key={product.id} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="px-6 py-3">
                       {product.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-xl border border-gray-200"
-                        />
+                        <ResponsiveImage src={product.image} alt={product.name} width={48} height={48} className="rounded-xl border border-gray-200" />
                       ) : (
                         <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
                           <Package size={18} className="text-gray-400" />

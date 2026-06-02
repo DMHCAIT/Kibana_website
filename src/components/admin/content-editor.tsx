@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { SiteConfig } from "@/lib/server-data";
 
 interface Props {
@@ -245,12 +246,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
                 <div className="grid grid-cols-3 gap-3 mb-3">
                   {(config.hero.images ?? []).map((url, i) => (
                     <div key={i} className="relative group">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={url}
-                        alt={`Hero ${i + 1}`}
-                        className="w-full h-28 object-cover rounded-xl border border-gray-200"
-                      />
+                      <ResponsiveImage src={url} alt={`Hero ${i + 1}`} width={400} height={112} className="rounded-xl border border-gray-200" />
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                         <button
                           onClick={() => removeHeroImage(i)}

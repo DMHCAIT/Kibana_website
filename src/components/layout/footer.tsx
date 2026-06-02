@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 import { Facebook, Instagram } from "lucide-react";
 import { NewsletterForm } from "./newsletter-form";
 
@@ -51,12 +51,7 @@ export function Footer() {
             {/* Logo */}
             <div className="md:flex-shrink-0 md:pl-8">
               <Link href="/" className="inline-block flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/extracted/kibana logo_white.png"
-                  alt="Kibana"
-                  className="h-32 w-auto object-contain"
-                />
+                <ResponsiveImage src="/extracted/kibana logo_white.png" alt="Kibana" width={160} height={64} className="object-contain h-32 w-auto" />
               </Link>
             </div>
 

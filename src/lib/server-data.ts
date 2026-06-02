@@ -17,9 +17,9 @@ import localSiteConfig from "@/data/site-config.json";
 const hasDatabase = !!process.env.DATABASE_URL;
 
 // In-memory cache for frequently accessed data
-const dataCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+const dataCache = new Map<string, { data: unknown; timestamp: number; ttl: number }>();
 
-function getCached(key: string): any | null {
+function getCached(key: string): unknown | null {
   const entry = dataCache.get(key);
   if (!entry) return null;
   if (Date.now() - entry.timestamp > entry.ttl) {
@@ -29,7 +29,7 @@ function getCached(key: string): any | null {
   return entry.data;
 }
 
-function setCached(key: string, data: any, ttlMs: number = 60000) {
+function setCached(key: string, data: unknown, ttlMs: number = 60000) {
   dataCache.set(key, { data, timestamp: Date.now(), ttl: ttlMs });
 }
 
@@ -80,7 +80,7 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 export async function getProducts(): Promise<Product[]> {
   // Check cache first (60 second TTL)
   const cached = getCached("products");
-  if (cached) return cached;
+  if (cached) return cached as Product[];
 
   if (!hasDatabase) {
     setCached("products", localProducts, 60000);
@@ -426,7 +426,7 @@ function rowToUser(row: typeof usersTable.$inferSelect): AdminUser {
 export async function getUsers(): Promise<AdminUser[]> {
   // Check cache first (30 second TTL)
   const cached = getCached("users");
-  if (cached) return cached;
+  if (cached) return cached as AdminUser[];
 
   if (!hasDatabase) {
     setCached("users", [], 30000);
@@ -519,7 +519,7 @@ function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
 export async function getOrders(): Promise<AdminOrder[]> {
   // Check cache first (30 second TTL for frequently changing data)
   const cached = getCached("orders");
-  if (cached) return cached;
+  if (cached) return cached as AdminOrder[];
 
   if (!hasDatabase) {
     setCached("orders", [], 30000);
@@ -593,7 +593,7 @@ export type AdminCartItem = {
 export async function getCartItems(): Promise<AdminCartItem[]> {
   // Check cache first (30 second TTL)
   const cached = getCached("cartItems");
-  if (cached) return cached;
+  if (cached) return cached as AdminCartItem[];
 
   if (!hasDatabase) {
     setCached("cartItems", [], 30000);

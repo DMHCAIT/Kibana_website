@@ -14,6 +14,7 @@ import {
   Trash2,
   RefreshCw,
 } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/responsive-image";
 
 interface MediaFile {
   id: string;
@@ -268,13 +269,8 @@ export default function AdminMediaPage() {
               >
                 {/* Preview */}
                 <div className="shrink-0">
-                  {file.type === "image" ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={file.url}
-                      alt={file.name}
-                      className="w-16 h-16 object-cover rounded-xl border border-gray-200"
-                    />
+                    {file.type === "image" ? (
+                      <ResponsiveImage src={file.url} alt={file.name} width={64} height={64} className="rounded-xl border border-gray-200" />
                   ) : (
                     <div className="w-16 h-16 bg-gray-200 rounded-xl flex items-center justify-center">
                       <Video size={24} className="text-gray-500" />

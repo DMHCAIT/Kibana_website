@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getProducts } from "@/lib/server-data";
+import type { Product } from "@/types/product";
 
 // Cache products for 5 minutes (since they change infrequently)
-let cachedProducts: any = null;
+let cachedProducts: Product[] | null = null;
 let cacheTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
