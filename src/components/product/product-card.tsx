@@ -77,7 +77,7 @@ export function ProductCard({ product, variant = "compact", className, imageClas
             fill={inWishlist ? "currentColor" : "none"}
           />
         </button>
-
+      </Link>
 
       <div className="pt-1.5 flex flex-col gap-0.5">
         <Link
