@@ -77,18 +77,7 @@ export function ProductCard({ product, variant = "compact", className, imageClas
             fill={inWishlist ? "currentColor" : "none"}
           />
         </button>
-        {product.colors.length > 0 && variant === "full" && (
-          <div className="absolute bottom-2 left-2 flex gap-1">
-            {product.colors.slice(0, 4).map((c) => (
-              <span
-                key={c}
-                className="h-3.5 w-3.5 ring-1 ring-black/10"
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-        )}
-      </Link>
+
 
       <div className="pt-1.5 flex flex-col gap-0.5">
         <Link
