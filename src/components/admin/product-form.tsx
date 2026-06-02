@@ -796,7 +796,7 @@ export function ProductForm({ product, categories, isNew = false }: Props) {
               onClick={() => {
                 const name = `Color ${form.colorVariants.length + 1}`;
                 const slug = slugify(name);
-                const updated = [...form.colorVariants, { color: name, slug, image: "", gallery: [] }];
+                const updated = [...form.colorVariants, { color: name, slug, image: "", gallery: [], hex: "" }];
                 update("colorVariants", updated);
                 update("colors", updated.map((u) => u.color));
               }}
