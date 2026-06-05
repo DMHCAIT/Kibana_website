@@ -25,7 +25,7 @@ export function BestSellers({
       <SectionHeading title="Best Sellers" />
 
       {/* Full-width banner — aspect matches image's natural 1816×866 ratio on mobile */}
-      <div className="relative w-full aspect-[21/10] sm:aspect-[16/9] md:aspect-[16/7] overflow-hidden">
+      <div className="relative w-full aspect-[21/10] sm:aspect-[16/9] md:aspect-[16/7] overflow-hidden rounded">
         <Image
           src={bannerImage}
           alt="Best Sellers"
@@ -40,7 +40,7 @@ export function BestSellers({
           <Link
             href="/shop"
             className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-widest uppercase
-                       text-[9px] px-3 py-1.5
+                       text-[8px] px-2.5 py-1
                        sm:text-xs sm:px-5 sm:py-2.5
                        md:text-sm md:px-7 md:py-3
                        transition-colors duration-200"

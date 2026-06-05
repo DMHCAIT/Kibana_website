@@ -12,7 +12,7 @@ export function ShopByGender() {
             href={`/shop?gender=${gender.slug}`}
             className="group flex flex-col items-center gap-1 text-center"
           >
-            <span className="relative w-full aspect-square overflow-hidden bg-kibana-cream">
+            <span className="relative w-full aspect-square overflow-hidden rounded-lg bg-kibana-cream">
               <Image
                 src={gender.image}
                 alt={gender.name}
@@ -21,7 +21,7 @@ export function ShopByGender() {
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </span>
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] text-center px-1">
+            <span className="text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-center px-1">
               {gender.name}
             </span>
           </Link>

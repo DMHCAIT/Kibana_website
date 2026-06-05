@@ -20,36 +20,38 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
   return (
     <>
       {/* ── Mobile: main image → horizontal thumbs below ── */}
-      <div className="flex flex-col gap-3 md:hidden w-full min-w-0">
+      <div className="flex flex-col gap-2 sm:gap-3 md:hidden w-full min-w-0">
         {/* Main image */}
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-[#f0ece4]">
-          <Image
-            src={allImages[active]}
-            alt={productName}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover transition-opacity duration-200"
-          />
-          {pct > 0 && (
-            <Badge variant="discount" className="absolute left-3 top-3">
-              {pct}% OFF
-            </Badge>
-          )}
+        <div className="p-3 sm:p-4 bg-[#f5f1ed] rounded-lg">
+          <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-white">
+            <Image
+              src={allImages[active]}
+              alt={productName}
+              fill
+              priority
+              sizes="(max-width: 640px) calc(100vw - 1.5rem), 100vw"
+              className="object-cover transition-opacity duration-200"
+            />
+            {pct > 0 && (
+              <Badge variant="discount" className="absolute left-2 sm:left-3 top-2 sm:top-3">
+                {pct}% OFF
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Horizontal thumb strip — scrollable, no arrows */}
         {allImages.length > 1 && (
-          <div ref={hScrollRef} className="flex flex-row gap-2 overflow-x-auto scrollbar-hide w-full">
+          <div ref={hScrollRef} className="flex flex-row gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide w-full px-0.5 sm:px-1">
             {allImages.map((src, i) => (
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`relative aspect-square w-16 shrink-0 overflow-hidden border-2 transition-all ${
+                className={`relative aspect-square w-14 sm:w-16 shrink-0 overflow-hidden border-2 transition-all rounded bg-white ${
                   active === i ? "border-kibana-ink" : "border-transparent hover:border-kibana-tan"
                 }`}
               >
-                <Image src={src} alt={`${productName} ${i + 1}`} fill sizes="64px" className="object-cover" />
+                <Image src={src} alt={`${productName} ${i + 1}`} fill sizes="(max-width: 640px) 56px, 64px" className="object-cover" />
               </button>
             ))}
           </div>
@@ -57,39 +59,41 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
       </div>
 
       {/* ── Desktop: vertical thumbs on left → main image on right ── */}
-      <div className="hidden md:flex flex-row gap-3 h-full">
+      <div className="hidden md:flex flex-row gap-6 w-full">
         {/* Vertical thumb strip — scrollable, no arrows */}
         {allImages.length > 1 && (
-          <div ref={vScrollRef} className="flex flex-col gap-2 overflow-y-auto scrollbar-hide w-[72px] shrink-0">
+          <div ref={vScrollRef} className="flex flex-col gap-2 overflow-y-auto scrollbar-hide w-[80px] shrink-0">
             {allImages.map((src, i) => (
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`relative aspect-square w-[68px] shrink-0 overflow-hidden border-2 transition-all ${
+                className={`relative aspect-square w-[72px] shrink-0 overflow-hidden border-2 transition-all rounded bg-white ${
                   active === i ? "border-kibana-ink" : "border-transparent hover:border-kibana-tan"
                 }`}
               >
-                <Image src={src} alt={`${productName} ${i + 1}`} fill sizes="68px" className="object-cover" />
+                <Image src={src} alt={`${productName} ${i + 1}`} fill sizes="72px" className="object-cover" />
               </button>
             ))}
           </div>
         )}
 
         {/* Main image */}
-        <div className="relative flex-1 aspect-[3/4] overflow-hidden bg-[#f0ece4]">
-          <Image
-            src={allImages[active]}
-            alt={productName}
-            fill
-            priority
-            sizes="50vw"
-            className="object-cover transition-opacity duration-200"
-          />
-          {pct > 0 && (
-            <Badge variant="discount" className="absolute left-3 top-3">
-              {pct}% OFF
-            </Badge>
-          )}
+        <div className="p-6 bg-[#f5f1ed] rounded-lg shrink-0 flex-shrink-0">
+          <div className="relative w-[512px] h-[704px] overflow-hidden bg-white rounded-lg flex-shrink-0">
+            <Image
+              src={allImages[active]}
+              alt={productName}
+              fill
+              priority
+              sizes="512px"
+              className="object-cover transition-opacity duration-200"
+            />
+            {pct > 0 && (
+              <Badge variant="discount" className="absolute left-3 top-3">
+                {pct}% OFF
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
     </>

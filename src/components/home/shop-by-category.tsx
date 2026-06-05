@@ -11,14 +11,14 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
     <section className="container py-2 md:py-6">
       <SectionHeading title="Shop by Category" />
       {/* 2 per row on mobile, 3 per row on tablet and desktop */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {cats.map((c) => (
           <Link
             key={c.slug}
             href={`/shop?cat=${c.slug}`}
             className="group flex flex-col items-center gap-1 text-center"
           >
-            <span className="relative w-full aspect-square overflow-hidden bg-kibana-cream">
+            <span className="relative w-full aspect-square overflow-hidden rounded-lg bg-kibana-cream">
               <Image
                 src={c.image}
                 alt={c.name}
@@ -27,7 +27,7 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </span>
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-center leading-tight">
+            <span className="text-[11px] sm:text-sm md:text-lg tracking-[0.12em] text-center leading-tight">
               {c.name}
             </span>
           </Link>

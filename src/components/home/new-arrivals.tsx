@@ -8,7 +8,7 @@ export function NewArrivals({ products }: { products: Product[] }) {
     <section className="bg-[#f5f0e8] w-full">
     <div className="container py-2 md:py-6">
       <SectionHeading title="Shop by New Arrivals" className="pt-2 sm:pt-4" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {items.map((p) => (
           <ProductCard key={p.id} product={p} variant="minimal" />
         ))}

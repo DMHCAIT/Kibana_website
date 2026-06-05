@@ -53,7 +53,7 @@ function TileCard({ tile }: { tile: Tile }) {
     <Link
       href={tile.href}
       data-card
-      className="relative flex-shrink-0 w-[48vw] sm:w-[calc(33%-6px)] md:w-[calc(25%-6px)] lg:flex-1 lg:min-w-0 aspect-[2/3] sm:aspect-[1/1.5] md:aspect-[1/1.6] lg:aspect-[1/1.7] overflow-hidden bg-kibana-cream group cursor-pointer block"
+      className="relative flex-shrink-0 w-[230px] h-[420px] overflow-hidden rounded-lg bg-kibana-cream group cursor-pointer block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -62,7 +62,7 @@ function TileCard({ tile }: { tile: Tile }) {
         src={tile.src}
         alt={tile.alt}
         fill
-        sizes="180px"
+        sizes="230px"
         className="object-cover transition-transform duration-500 group-hover:scale-105"
       />
 
@@ -79,7 +79,7 @@ function TileCard({ tile }: { tile: Tile }) {
 
       {/* Bottom label */}
       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent pt-8 pb-2 px-2">
-        <span className="text-white font-semibold text-xs sm:text-sm uppercase tracking-[0.1em] block text-center">{tile.label}</span>
+        <span className="text-white text-xs sm:text-sm uppercase tracking-[0.1em] block text-center">{tile.label}</span>
       </div>
     </Link>
   );
@@ -90,8 +90,9 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
-    const width = scrollContainerRef.current.clientWidth;
-    scrollContainerRef.current.scrollBy({ left: direction === "left" ? -width : width, behavior: "smooth" });
+    const card = scrollContainerRef.current.querySelector("[data-card]") as HTMLElement | null;
+    const amount = card ? (card.offsetWidth + 16) * 5 : 1200; // 5 cards + gaps
+    scrollContainerRef.current.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
   };
 
   // Use admin-assigned products as tiles if available; otherwise fall back to defaults
@@ -103,26 +104,26 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     <section className="container py-2 md:py-6">
       <SectionHeading title="Style in Motion" />
       <div className="relative">
-        {/* Left Arrow — hidden on mobile, visible on sm+ */}
+        {/* Left Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("left")}
-          className="hidden sm:block absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block lg:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6 text-gray-400 hover:text-gray-600" />
         </button>
 
-        {/* Right Arrow — hidden on mobile, visible on sm+ */}
+        {/* Right Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("right")}
-          className="hidden sm:block absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block lg:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6 text-gray-400 hover:text-gray-600" />
         </button>
 
         {/* Carousel */}
-        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-2 mb-8 scrollbar-hide">
+        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-4 mb-8 scrollbar-hide">
           {tiles.map((t, i) => (
             <TileCard key={`${t.label}-${i}`} tile={t} />
           ))}
@@ -130,7 +131,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
       </div>
 
       {/* Trust Badges */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-2">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-4 px-4 bg-kibana-cream/40 rounded-lg">
         {badges.map((badge) => {
           const Icon = badge.icon;
           return (

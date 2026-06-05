@@ -320,10 +320,10 @@ export async function sendOtpEmail(options: OtpEmailOptions): Promise<boolean> {
     console.log(`📧 sendOtpEmail: Preparing to send to ${options.email}`);
     console.log(`📧 From: ${process.env.SMTP_EMAIL}, Type: ${options.type}`);
     
-    // Create a promise with timeout
+    // Create a promise with timeout (30 seconds for slower connections)
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("Email send timeout after 10 seconds")), 10000)
+      setTimeout(() => reject(new Error("Email send timeout after 30 seconds")), 30000)
     );
     
     console.log(`📧 Awaiting transporter.sendMail...`);

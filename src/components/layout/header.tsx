@@ -81,7 +81,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background">
-      <div className="container relative flex h-14 items-center gap-3 md:h-16 lg:h-18">
+      <div className="container relative flex h-14 md:h-auto lg:h-20 items-center gap-3 py-2 md:py-4">
         <button
           aria-label="Open menu"
           onClick={() => setOpen(true)}
@@ -91,19 +91,19 @@ export function Header() {
         </button>
 
         {/* Logo: responsive size across all screens */}
-        <Link href="/" className="absolute md:static left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 flex items-center justify-center">
+        <Link href="/" className="absolute md:relative left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 flex items-center justify-center flex-shrink-0">
           <Image
             src="/extracted/kibana logo black.png"
             alt="Kibana"
             width={280}
             height={112}
-            className="h-28 md:h-40 lg:h-44 w-auto object-contain"
+            className="h-32 md:h-56 lg:h-20 w-auto object-contain"
             priority
             quality={100}
           />
         </Link>
 
-        <nav className="ml-8 hidden md:flex items-center gap-6 text-sm">
+        <nav className="ml-8 hidden md:flex items-center gap-6 text-sm md:text-base">
           {desktopNav.map((n) => (
             <Link
               key={n.href}

@@ -125,7 +125,11 @@ export function AuthModal() {
     setLoading(false);
 
     if (result.error) {
-      setError(result.error);
+      if (result.error === "Invalid or expired verification code") {
+        setError("The code you entered is incorrect or has expired. Please check your latest email or resend a new code.");
+      } else {
+        setError(result.error);
+      }
       setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 50);
       return;
@@ -180,26 +184,26 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-md mx-4 bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4">
+      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-2xl rounded-lg bg-white shadow-2xl max-h-[92vh] md:max-h-[95vh] overflow-y-auto">
         <button
           onClick={closeAuthModal}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-700 transition-colors z-10"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 text-gray-400 hover:text-gray-700 transition-colors z-10"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="px-8 pt-8 pb-6">
-          <p className="font-display text-center tracking-[0.3em] text-sm text-gray-500 mb-1">KIBANA</p>
-          <h2 className="text-center font-display text-2xl tracking-wide mb-1">
+        <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-6">
+          <p className="font-display text-center tracking-[0.3em] text-xs sm:text-sm text-gray-500 mb-1">KIBANA</p>
+          <h2 className="text-center font-display text-xl sm:text-2xl tracking-wide mb-1">
             {step === "email"
               ? tab === "login" ? "Welcome Back" : "Create Account"
               : "Check Your Email"}
           </h2>
 
           {authModalMessage && (
-            <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 mb-4 mt-2">
+            <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-4 mt-2">
               {authModalMessage}
             </p>
           )}
@@ -223,7 +227,7 @@ export function AuthModal() {
                 ))}
               </div>
 
-              <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-3 sm:gap-4">
                 {tab === "signup" && (
                   <>
                     <div>
@@ -236,7 +240,7 @@ export function AuthModal() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        className="h-11"
+                        className="h-10 sm:h-11"
                       />
                     </div>
                     <div>
@@ -249,7 +253,7 @@ export function AuthModal() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         required
-                        className="h-11"
+                        className="h-10 sm:h-11"
                       />
                     </div>
                   </>
@@ -266,21 +270,21 @@ export function AuthModal() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoFocus
-                    className="h-11"
+                    className="h-10 sm:h-11"
                   />
                 </div>
 
                 {error && (
-                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2">{error}</p>
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
                 )}
 
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="mt-1 h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase flex items-center justify-center gap-2"
+                  className="mt-1 h-10 sm:h-11 w-full bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase flex items-center justify-center gap-2"
                 >
-                  <Mail className="h-4 w-4" />
-                  {loading ? "Sending code..." : "Send verification code"}
+                  <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  {loading ? "Sending..." : "Send code"}
                 </Button>
               </form>
 
@@ -305,10 +309,10 @@ export function AuthModal() {
           )}
 
           {step === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5 mt-4">
+            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4 sm:gap-5 mt-4">
               <div className="text-center">
-                <p className="text-sm text-gray-500">We sent a 6-digit code to</p>
-                <p className="font-semibold text-gray-800 mt-0.5">{email}</p>
+                <p className="text-xs sm:text-sm text-gray-500">We sent a 6-digit code to</p>
+                <p className="font-semibold text-gray-800 mt-0.5 text-sm break-all">{email}</p>
                 <button
                   type="button"
                   onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
@@ -322,7 +326,7 @@ export function AuthModal() {
                 Check your inbox (and spam folder). The code expires in 10 minutes.
               </p>
 
-              <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
+              <div className="flex justify-center gap-1 sm:gap-2" onPaste={handleOtpPaste}>
                 {otp.map((digit, i) => (
                   <input
                     key={i}
@@ -333,21 +337,21 @@ export function AuthModal() {
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                    className="w-11 h-12 text-center text-lg font-semibold border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-colors"
+                    className="w-9 h-10 sm:w-11 sm:h-12 rounded text-center text-base sm:text-lg font-semibold border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-colors"
                     aria-label={`Code digit ${i + 1}`}
                   />
                 ))}
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 text-center">{error}</p>
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2 text-center">{error}</p>
               )}
 
               <Button
                 id="otp-submit-btn"
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="h-11 w-full rounded-none bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
+                className="h-10 sm:h-11 w-full bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
               >
                 {loading ? "Verifying..." : isNewUser ? "Create Account" : "Verify & Login"}
               </Button>
@@ -359,7 +363,7 @@ export function AuthModal() {
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || loading}
                   className={cn(
-                    "underline transition-colors",
+                    "underline transition-colors text-nowrap",
                     resendCooldown > 0
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-gray-600 hover:text-gray-900"

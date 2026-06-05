@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { products as staticProducts } from "@/lib/data";
-import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
 import type { Product } from "@/types/product";
 
@@ -30,7 +31,8 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const card = scrollRef.current.querySelector("[data-card]") as HTMLElement | null;
-    const amount = card ? (card.offsetWidth + 8) * 2 : 600;
+    // Scroll by 1 card at a time
+    const amount = card ? card.offsetWidth + 16 : 900;
     scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   };
 
@@ -39,19 +41,34 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
       <div className="relative">
-        {/* Scrollable row — 2 cards visible at a time */}
+        {/* Scrollable carousel — shows 2 cards on desktop, 1 on mobile */}
         <div
           ref={scrollRef}
-          className="flex gap-2 overflow-x-auto sm:overflow-x-hidden scroll-smooth scrollbar-hide"
+          className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:px-0"
+          style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
-            <div
+            <Link
               key={p.id}
+              href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[75%] sm:w-[calc(50%-4px)]"
+              className="flex-shrink-0 w-[calc(100vw-40px)] sm:w-[calc(50vw-12px)] md:w-[calc(33.333%-12px)] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
+              style={{ scrollSnapAlign: "start" }}
             >
-              <ProductCard product={p} variant="compact" imageClassName="aspect-[3/4] sm:aspect-[1/1]" />
-            </div>
+              <Image
+                src={p.image}
+                alt={p.name}
+                fill
+                sizes="428px"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              {/* Overlay at bottom with product name */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent pt-16 pb-5 px-3 sm:px-4">
+                <p className="text-white text-xs sm:text-base md:text-lg font-semibold uppercase tracking-widest text-center line-clamp-2 leading-tight">
+                  {p.name}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
 
@@ -59,7 +76,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("left")}
           aria-label="Previous"
-          className="hidden sm:flex absolute left-0 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:flex absolute left-4 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronLeft className="h-8 w-8" />
         </button>
@@ -68,7 +85,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         <button
           onClick={() => scroll("right")}
           aria-label="Next"
-          className="hidden sm:flex absolute right-0 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
+          className="hidden sm:flex absolute right-4 top-1/3 -translate-y-1/2 z-10 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <ChevronRight className="h-8 w-8" />
         </button>

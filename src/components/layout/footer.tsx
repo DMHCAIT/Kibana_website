@@ -36,27 +36,27 @@ const columns = [
 export function Footer() {
   return (
     <footer className="bg-kibana-ink text-kibana-cream pb-16 md:pb-0">
-      <div className="px-5 sm:px-8 md:container py-5 md:py-6">
+      <div className="px-4 sm:px-8 md:container py-6 md:py-8">
 
         {/* Newsletter section */}
-        <div className="mb-0 pb-3 border-b border-kibana-cream/10">
-          <h3 className="font-bold text-base sm:text-lg md:text-2xl uppercase tracking-[0.15em] mb-3">Get In Touch</h3>
+        <div className="mb-6 pb-6 border-b border-kibana-cream/10">
+          <h3 className="font-bold text-base sm:text-lg md:text-2xl uppercase tracking-[0.15em] mb-4">Get In Touch</h3>
           <NewsletterForm />
         </div>
 
         {/* Logo + Nav columns */}
-        <div className="mb-4">
+        <div className="mb-6">
           <div className="flex flex-col md:grid md:grid-cols-4 md:gap-12 md:items-start md:pt-6">
 
             {/* Logo */}
-            <div className="md:flex-shrink-0 md:pl-8">
+            <div className="hidden md:flex md:flex-shrink-0 md:pl-8">
               <Link href="/" className="inline-block flex items-center justify-center">
                 <ResponsiveImage src="/extracted/kibana logo_white.png" alt="Kibana" width={160} height={64} className="object-contain h-32 w-auto" />
               </Link>
             </div>
 
             {/* Nav columns — 3-col grid on mobile, each in own col on desktop */}
-            <div className="flex-1 grid grid-cols-3 md:contents gap-4 md:gap-0 -mt-4 md:mt-0">
+            <div className="flex-1 grid grid-cols-3 md:contents gap-4 md:gap-0 md:mt-0">
               {columns.map((col) => (
                 <div key={col.title}>
                   <h4 className="text-xs font-bold tracking-[0.2em] text-kibana-cream mb-3 uppercase">
@@ -78,10 +78,10 @@ export function Footer() {
         </div>
 
         {/* Social row */}
-        <div className="pt-5 border-t border-kibana-cream/10">
-          <div className="flex flex-col items-center gap-3">
+        <div className="pt-6 border-t border-kibana-cream/10">
+          <div className="flex flex-col items-center gap-4">
             <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-kibana-cream/70">Follow us</h3>
-            <div className="flex items-center gap-7">
+            <div className="flex items-center gap-8">
               <Link href="https://www.facebook.com/kibanalife" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
                 <Facebook className="h-5 w-5" />
               </Link>

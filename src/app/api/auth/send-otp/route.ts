@@ -24,8 +24,16 @@ export async function POST(request: Request) {
     console.log(`📧 Generated OTP: ${otp} for ${cleanEmail}`);
 
     // Store OTP in database immediately
-    await storeOtp(cleanEmail, otp, 10); // 10 minute expiry
-    console.log(`✓ OTP stored in database for ${cleanEmail}`);
+    try {
+      await storeOtp(cleanEmail, otp, 10); // 10 minute expiry
+      console.log(`✓ OTP stored successfully in database for ${cleanEmail}`);
+    } catch (storeError) {
+      console.error(`❌ CRITICAL: Failed to store OTP in database:`, storeError);
+      return NextResponse.json(
+        { error: "Failed to store verification code. Database error." },
+        { status: 500 }
+      );
+    }
 
     // Send email and wait for result to ensure delivery
     try {
@@ -64,7 +72,7 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error("Error in send-otp route:", error);
+    console.error("❌ Error in send-otp route:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

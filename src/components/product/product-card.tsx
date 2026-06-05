@@ -49,7 +49,7 @@ export function ProductCard({ product, variant = "compact", className, imageClas
     <div className={cn("group flex flex-col", className)}>
       <Link
         href={`/shop/${product.slug}`}
-        className={cn("relative block overflow-hidden bg-kibana-cream", imageClassName ?? "aspect-[5/6]")}
+        className={cn("relative block overflow-hidden rounded-lg bg-kibana-cream", imageClassName ?? "aspect-[5/6]")}
       >
         <Image
           src={product.image}
@@ -82,15 +82,15 @@ export function ProductCard({ product, variant = "compact", className, imageClas
       <div className="pt-1.5 flex flex-col gap-0.5">
         <Link
           href={`/shop/${product.slug}`}
-          className="line-clamp-1 text-[10px] sm:text-xs md:text-sm font-medium leading-snug hover:underline"
+          className="line-clamp-1 text-[11px] sm:text-sm md:text-lg font-medium leading-snug hover:underline"
         >
           {product.name}
         </Link>
         {variant !== "minimal" && (
           <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[11px] sm:text-xs md:text-sm font-bold">{formatINR(product.price)}</span>
+            <span className="text-[12px] sm:text-sm md:text-lg font-bold">{formatINR(product.price)}</span>
             {product.compareAtPrice && (
-              <span className="text-[10px] sm:text-xs text-muted-foreground line-through">
+              <span className="text-[11px] sm:text-xs md:text-base text-muted-foreground line-through">
                 {formatINR(product.compareAtPrice)}
               </span>
             )}

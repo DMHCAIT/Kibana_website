@@ -19,21 +19,25 @@ export async function storeOtp(email: string, otp: string, expiresInMinutes = 10
   expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes);
 
   try {
+    console.log(`📝 Storing OTP for ${cleanEmail}, expires at ${expiresAt.toISOString()}`);
+    
     // Delete any existing OTP for this email first
-    await sql`
+    const deleteResult = await sql`
       DELETE FROM email_otp_sessions 
       WHERE email = ${cleanEmail}
     `;
+    console.log(`📝 Deleted ${deleteResult.count || 0} old OTP records for ${cleanEmail}`);
 
     // Store OTP in database
-    await sql`
+    const insertResult = await sql`
       INSERT INTO email_otp_sessions (email, otp, expires_at, created_at)
       VALUES (${cleanEmail}, ${otp}, ${expiresAt.toISOString()}, NOW())
     `;
-
-    console.log(`✓ OTP stored in database for ${cleanEmail}`);
+    console.log(`✓ OTP stored successfully in database for ${cleanEmail}. Rows inserted: ${insertResult.count || 1}`);
   } catch (error) {
     console.error("✗ Error storing OTP:", error);
+    console.error(`   Email: ${cleanEmail}`);
+    console.error(`   OTP: ${otp}`);
   }
 }
 
@@ -42,6 +46,8 @@ export async function getOtp(email: string): Promise<string | null> {
   const cleanEmail = email.toLowerCase().trim();
 
   try {
+    console.log(`🔍 Getting OTP for ${cleanEmail}...`);
+    
     // Query database for valid OTP
     const result = await sql`
       SELECT otp, expires_at 
@@ -50,16 +56,23 @@ export async function getOtp(email: string): Promise<string | null> {
       LIMIT 1
     `;
 
+    console.log(`🔍 Query returned ${result.length} rows for ${cleanEmail}`);
+
     if (result.length === 0) {
-      console.log(`ℹ No OTP found for ${cleanEmail}`);
+      console.log(`ℹ No OTP found for ${cleanEmail} - table might be empty or email not in database`);
       return null;
     }
 
     const data = result[0];
+    console.log(`🔍 Found OTP record: otp_length=${data.otp?.length}, expires_at=${data.expires_at}`);
 
     // Check if expired
     const expiresAt = new Date(data.expires_at);
-    if (new Date() > expiresAt) {
+    const now = new Date();
+    const isExpired = now > expiresAt;
+    console.log(`🔍 Expiry check: now=${now.toISOString()}, expires_at=${expiresAt.toISOString()}, expired=${isExpired}`);
+    
+    if (isExpired) {
       console.log(`ℹ OTP expired for ${cleanEmail}`);
       // Delete expired OTP
       await sql`
@@ -69,9 +82,11 @@ export async function getOtp(email: string): Promise<string | null> {
       return null;
     }
 
+    console.log(`✓ Returning valid OTP for ${cleanEmail}`);
     return data.otp;
   } catch (error) {
     console.error("✗ Error getting OTP:", error);
+    console.error(`   Email: ${cleanEmail}`);
     return null;
   }
 }

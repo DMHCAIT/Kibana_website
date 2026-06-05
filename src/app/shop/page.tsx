@@ -46,10 +46,8 @@ export default async function ShopPage({
       <ShopHeader
         heading={heading}
         count={filtered.length}
-        activeCat={cat}
         sort={sort}
         showSort
-        categories={categories}
       />
 
       {filtered.length > 0 ? (

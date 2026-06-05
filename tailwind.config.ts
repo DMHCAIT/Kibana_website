@@ -50,7 +50,7 @@ const config: Config = {
         kibana: {
           tan: "#C9A77B",
           camel: "#B98E5A",
-          cream: "#F6EFE5",
+          cream: "#EFE8DE",
           ink: "#1A1A1A",
           stone: "#EFEAE3",
           olive: "#3C4A2C",
