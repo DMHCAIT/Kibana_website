@@ -44,7 +44,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
-          className="flex gap-3 sm:gap-4 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:pl-0 pr-6 sm:pr-4 md:pl-0 md:pr-0 md:overflow-hidden md:max-w-fit"
+          className="flex gap-3 sm:gap-4 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:pl-0 pr-6 sm:pr-4 md:pl-0 md:pr-0 md:overflow-hidden"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
