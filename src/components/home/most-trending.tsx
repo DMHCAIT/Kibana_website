@@ -41,10 +41,10 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
       <div className="relative">
-        {/* Scrollable carousel — shows 1 on mobile, 2 on tablet, 3 on desktop */}
+        {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-6 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:pl-0 md:pr-0"
+          className="flex gap-3 sm:gap-4 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:pl-0 pr-6 sm:pr-4 md:pl-0 md:pr-0"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
@@ -52,7 +52,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               key={p.id}
               href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[calc(50vw-16px)] sm:w-[calc(50vw-16px)] md:w-[320px] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
+              className="flex-shrink-0 w-[calc(66.67vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[calc(33.333%-6px)] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
               style={{ scrollSnapAlign: "start" }}
             >
               <Image
