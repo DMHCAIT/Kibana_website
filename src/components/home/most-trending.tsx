@@ -41,10 +41,10 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
       <div className="relative">
-        {/* Scrollable carousel — shows 2 cards on desktop, 1 on mobile */}
+        {/* Scrollable carousel — shows 1 on mobile, 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:px-0"
+          className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:pl-0 md:pr-8"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
