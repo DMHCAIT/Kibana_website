@@ -41,7 +41,7 @@ Premium structure:
 - Trust/security badge
 - Rich footer with links
 - Professional typography
-- Responsive design
+- Responsive designthe
 - Multiple trust signals
 ```
 
