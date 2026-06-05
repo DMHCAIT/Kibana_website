@@ -1,11 +1,18 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function WhatsAppButton() {
+  const [whatsappUrl, setWhatsappUrl] = useState("");
   const phoneNumber = "9711414110";
-  const message = "Hi! I'm interested in Kibana's premium vegan leather handbags.";
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  useEffect(() => {
+    const kibanaLogoUrl = `${window.location.origin}/kihana-logo.png`;
+    const message = `🎀 *KIBANA - Pure. Minimal. Luxe.*\n\n${kibanaLogoUrl}\n\nHi! I'm interested in Kibana's premium vegan leather handbags.`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    setWhatsappUrl(url);
+  }, []);
 
   return (
     <a
