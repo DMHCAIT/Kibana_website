@@ -52,7 +52,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               key={p.id}
               href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[calc(33.333% - 8px)] sm:w-[calc(50vw-16px)] md:w-[calc(33.333% - 8px)] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
+              className="flex-shrink-0 w-[calc(50vw-16px)] sm:w-[calc(50vw-16px)] md:w-[320px] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
               style={{ scrollSnapAlign: "start" }}
             >
               <Image
