@@ -123,7 +123,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
         </button>
 
         {/* Carousel */}
-        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-4 mb-8 scrollbar-hide">
+        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-4 mb-2 sm:mb-8 scrollbar-hide">
           {tiles.map((t, i) => (
             <TileCard key={`${t.label}-${i}`} tile={t} />
           ))}
@@ -131,7 +131,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
       </div>
 
       {/* Trust Badges */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-4 px-4 bg-kibana-cream/40 rounded-lg">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-2 sm:py-4 px-4 bg-kibana-cream/40 rounded-lg">
         {badges.map((badge) => {
           const Icon = badge.icon;
           return (
