@@ -44,7 +44,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         {/* Scrollable carousel — shows 1 on mobile, 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-6 md:gap-3 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:pl-0 md:pr-0"
+          className="flex gap-4 sm:gap-6 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:px-0 pr-6 sm:pr-8 md:pl-0 md:pr-0"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
@@ -52,7 +52,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               key={p.id}
               href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[calc(31.5% - 6px)] sm:w-[calc(50vw-16px)] md:w-[calc(31.5% - 6px)] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
+              className="flex-shrink-0 w-[calc(33.333% - 8px)] sm:w-[calc(50vw-16px)] md:w-[calc(33.333% - 8px)] h-[420px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
               style={{ scrollSnapAlign: "start" }}
             >
               <Image
