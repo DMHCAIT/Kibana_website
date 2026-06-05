@@ -40,7 +40,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     <section className="bg-[#eef4f0] w-full py-2 md:py-8">
     <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
-      <div className="relative overflow-hidden">
+      <div className="relative">
         {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
@@ -52,7 +52,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               key={p.id}
               href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[calc(80vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[320px] lg:w-[calc(33.333%-8px)] h-[340px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-md sm:shadow-lg"
+              className="flex-shrink-0 w-[calc(80vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[320px] lg:w-[calc(33.333%-8px)] h-[340px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-sm md:shadow-none"
               style={{ scrollSnapAlign: "start" }}
             >
               <Image
