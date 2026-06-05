@@ -40,7 +40,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     <section className="bg-[#eef4f0] w-full py-2 md:py-8">
     <div className="md:container">
       <SectionHeading title="Most Trending" className="px-4 md:px-0" />
-      <div className="relative">
+      <div className="relative overflow-hidden">
         {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
