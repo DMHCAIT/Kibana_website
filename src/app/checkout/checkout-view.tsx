@@ -98,24 +98,6 @@ export function CheckoutView() {
   const codExtraCharge = payment === "cod" ? 50 : 0;
   const total = Math.max(0, subtotalWithShipping - discount + codExtraCharge);
 
-  // Empty cart redirect
-  if (items.length === 0 && !orderId) {
-    return (
-      <section className="container py-16 md:py-24">
-        <div className="mx-auto flex max-w-md flex-col items-center text-center">
-          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <ShoppingBag className="h-7 w-7 text-muted-foreground" />
-          </span>
-          <h1 className="mt-4 font-display text-3xl">Your cart is empty</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Add some items before checking out.</p>
-          <Button asChild size="lg" className="mt-6">
-            <Link href="/shop">Shop Bags</Link>
-          </Button>
-        </div>
-      </section>
-    );
-  }
-
   // ── Order confirmed screen ────────────────────────────────────────────────
   if (orderId) {
     return (
@@ -361,30 +343,30 @@ export function CheckoutView() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <section className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm">
-        <div className="container py-4 max-w-6xl">
+      <div className="border-b border-border bg-card sticky top-0 z-40 shadow-sm">
+        <div className="container max-w-6xl py-4">
           <div className="flex items-center gap-4 justify-between">
             <div className="flex items-center gap-3">
               {step > 0 && (
                 <button
                   type="button"
                   onClick={() => setStep((s) => (s - 1) as Step)}
-                  className="text-slate-600 hover:text-slate-900 transition-colors p-1"
+                  className="text-muted-foreground hover:text-foreground transition-colors p-1"
                   aria-label="Back"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
               )}
               <div>
-                <h1 className="font-display text-xl md:text-2xl font-bold text-slate-900">Secure Checkout</h1>
-                <p className="text-xs text-slate-500 mt-0.5">Your order is safe with us</p>
+                <h1 className="font-display text-xl md:text-2xl font-bold text-foreground">Secure Checkout</h1>
+                <p className="text-xs text-muted-foreground mt-0.5">Your order is safe with us</p>
               </div>
             </div>
             <div className="text-right hidden sm:block">
-              <p className="text-xs text-slate-500 font-medium">TOTAL AMOUNT</p>
-              <p className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">{formatINR(total)}</p>
+              <p className="text-xs text-muted-foreground font-medium">TOTAL</p>
+              <p className="text-2xl md:text-3xl font-bold text-foreground mt-1">{formatINR(total)}</p>
             </div>
           </div>
           <div className="mt-4">
@@ -399,17 +381,17 @@ export function CheckoutView() {
           <div>
             {/* Step 0 – Order Summary */}
             {step === 0 && (
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3 bg-gradient-to-r from-slate-50 to-white">
-                  <div className="p-2 bg-slate-100 rounded-lg">
-                    <ShoppingBag className="h-5 w-5 text-slate-700" />
+              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div className="px-6 py-4 border-b border-border flex items-center gap-3 bg-muted">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <ShoppingBag className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">Your Items</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">{items.length} item{items.length !== 1 ? 's' : ''} in cart</p>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">Your Items</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">{items.length} item{items.length !== 1 ? 's' : ''} in cart</p>
                   </div>
                 </div>
-                <ul className="divide-y divide-slate-200">
+                <ul className="divide-y divide-border">
                   {items.map(({ product, quantity }) => (
                     <li key={product.id} className="flex gap-4 px-6 py-4 items-start hover:bg-slate-50/50 transition-colors">
                       <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
@@ -426,8 +408,8 @@ export function CheckoutView() {
                     </li>
                   ))}
                 </ul>
-                <div className="px-6 py-4 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-white">
-                  <Button size="lg" className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold" onClick={() => {
+                <div className="px-6 py-4 border-t border-border bg-muted">
+                  <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold" onClick={() => {
                     if (!user) { openAuthModal("Please log in to proceed to checkout."); return; }
                     setStep(1);
                   }}>
@@ -552,14 +534,14 @@ export function CheckoutView() {
                       id="cod"
                       selected={payment === "cod"}
                       onSelect={() => setPayment("cod")}
-                      icon={<Banknote className="h-6 w-6 text-emerald-600" />}
+                      icon={<Banknote className="h-6 w-6 text-accent" />}
                       title="Cash on Delivery"
                       subtitle="Pay when your order arrives at your doorstep"
                     />
                     {payment === "cod" && (
-                      <div className="mt-3 ml-14 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                        <p className="text-xs font-semibold text-orange-700">🚚 COD Handling Charge: +₹50</p>
-                        <p className="text-xs text-orange-600 mt-1">This charge is added to your total amount</p>
+                      <div className="mt-3 ml-14 p-3 bg-muted border border-border rounded-lg">
+                        <p className="text-xs font-semibold text-foreground">🚚 COD Charge: +₹50</p>
+                        <p className="text-xs text-muted-foreground mt-1">Added to your total</p>
                       </div>
                     )}
                   </div>
@@ -570,7 +552,7 @@ export function CheckoutView() {
                       id="upi"
                       selected={payment === "upi"}
                       onSelect={() => setPayment("upi")}
-                      icon={<Smartphone className="h-6 w-6 text-blue-600" />}
+                      icon={<Smartphone className="h-6 w-6 text-primary" />}
                       title="UPI Payment"
                       subtitle="Pay instantly using GPay, PhonePe, Paytm, BHIM"
                     />
@@ -647,12 +629,12 @@ export function CheckoutView() {
           </div>
 
           {/* Right panel – Order summary */}
-          <aside className="rounded-xl border border-slate-200 bg-white shadow-sm p-6 h-fit lg:sticky lg:top-28">
+          <aside className="rounded-xl border border-border bg-card shadow-sm p-6 h-fit lg:sticky lg:top-28">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-slate-100 rounded-lg">
-                <ShoppingBag className="h-4 w-4 text-slate-700" />
+              <div className="p-1.5 bg-primary/10 rounded-lg">
+                <ShoppingBag className="h-4 w-4 text-primary" />
               </div>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">Order Summary</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">Order Summary</h2>
             </div>
             
             {step >= 1 && (
@@ -676,42 +658,42 @@ export function CheckoutView() {
 
             <div className="space-y-3 mb-4">
               <div className="flex justify-between items-center text-sm">
-                <dt className="text-slate-600">Subtotal</dt>
-                <dd className="font-medium text-slate-900">{formatINR(subtotal)}</dd>
+                <dt className="text-muted-foreground">Subtotal</dt>
+                <dd className="font-medium text-foreground">{formatINR(subtotal)}</dd>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <dt className="text-slate-600">Shipping</dt>
-                <dd className="font-medium text-slate-900">{shipping === 0 ? "FREE" : formatINR(shipping)}</dd>
+                <dt className="text-muted-foreground">Shipping</dt>
+                <dd className="font-medium text-foreground">{shipping === 0 ? "FREE" : formatINR(shipping)}</dd>
               </div>
               {discount > 0 && step >= 2 && (
                 <div className="flex justify-between items-center text-sm">
-                  <dt className="font-medium text-emerald-700">{discountLabel}</dt>
-                  <dd className="font-bold text-emerald-600">-{formatINR(discount)}</dd>
+                  <dt className="font-medium text-accent">{discountLabel}</dt>
+                  <dd className="font-bold text-accent">-{formatINR(discount)}</dd>
                 </div>
               )}
               {codExtraCharge > 0 && step >= 2 && (
                 <div className="flex justify-between items-center text-sm">
-                  <dt className="font-medium text-orange-600">🚚 COD Charge</dt>
-                  <dd className="font-bold text-orange-600">+{formatINR(codExtraCharge)}</dd>
+                  <dt className="font-medium text-foreground">🚚 COD Charge</dt>
+                  <dd className="font-bold text-foreground">+{formatINR(codExtraCharge)}</dd>
                 </div>
               )}
             </div>
 
-            <div className="border-t border-slate-200 pt-4 mb-4">
+            <div className="border-t border-border pt-4 mb-4">
               <div className="flex justify-between items-center text-lg">
-                <dt className="font-bold text-slate-900">Total</dt>
-                <dd className="font-black text-slate-900 text-xl">{formatINR(total)}</dd>
+                <dt className="font-bold text-foreground">Total</dt>
+                <dd className="font-bold text-foreground text-xl">{formatINR(total)}</dd>
               </div>
             </div>
 
             {step >= 1 && address.fullName && (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                <p className="font-bold text-xs uppercase tracking-wider text-slate-900 mb-2">📍 Delivering To</p>
+              <div className="bg-muted rounded-lg p-4 border border-border">
+                <p className="font-bold text-xs uppercase tracking-wider text-foreground mb-2">📍 Delivering To</p>
                 <div className="space-y-1 text-xs">
-                  <p className="font-semibold text-slate-900">{address.fullName}</p>
-                  {address.addressLine1 && <p className="text-slate-600">{address.addressLine1}{address.addressLine2 ? `, ${address.addressLine2}` : ""}</p>}
-                  {address.city && <p className="text-slate-600">{address.city}{address.state ? `, ${address.state}` : ""}{address.pincode ? ` – ${address.pincode}` : ""}</p>}
-                  {address.phone && <p className="text-slate-600 font-medium mt-1.5">📞 {address.phone}</p>}
+                  <p className="font-semibold text-foreground">{address.fullName}</p>
+                  {address.addressLine1 && <p className="text-muted-foreground">{address.addressLine1}{address.addressLine2 ? `, ${address.addressLine2}` : ""}</p>}
+                  {address.city && <p className="text-muted-foreground">{address.city}{address.state ? `, ${address.state}` : ""}{address.pincode ? ` – ${address.pincode}` : ""}</p>}
+                  {address.phone && <p className="text-muted-foreground font-medium mt-1.5">📞 {address.phone}</p>}
                 </div>
               </div>
             )}
@@ -724,7 +706,7 @@ export function CheckoutView() {
 
 // ── Helper sub-components ──────────────────────────────────────────────────────
 function inputCls(hasError: boolean) {
-  return `w-full border ${hasError ? "border-red-400 bg-red-50" : "border-slate-300 bg-white"} px-4 py-2.5 text-sm rounded-lg outline-none focus:ring-2 ${hasError ? "focus:ring-red-200" : "focus:ring-slate-100"} focus:border-slate-400 transition-all placeholder:text-slate-400`;
+  return `w-full border ${hasError ? "border-red-400 bg-red-50" : "border-border bg-card"} px-4 py-2.5 text-sm rounded-lg outline-none focus:ring-2 ${hasError ? "focus:ring-red-200" : "focus:ring-muted"} focus:border-border transition-all placeholder:text-muted-foreground`;
 }
 
 function Field({
@@ -738,7 +720,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-900 mb-2 block uppercase tracking-wider">{label}</label>
+      <label className="text-xs font-bold text-foreground mb-2 block uppercase tracking-wider">{label}</label>
       {children}
       {error && <p className="mt-1.5 text-xs font-semibold text-red-600">✕ {error}</p>}
     </div>
@@ -766,22 +748,22 @@ function PaymentOption({
       onClick={onSelect}
       className={`w-full flex items-start gap-4 px-5 py-4 rounded-lg border-2 transition-all text-left group ${
         selected 
-          ? "border-slate-900 bg-slate-50 shadow-md" 
-          : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+          ? "border-primary bg-muted shadow-md" 
+          : "border-border bg-card hover:border-primary hover:shadow-sm"
       }`}
     >
       <div
         className={`h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
           selected 
-            ? "border-slate-900 bg-slate-900" 
-            : "border-slate-300 bg-white group-hover:border-slate-400"
+            ? "border-primary bg-primary" 
+            : "border-border bg-card group-hover:border-primary"
         }`}
       >
-        {selected && <div className="h-2 w-2 rounded-full bg-white" />}
+        {selected && <div className="h-2 w-2 rounded-full bg-card" />}
       </div>
       <div className="flex-1">
-        <p className={`font-bold text-sm ${selected ? "text-slate-900" : "text-slate-900"}`}>{title}</p>
-        <p className="text-xs text-slate-600 mt-0.5">{subtitle}</p>
+        <p className={`font-bold text-sm ${selected ? "text-foreground" : "text-foreground"}`}>{title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
       </div>
       <div className="text-xl mt-1">{icon}</div>
     </button>
@@ -797,15 +779,15 @@ function StepBar({ step }: { step: number }) {
             <div
               className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm ${
                 i < step
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-accent text-white"
                   : i === step
-                  ? "bg-slate-900 text-white ring-2 ring-slate-900 ring-offset-2"
-                  : "bg-slate-200 text-slate-600"
+                  ? "bg-primary text-white ring-2 ring-primary ring-offset-2"
+                  : "bg-muted text-muted-foreground"
               }`}
             >
               {i < step ? <Check className="h-5 w-5" /> : i + 1}
             </div>
-            <span className={`mt-2 text-xs font-bold tracking-wider ${i === step ? "text-slate-900" : i < step ? "text-emerald-700" : "text-slate-400"}`}>
+            <span className={`mt-2 text-xs font-bold tracking-wider ${i === step ? "text-foreground" : i < step ? "text-accent" : "text-muted-foreground"}`}>
               {label}
             </span>
           </div>
