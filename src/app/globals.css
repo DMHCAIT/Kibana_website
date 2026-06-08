@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent scrollbar from causing layout shift */
+html {
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Ensure body doesn't overflow horizontally */
+body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   :root {
     --background: 36 33% 91%;       /* soft cream - darkened slightly */

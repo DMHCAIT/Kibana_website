@@ -343,10 +343,10 @@ export function CheckoutView() {
   }
 
   return (
-    <section className="min-h-screen bg-background">
+    <section className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <div className="border-b border-border bg-card sticky top-0 z-40 shadow-sm">
-        <div className="container max-w-6xl py-4">
+      <div className="border-b border-border bg-card sticky top-0 z-40 shadow-sm w-full">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 justify-between">
             <div className="flex items-center gap-3">
               {step > 0 && (
@@ -375,8 +375,8 @@ export function CheckoutView() {
         </div>
       </div>
 
-      <div className="container max-w-6xl py-6 md:py-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="grid gap-6 lg:grid-cols-[1fr_380px] w-full">
           {/* Left panel */}
           <div>
             {/* Step 0 – Order Summary */}
