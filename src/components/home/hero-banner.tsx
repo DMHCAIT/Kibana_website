@@ -127,10 +127,10 @@ export function HeroBanner() {
           style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
         />
         {/* Dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-3 z-10">
           {heroSlides.map((_, index) => (
             <button key={index} onClick={() => goTo(index)}
-              className={`h-2 w-2 transition-all cursor-pointer ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
+              className={`h-1.5 sm:h-2 w-1.5 sm:w-2 transition-all cursor-pointer ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
               aria-label={`View image ${index + 1}`} />
           ))}
         </div>

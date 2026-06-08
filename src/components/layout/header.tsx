@@ -81,7 +81,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background">
-      <div className="container relative flex h-14 md:h-auto lg:h-20 items-center gap-3 py-2 md:py-4">
+      <div className="container relative flex h-14 md:h-16 lg:h-20 items-center gap-3 py-2 md:py-4">
         <button
           aria-label="Open menu"
           onClick={() => setOpen(true)}
@@ -97,7 +97,7 @@ export function Header() {
             alt="Kibana"
             width={280}
             height={112}
-            className="h-32 md:h-56 lg:h-20 w-auto object-contain"
+            className="h-24 md:h-20 lg:h-24 w-auto object-contain"
             priority
             quality={100}
           />
@@ -115,7 +115,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden md:flex ml-auto max-w-sm w-full">
+        <div className="hidden md:flex ml-auto md:max-w-xs lg:max-w-sm w-full\">
           <form onSubmit={handleSearch} className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 

@@ -27,7 +27,7 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </span>
-            <span className="text-[11px] sm:text-sm md:text-lg tracking-[0.12em] text-center leading-tight">
+            <span className="text-xs sm:text-sm md:text-base text-center leading-tight">
               {c.name}
             </span>
           </Link>

@@ -55,23 +55,23 @@ export function ProductCard({ product, variant = "compact", className, imageClas
           src={product.image}
           alt={product.name}
           fill
-          sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 320px"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {/* Discount badge — top left on image */}
         {pct > 0 && variant !== "minimal" && (
-          <span className="absolute left-2 top-2 bg-gray-900 text-white text-[10px] font-bold px-1.5 py-0.5 tracking-wide">
+          <span className="absolute left-2 top-2 bg-gray-900 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 tracking-wide">
             {pct}% OFF
           </span>
         )}
         <button
           aria-label="Add to wishlist"
-          className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center transition-all hover:scale-110"
+          className="absolute right-2 top-2 inline-flex h-7 sm:h-8 w-7 sm:w-8 items-center justify-center transition-all hover:scale-110"
           onClick={toggleWishlist}
         >
           <Heart 
             className={cn(
-              "h-4 w-4 transition-colors",
+              "h-5 sm:h-6 w-5 sm:w-6 transition-colors",
               inWishlist ? "text-red-500" : "text-gray-400 hover:text-gray-600"
             )}
             fill={inWishlist ? "currentColor" : "none"}
@@ -82,13 +82,13 @@ export function ProductCard({ product, variant = "compact", className, imageClas
       <div className="pt-1.5 flex flex-col gap-0.5">
         <Link
           href={`/shop/${product.slug}`}
-          className="line-clamp-1 text-[11px] sm:text-sm md:text-lg font-medium leading-snug hover:underline"
+          className="line-clamp-1 text-xs sm:text-sm md:text-base leading-snug hover:underline"
         >
           {product.name}
         </Link>
         {variant !== "minimal" && (
           <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[12px] sm:text-sm md:text-lg font-bold">{formatINR(product.price)}</span>
+            <span className="text-[12px] sm:text-sm md:text-lg">{formatINR(product.price)}</span>
             {product.compareAtPrice && (
               <span className="text-[11px] sm:text-xs md:text-base text-muted-foreground line-through">
                 {formatINR(product.compareAtPrice)}

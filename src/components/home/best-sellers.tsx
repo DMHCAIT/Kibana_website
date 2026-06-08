@@ -22,7 +22,7 @@ export function BestSellers({
 
   return (
     <section className="container py-2 md:py-6">
-      <SectionHeading title="Best Sellers" />
+      <SectionHeading title="Best Sellers" className="font-normal normal-case tracking-[0.05em]" />
 
       {/* Full-width banner — aspect matches image's natural 1816×866 ratio on mobile */}
       <div className="relative w-full aspect-[21/10] sm:aspect-[16/9] md:aspect-[16/7] overflow-hidden rounded">
@@ -35,15 +35,15 @@ export function BestSellers({
           priority
           className="object-cover object-left-top sm:object-center"
         />
-        {/* Shop Now overlay — stays inside the left text panel at every breakpoint */}
-        <div className="absolute left-[12%] top-[50%] sm:left-[16%] sm:top-[44%] md:left-[18%] md:top-[46%]">
+        {/* Shop Now overlay — responsive positioning across all breakpoints */}
+        <div className="absolute left-[calc(12%-0.5rem)] top-1/2 sm:left-[calc(16%-0.5rem)] sm:top-[44%] md:left-[calc(18%-0.5rem)] md:top-[46%] -translate-y-1/2 sm:translate-y-0">
           <Link
             href="/shop"
-            className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-widest uppercase
-                       text-[8px] px-2.5 py-1
+            className="inline-block bg-[#7C4A22] hover:bg-[#5E3518] text-white font-semibold tracking-[0.15em] uppercase
+                       text-[7px] px-2 py-0.5
                        sm:text-xs sm:px-5 sm:py-2.5
                        md:text-sm md:px-7 md:py-3
-                       transition-colors duration-200"
+                       transition-colors duration-200 whitespace-nowrap"
           >
             Shop Now
           </Link>

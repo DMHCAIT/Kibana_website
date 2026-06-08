@@ -16,7 +16,7 @@ export function CustomerReview() {
       {/* Black top section with heading */}
       <div className="bg-kibana-ink text-kibana-cream py-8 md:py-12 pb-20 md:pb-28">
         <div className="text-center">
-          <h2 className="font-bold text-2xl sm:text-3xl uppercase tracking-[0.15em]">Customer review</h2>
+          <h2 className="font-bold text-base sm:text-lg uppercase tracking-[0.15em]">Customer review</h2>
           <p className="text-sm text-kibana-cream/70 mt-2">Real feedback from happy customers</p>
         </div>
       </div>

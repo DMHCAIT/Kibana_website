@@ -39,7 +39,7 @@ export function TrustBadges() {
         <div className="grid grid-cols-3 items-center gap-4 sm:gap-6">
           {badges.map(({ label }) => (
             <div key={label} className="flex flex-col items-center">
-              <span className="text-xs sm:text-sm font-semibold text-kibana-ink">{label}</span>
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.15em] text-kibana-ink">{label}</span>
             </div>
           ))}
         </div>

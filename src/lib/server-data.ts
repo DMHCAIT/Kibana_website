@@ -573,6 +573,13 @@ export async function updateOrderStatus(
   dataCache.delete("orders");
 }
 
+export async function deleteOrder(id: string): Promise<void> {
+  await db.delete(ordersTable).where(eq(ordersTable.id, id));
+  
+  // Invalidate cache
+  dataCache.delete("orders");
+}
+
 // ── Cart Items ────────────────────────────────────────────────────────────────
 
 export type AdminCartItem = {

@@ -21,7 +21,7 @@ export function ShopByGender() {
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </span>
-            <span className="text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-center px-1">
+              <span className="text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-[0.15em] text-center px-1">
               {gender.name}
             </span>
           </Link>

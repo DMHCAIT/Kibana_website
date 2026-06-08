@@ -53,7 +53,7 @@ function TileCard({ tile }: { tile: Tile }) {
     <Link
       href={tile.href}
       data-card
-      className="relative flex-shrink-0 w-[230px] h-[420px] overflow-hidden rounded-lg bg-kibana-cream group cursor-pointer block"
+      className="relative flex-shrink-0 w-[230px] h-[420px] overflow-hidden rounded-xl bg-kibana-cream group cursor-pointer block shadow-lg hover:shadow-2xl transition-all duration-300"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -63,7 +63,7 @@ function TileCard({ tile }: { tile: Tile }) {
         alt={tile.alt}
         fill
         sizes="230px"
-        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        className="object-cover transition-transform duration-500 group-hover:scale-110"
       />
 
       {/* Video overlay — shown on hover, plays once with sound, no controls */}
@@ -78,8 +78,8 @@ function TileCard({ tile }: { tile: Tile }) {
       )}
 
       {/* Bottom label */}
-      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent pt-8 pb-2 px-2">
-        <span className="text-white text-xs sm:text-sm uppercase tracking-[0.1em] block text-center">{tile.label}</span>
+      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent pt-12 pb-3 px-3">
+        <span className="text-white text-xs sm:text-sm font-semibold uppercase tracking-[0.15em] block text-center line-clamp-2">{tile.label}</span>
       </div>
     </Link>
   );
@@ -101,47 +101,54 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     : FALLBACK_TILES;
 
   return (
-    <section className="container py-2 md:py-6">
+    <section className="container py-6 md:py-12">
       <SectionHeading title="Style in Motion" />
-      <div className="relative">
+      <div className="relative space-y-6 sm:space-y-8">
         {/* Left Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("left")}
-          className="hidden sm:block lg:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block lg:hidden absolute left-2 top-[40%] -translate-y-1/2 z-10 transition-all duration-300 hover:scale-110"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+          <ChevronLeft className="h-7 w-7 text-kibana-tan hover:text-kibana-camel drop-shadow-lg" />
         </button>
 
         {/* Right Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("right")}
-          className="hidden sm:block lg:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 transition-colors"
+          className="hidden sm:block lg:hidden absolute right-2 top-[40%] -translate-y-1/2 z-10 transition-all duration-300 hover:scale-110"
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+          <ChevronRight className="h-7 w-7 text-kibana-tan hover:text-kibana-camel drop-shadow-lg" />
         </button>
 
         {/* Carousel */}
-        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-4 mb-2 sm:mb-8 scrollbar-hide">
+        <div ref={scrollContainerRef} className="flex overflow-x-auto lg:overflow-hidden pb-2 gap-4 mb-2 sm:mb-0 scrollbar-hide">
           {tiles.map((t, i) => (
             <TileCard key={`${t.label}-${i}`} tile={t} />
           ))}
         </div>
       </div>
 
-      {/* Trust Badges */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-2 sm:py-4 px-4 bg-kibana-cream/40 rounded-lg">
+      {/* Trust Badges — Premium Luxury Section */}
+      <div className="grid grid-cols-3 gap-5 sm:gap-10 text-center py-8 sm:py-12 px-5 sm:px-10 bg-gradient-to-br from-kibana-tan/15 via-kibana-cream/40 to-kibana-camel/20 rounded-3xl border-2 border-kibana-tan/30 shadow-2xl mt-10 sm:mt-14 backdrop-blur-sm">
         {badges.map((badge) => {
           const Icon = badge.icon;
           return (
-            <div key={badge.label} className="flex flex-col items-center gap-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
-                <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-foreground/70" />
+            <div key={badge.label} className="flex flex-col items-center gap-4 sm:gap-5 group">
+              <div className="relative">
+                {/* Luxury glow effect behind circle */}
+                <div className="absolute inset-0 bg-kibana-tan/20 rounded-full blur-lg scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Premium circular badge with border */}
+                <div className="w-14 h-14 sm:w-18 sm:h-18 flex items-center justify-center bg-white rounded-full shadow-2xl border-2 border-kibana-tan/30 transition-all duration-300 group-hover:shadow-[0_20px_40px_rgba(201,167,123,0.3)] group-hover:scale-110">
+                  <Icon className="h-8 w-8 sm:h-10 sm:w-10 text-kibana-tan transition-transform duration-300 group-hover:scale-125" />
+                </div>
               </div>
-              <p className="text-xs font-medium text-foreground/70 uppercase tracking-[0.1em]">
-                {badge.label}
-              </p>
+              <div>
+                <p className="text-sm sm:text-base font-bold text-kibana-ink uppercase tracking-[0.2em] leading-tight">
+                  {badge.label}
+                </p>
+              </div>
             </div>
           );
         })}

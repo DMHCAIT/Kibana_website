@@ -44,7 +44,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
         {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
         <div
           ref={scrollRef}
-          className="flex gap-3 sm:gap-4 md:gap-2 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:pl-0 pr-6 sm:pr-4 md:pl-0 md:pr-2 md:overflow-hidden md:w-full"
+          className="flex gap-3 sm:gap-4 md:gap-3 overflow-x-auto scroll-smooth scrollbar-hide pl-4 sm:pl-0 pr-6 sm:pr-4 md:pl-0 md:pr-2 w-full"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {trendingProducts.map((p) => (
@@ -52,19 +52,19 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
               key={p.id}
               href={`/shop/${p.slug}`}
               data-card
-              className="flex-shrink-0 w-[calc(80vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[320px] lg:w-[calc(33.333%-8px)] h-[340px] sm:h-[400px] md:h-[480px] relative overflow-hidden rounded-xl group shadow-sm md:shadow-none"
+              className="flex-shrink-0 w-[calc(85vw-1rem)] sm:w-[calc(50vw-1rem)] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)] h-[450px] sm:h-[520px] md:h-[560px] relative overflow-hidden rounded-xl group shadow-sm"
               style={{ scrollSnapAlign: "start" }}
             >
               <Image
                 src={p.image}
                 alt={p.name}
                 fill
-                sizes="428px"
+                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               {/* Overlay at bottom with product name */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent pt-16 pb-5 px-3 sm:px-4">
-                <p className="text-white text-xs sm:text-base md:text-lg font-semibold uppercase tracking-widest text-center line-clamp-2 leading-tight">
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent pt-12 pb-4 px-3 sm:px-4">
+                <p className="text-white text-xs sm:text-sm font-semibold uppercase tracking-[0.15em] text-center line-clamp-2 leading-snug">
                   {p.name}
                 </p>
               </div>
