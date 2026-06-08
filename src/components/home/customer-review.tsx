@@ -25,8 +25,16 @@ export function CustomerReview() {
       <div className="bg-gray-100 relative pt-12 md:pt-16 pb-8 md:pb-12">
         <div className="flex flex-col items-center text-center max-w-md md:max-w-2xl mx-auto px-4">
             {/* Avatar - positioned to touch black background */}
-            <span className="relative h-40 w-40 sm:h-48 sm:w-48 md:h-56 md:w-56 overflow-hidden rounded-full ring-4 ring-white shadow-lg -mt-24 md:-mt-32 mb-6 md:mb-8">
-              <Image src={r.avatar} alt={r.name} fill className="object-cover" sizes="256px" />
+            <span className="relative h-40 w-40 sm:h-48 sm:w-48 md:h-56 md:w-56 overflow-hidden rounded-full ring-4 ring-white shadow-2xl -mt-24 md:-mt-32 mb-6 md:mb-8">
+              <Image 
+                src={r.avatar} 
+                alt={r.name} 
+                fill 
+                className="object-cover"
+                quality={95}
+                priority
+                sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, 224px"
+              />
             </span>
             
             {/* Stars - thin with sharp corners */}
