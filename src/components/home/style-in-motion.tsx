@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
-import { Leaf, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Truck, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useCallback } from "react";
 import type { Product } from "@/types/product";
 
@@ -17,7 +17,7 @@ const FALLBACK_TILES: { src: string; alt: string; label: string; href: string; v
   ];
 
 const badges = [
-  { icon: Leaf, label: "Eco-Friendly" },
+  { icon: Truck, label: "Delivery in 4 days" },
   { icon: Zap, label: "Vegan Leather" },
   { icon: RotateCcw, label: "Easy Returns" },
 ];
@@ -156,7 +156,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border border-kibana-tan/30 bg-white shadow-md transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16">
                   <Icon className="h-5 w-5 text-kibana-tan sm:h-7 sm:w-7" />
                 </div>
-                <p className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.08em] text-kibana-ink sm:text-sm sm:tracking-[0.18em]">
+                <p className="whitespace-normal text-[9px] font-semibold uppercase leading-snug tracking-[0.08em] text-kibana-ink sm:whitespace-nowrap sm:text-sm sm:tracking-[0.18em]">
                   {badge.label}
                 </p>
               </div>

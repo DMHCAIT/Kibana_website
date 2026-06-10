@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -101,23 +100,18 @@ export function Header() {
           <Menu className="h-5 w-5" />
         </button>
 
-        {/* Logo: responsive size across all screens */}
+        {/* Logo: bold KIBANA wordmark */}
         <Link
           href="/"
+          aria-label="Kibana home"
           className="absolute left-1/2 flex flex-shrink-0 -translate-x-1/2 items-center justify-center md:relative md:left-auto md:translate-x-0"
         >
-          <Image
-            src="/extracted/kibana logo black.webp"
-            alt="Kibana"
-            width={280}
-            height={112}
-            className="h-12 w-auto object-cover md:h-14 lg:h-16"
-            priority
-            quality={100}
-          />
+          <span className="font-display text-lg font-normal tracking-[0.25em] text-foreground md:text-xl lg:text-2xl">
+            KIBANA
+          </span>
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-5 whitespace-nowrap text-xs uppercase tracking-[0.12em] md:flex lg:gap-6">
+        <nav className="ml-10 hidden items-center gap-5 whitespace-nowrap text-xs uppercase tracking-[0.12em] md:flex lg:ml-16 lg:gap-6">
           {desktopNav.map((n) => (
             <Link
               key={n.href}
