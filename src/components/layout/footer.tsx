@@ -17,11 +17,7 @@ const columns = [
   },
   {
     title: "ABOUT",
-    links: [
-      { label: "our story", href: "/about" },
-      { label: "sitemap", href: "/sitemap" },
-      { label: "blogs", href: "/blogs" },
-    ],
+    links: [{ label: "our story", href: "/about" }],
   },
   {
     title: "SUPPORT",
@@ -35,37 +31,46 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="bg-kibana-ink text-kibana-cream pb-16 md:pb-0">
-      <div className="px-4 sm:px-8 md:container py-6 md:py-8">
-
+    <footer className="bg-kibana-ink pb-16 text-kibana-cream md:pb-0">
+      <div className="px-4 py-6 md:container sm:px-8 md:py-8">
         {/* Newsletter section */}
-        <div className="mb-6 pb-6 border-b border-kibana-cream/10">
-          <h3 className="font-bold text-base sm:text-lg uppercase tracking-[0.15em] mb-4">Get In Touch</h3>
+        <div className="mb-6 border-b border-kibana-cream/10 pb-6">
+          <h3 className="mb-4 text-base font-bold uppercase tracking-[0.15em] sm:text-lg">
+            Get In Touch
+          </h3>
           <NewsletterForm />
         </div>
 
         {/* Logo + Nav columns */}
         <div className="mb-6">
-          <div className="flex flex-col md:grid md:grid-cols-4 md:gap-12 md:items-start md:pt-6">
-
+          <div className="flex flex-col md:grid md:grid-cols-4 md:items-start md:gap-12 md:pt-6">
             {/* Logo */}
             <div className="hidden md:flex md:flex-shrink-0 md:pl-8">
               <Link href="/" className="inline-block flex items-center justify-center">
-                <ResponsiveImage src="/extracted/kibana logo_white.png" alt="Kibana" width={160} height={64} className="object-contain h-32 w-auto" />
+                <ResponsiveImage
+                  src="/extracted/kibana logo_white.webp"
+                  alt="Kibana"
+                  width={160}
+                  height={64}
+                  className="h-32 w-auto object-contain"
+                />
               </Link>
             </div>
 
             {/* Nav columns — 3 cols on mobile/tablet, each in own col on desktop */}
-            <div className="flex-1 grid grid-cols-3 sm:grid-cols-3 md:contents gap-6 sm:gap-8 md:gap-0 md:mt-0">
+            <div className="grid flex-1 grid-cols-3 gap-6 sm:grid-cols-3 sm:gap-8 md:mt-0 md:contents md:gap-0">
               {columns.map((col) => (
                 <div key={col.title}>
-                  <h4 className="text-xs font-semibold tracking-[0.2em] text-kibana-cream mb-3 uppercase">
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-kibana-cream">
                     {col.title}
                   </h4>
                   <ul className="space-y-2 text-xs text-kibana-cream/70">
                     {col.links.map((l) => (
                       <li key={l.href}>
-                        <Link href={l.href} className="hover:text-kibana-cream transition-colors leading-snug block">
+                        <Link
+                          href={l.href}
+                          className="block leading-snug transition-colors hover:text-kibana-cream"
+                        >
                           {l.label}
                         </Link>
                       </li>
@@ -78,23 +83,42 @@ export function Footer() {
         </div>
 
         {/* Social row */}
-        <div className="pt-6 border-t border-kibana-cream/10">
+        <div className="border-t border-kibana-cream/10 pt-6">
           <div className="flex flex-col items-center gap-4">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-kibana-cream/70">Follow us</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-kibana-cream/70">
+              Follow us
+            </h3>
             <div className="flex items-center gap-8">
-              <Link href="https://www.facebook.com/kibanalife" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
+              <Link
+                href="https://www.facebook.com/kibanalife"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
+              >
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="https://www.youtube.com/@KibanaLife" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
+              <Link
+                href="https://www.youtube.com/@KibanaLife"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
+              >
                 <Youtube className="h-5 w-5" />
               </Link>
-              <Link href="https://www.instagram.com/kibanalifeofficial/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-kibana-cream/70 hover:text-kibana-cream transition-colors">
+              <Link
+                href="https://www.instagram.com/kibanalifeofficial/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
+              >
                 <Instagram className="h-5 w-5" />
               </Link>
             </div>
           </div>
         </div>
-
       </div>
     </footer>
   );
