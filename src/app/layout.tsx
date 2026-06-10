@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { getSiteConfig } from "@/lib/server-data";
@@ -11,10 +11,31 @@ import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthAutoPopup } from "@/components/auth/auth-auto-popup";
 
-const inter = Inter({ subsets: ["latin"], weight: ["100", "300", "400", "500", "700"], variable: "--font-inter" });
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
+const canela = localFont({
+  src: [
+    {
+      path: "../../public/Canela Deck Family/CanelaDeck-Light-Trial.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/Canela Deck Family/CanelaDeck-Regular-Trial.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/Canela Deck Family/CanelaDeck-Medium-Trial.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/Canela Deck Family/CanelaDeck-Bold-Trial.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-canela",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -53,11 +74,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   await withTimeout(
     getSiteConfig().catch(() => FALLBACK_CONFIG),
     2000,
-    FALLBACK_CONFIG
+    FALLBACK_CONFIG,
   );
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="min-h-dvh flex flex-col">
+    <html lang="en" className={canela.variable}>
+      <body className="flex min-h-dvh flex-col">
         <Providers>
           <Header />
           <AuthModal />

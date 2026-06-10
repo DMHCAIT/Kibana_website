@@ -18,6 +18,11 @@ node_modules/
 .DS_Store
 *.pem
 
+# trial font families not used by the site (only Canela Deck is wired up)
+/public/Canela Family/
+/public/Canela Text Family/
+/public/Canela Condensed Family/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

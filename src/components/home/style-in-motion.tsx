@@ -146,28 +146,23 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
         </div>
       </div>
 
-      {/* Trust Badges — Premium Luxury Section */}
-      <div className="mt-10 grid grid-cols-3 gap-5 rounded-3xl border-2 border-kibana-tan/30 bg-gradient-to-br from-kibana-tan/15 via-kibana-cream/40 to-kibana-camel/20 px-5 py-8 text-center shadow-2xl backdrop-blur-sm sm:mt-14 sm:gap-10 sm:px-10 sm:py-12">
-        {badges.map((badge) => {
-          const Icon = badge.icon;
-          return (
-            <div key={badge.label} className="group flex flex-col items-center gap-4 sm:gap-5">
-              <div className="relative">
-                {/* Luxury glow effect behind circle */}
-                <div className="absolute inset-0 scale-110 rounded-full bg-kibana-tan/20 opacity-0 blur-lg transition-opacity duration-300 group-hover:opacity-100" />
-                {/* Premium circular badge with border */}
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-kibana-tan/30 bg-white shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_20px_40px_rgba(201,167,123,0.3)] sm:h-20 sm:w-20">
-                  <Icon className="h-7 w-7 text-kibana-tan transition-transform duration-300 group-hover:scale-125 sm:h-10 sm:w-10" />
+      {/* Trust Badges — USP strip */}
+      <div className="mt-8 rounded-2xl border border-kibana-tan/25 bg-gradient-to-br from-kibana-tan/10 via-kibana-cream/40 to-kibana-camel/10 px-2 py-5 sm:mt-12 sm:px-8 sm:py-8">
+        <div className="grid grid-cols-3 gap-2 text-center sm:gap-8">
+          {badges.map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div key={badge.label} className="group flex flex-col items-center gap-2 sm:gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-kibana-tan/30 bg-white shadow-md transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16">
+                  <Icon className="h-5 w-5 text-kibana-tan sm:h-7 sm:w-7" />
                 </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold uppercase leading-tight tracking-[0.2em] text-kibana-ink sm:text-base">
+                <p className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.08em] text-kibana-ink sm:text-sm sm:tracking-[0.18em]">
                   {badge.label}
                 </p>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

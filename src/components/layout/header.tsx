@@ -117,7 +117,7 @@ export function Header() {
           />
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-5 whitespace-nowrap text-sm md:flex lg:gap-6">
+        <nav className="ml-6 hidden items-center gap-5 whitespace-nowrap text-xs uppercase tracking-[0.12em] md:flex lg:gap-6">
           {desktopNav.map((n) => (
             <Link
               key={n.href}
@@ -306,7 +306,7 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1">
+            <nav className="flex flex-1 flex-col gap-1 uppercase tracking-[0.1em]">
               {!activeSubmenu
                 ? // Main menu
                   mainMenu.map((item) => (
