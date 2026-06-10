@@ -4,11 +4,7 @@
     "subtitle": "Premium Vegan Leather Bags",
     "ctaLabel": "Shop Now",
     "ctaHref": "/shop",
-    "images": [
-      "/extracted/img-010.jpg",
-      "/extracted/img-060.jpg",
-      "/extracted/img-070.jpg"
-    ]
+    "images": ["/extracted/img-010.jpg", "/extracted/img-060.jpg", "/extracted/img-070.jpg"]
   },
   "sections": [
     {
@@ -89,7 +85,7 @@
       "productSlug": "north-backpack"
     },
     "craftsmanship": {
-      "image": "/extracted/craftmanship.png",
+      "image": "/extracted/craftmanship.webp",
       "text": "Craftsmanship"
     }
   },
@@ -114,7 +110,12 @@
       "address": "Kibana Life, 123 Design District, Mumbai, Maharashtra 400001",
       "responseTime": "We typically respond within 24 hours.",
       "socialLinks": [
-        { "id": "sl1", "platform": "Instagram", "url": "https://instagram.com/kibanalife", "label": "Follow us on Instagram" }
+        {
+          "id": "sl1",
+          "platform": "Instagram",
+          "url": "https://instagram.com/kibanalife",
+          "label": "Follow us on Instagram"
+        }
       ]
     },
     "faqs": {

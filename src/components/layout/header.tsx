@@ -4,7 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Menu, Search, ShoppingBag, User, X, ChevronRight, ChevronLeft, LogOut, Package } from "lucide-react";
+import {
+  Heart,
+  Menu,
+  Search,
+  ShoppingBag,
+  User,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  LogOut,
+  Package,
+} from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/store/cart-store";
@@ -13,8 +24,8 @@ import { cn } from "@/lib/utils";
 
 const mainMenu = [
   { label: "Shop", submenu: null },
-  { 
-    label: "Women Bags", 
+  {
+    label: "Women Bags",
     submenu: [
       { label: "Tote Bags", href: "/shop?cat=tote-bag" },
       { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
@@ -22,10 +33,10 @@ const mainMenu = [
       { label: "Backpacks", href: "/shop?cat=backpack" },
       { label: "Clutch", href: "/shop?cat=clutch" },
       { label: "Wallets", href: "/shop?cat=wallet" },
-    ]
+    ],
   },
-  { 
-    label: "Men Bags", 
+  {
+    label: "Men Bags",
     submenu: [
       { label: "Tote Bags", href: "/shop?cat=tote-bag" },
       { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
@@ -33,7 +44,7 @@ const mainMenu = [
       { label: "Backpacks", href: "/shop?cat=backpack" },
       { label: "Clutch", href: "/shop?cat=clutch" },
       { label: "Wallets", href: "/shop?cat=wallet" },
-    ]
+    ],
   },
 ];
 
@@ -75,52 +86,55 @@ export function Header() {
     }
   };
 
-  const currentSubmenu = activeSubmenu 
-    ? mainMenu.find(m => m.label === activeSubmenu)?.submenu 
+  const currentSubmenu = activeSubmenu
+    ? mainMenu.find((m) => m.label === activeSubmenu)?.submenu
     : null;
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background">
-      <div className="container relative flex h-14 md:h-16 lg:h-20 items-center gap-3 py-2 md:py-4">
+      <div className="container relative flex h-14 items-center gap-3 py-2 md:h-16 md:py-4 lg:h-20">
         <button
           aria-label="Open menu"
           onClick={() => setOpen(true)}
-          className="md:hidden -ml-2 p-2"
+          className="-ml-2 p-2 md:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         {/* Logo: responsive size across all screens */}
-        <Link href="/" className="absolute md:relative left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 flex items-center justify-center flex-shrink-0">
+        <Link
+          href="/"
+          className="absolute left-1/2 flex flex-shrink-0 -translate-x-1/2 items-center justify-center md:relative md:left-auto md:translate-x-0"
+        >
           <Image
-            src="/extracted/kibana logo black.png"
+            src="/extracted/kibana logo black.webp"
             alt="Kibana"
             width={280}
             height={112}
-            className="h-24 md:h-20 lg:h-24 w-auto object-contain"
+            className="h-12 w-auto object-cover md:h-14 lg:h-16"
             priority
             quality={100}
           />
         </Link>
 
-        <nav className="ml-8 hidden md:flex items-center gap-6 text-sm md:text-base">
+        <nav className="ml-6 hidden items-center gap-5 whitespace-nowrap text-sm md:flex lg:gap-6">
           {desktopNav.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className="text-foreground/80 hover:text-foreground transition-colors"
+              className="text-foreground/80 transition-colors hover:text-foreground"
             >
               {n.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden md:flex ml-auto md:max-w-xs lg:max-w-sm w-full\">
+        <div className="ml-auto hidden w-full md:flex md:max-w-xs lg:max-w-sm">
           <form onSubmit={handleSearch} className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search for bags, wallets…" 
-              className="pl-9 bg-muted/50"
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search for bags, wallets…"
+              className="bg-muted/50 pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -128,12 +142,11 @@ export function Header() {
         </div>
 
         <div className={cn("flex items-center gap-1 md:gap-2", "ml-auto md:ml-3")}>
-
           {/* Search icon — mobile only */}
           <button
             aria-label="Search"
             onClick={() => setShowMobileSearch((v) => !v)}
-            className="relative md:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20 transition-colors"
+            className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center transition-colors hover:bg-accent/20 md:hidden"
           >
             {showMobileSearch ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
           </button>
@@ -142,11 +155,11 @@ export function Header() {
           <Link
             href="/cart"
             aria-label="Cart"
-            className="relative md:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20"
+            className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20 md:hidden"
           >
             <ShoppingBag className="h-4 w-4" />
             {count > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                 {count}
               </span>
             )}
@@ -158,9 +171,9 @@ export function Header() {
               <button
                 aria-label="Account menu"
                 onClick={() => setShowUserMenu((v) => !v)}
-                className="relative inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
+                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20"
               >
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-white text-xs font-semibold">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
               </button>
@@ -168,26 +181,23 @@ export function Header() {
               <button
                 aria-label="Login"
                 onClick={() => openAuthModal()}
-                className="relative inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
+                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20"
               >
                 <User className="h-5 w-5" />
               </button>
             )}
             {showUserMenu && user && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowUserMenu(false)}
-                />
-                <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-border shadow-lg z-50">
-                  <div className="px-4 py-3 border-b border-border">
-                    <p className="text-sm font-semibold truncate">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+                <div className="absolute right-0 top-full z-50 mt-1 w-52 border border-border bg-white shadow-lg">
+                  <div className="border-b border-border px-4 py-3">
+                    <p className="truncate text-sm font-semibold">{user.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                   </div>
                   <Link
                     href="/account"
                     onClick={() => setShowUserMenu(false)}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors"
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-muted"
                   >
                     <User className="h-4 w-4 text-muted-foreground" />
                     My Account
@@ -195,14 +205,17 @@ export function Header() {
                   <Link
                     href="/orders"
                     onClick={() => setShowUserMenu(false)}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors border-b border-border"
+                    className="flex w-full items-center gap-2 border-b border-border px-4 py-2.5 text-sm transition-colors hover:bg-muted"
                   >
                     <Package className="h-4 w-4 text-muted-foreground" />
                     My Orders
                   </Link>
                   <button
-                    onClick={() => { logout(); setShowUserMenu(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors text-left text-red-600"
+                    onClick={() => {
+                      logout();
+                      setShowUserMenu(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-muted"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout
@@ -216,8 +229,13 @@ export function Header() {
           <Link
             href={user ? "/wishlist" : "#"}
             aria-label="Wishlist"
-            onClick={(e) => { if (!user) { e.preventDefault(); openAuthModal(); } }}
-            className="relative hidden md:inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20 transition-colors"
+            onClick={(e) => {
+              if (!user) {
+                e.preventDefault();
+                openAuthModal();
+              }
+            }}
+            className="relative hidden h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20 md:inline-flex"
           >
             <Heart className="h-5 w-5" />
           </Link>
@@ -226,11 +244,11 @@ export function Header() {
           <Link
             href="/cart"
             aria-label="Cart"
-            className="relative hidden md:inline-flex h-10 w-10 items-center justify-center hover:bg-accent/20"
+            className="relative hidden h-10 w-10 items-center justify-center hover:bg-accent/20 md:inline-flex"
           >
             <ShoppingBag className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                 {count}
               </span>
             )}
@@ -240,14 +258,14 @@ export function Header() {
 
       {/* Mobile search bar — slides in below header */}
       {showMobileSearch && (
-        <div className="md:hidden border-b border-border bg-background">
+        <div className="border-b border-border bg-background md:hidden">
           <div className="container py-2.5">
             <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 autoFocus
                 placeholder="Search for bags, wallets…"
-                className="pl-9 h-9 bg-muted/60"
+                className="h-9 bg-muted/60 pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -263,70 +281,66 @@ export function Header() {
           onClick={() => setOpen(false)}
         >
           <aside
-            className="absolute inset-y-0 left-0 w-72 max-w-[80%] bg-background p-5 flex flex-col"
+            className="absolute inset-y-0 left-0 flex w-72 max-w-[80%] flex-col bg-background p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex items-center justify-between">
               {activeSubmenu && (
-                <button 
-                  onClick={handleBackClick}
-                  className="flex items-center gap-1 text-sm"
-                >
+                <button onClick={handleBackClick} className="flex items-center gap-1 text-sm">
                   <ChevronLeft className="h-4 w-4" />
                   Back
                 </button>
               )}
-              {!activeSubmenu && (
-                <span className="font-display tracking-[0.25em]">KIBANA</span>
-              )}
+              {!activeSubmenu && <span className="font-display tracking-[0.25em]">KIBANA</span>}
               {activeSubmenu && (
-                <span className="font-display tracking-[0.15em] text-sm">{activeSubmenu}</span>
+                <span className="font-display text-sm tracking-[0.15em]">{activeSubmenu}</span>
               )}
-              <button aria-label="Close menu" onClick={() => {
-                setOpen(false);
-                setActiveSubmenu(null);
-              }}>
+              <button
+                aria-label="Close menu"
+                onClick={() => {
+                  setOpen(false);
+                  setActiveSubmenu(null);
+                }}
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-1 flex-1">
-              {!activeSubmenu ? (
-                // Main menu
-                mainMenu.map((item) => (
-                  <div key={item.label}>
-                    {item.submenu ? (
-                      <button
-                        onClick={() => handleSubmenuOpen(item.label)}
-                        className="w-full flex items-center justify-between py-2 text-sm border-b border-border/60 hover:bg-muted/50 px-2 -mx-2"
-                      >
-                        <span>{item.label}</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    ) : (
-                      <Link
-                        href="/shop"
-                        className="py-2 text-sm border-b border-border/60 block"
-                        onClick={() => setOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
-                    )}
-                  </div>
-                ))
-              ) : (
-                // Submenu
-                currentSubmenu?.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="py-2 text-sm border-b border-border/60 bg-muted/30 px-2 -mx-2 hover:bg-muted/60"
-                    onClick={() => setOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))
-              )}
+            <nav className="flex flex-1 flex-col gap-1">
+              {!activeSubmenu
+                ? // Main menu
+                  mainMenu.map((item) => (
+                    <div key={item.label}>
+                      {item.submenu ? (
+                        <button
+                          onClick={() => handleSubmenuOpen(item.label)}
+                          className="-mx-2 flex w-full items-center justify-between border-b border-border/60 px-2 py-2 text-sm hover:bg-muted/50"
+                        >
+                          <span>{item.label}</span>
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <Link
+                          href="/shop"
+                          className="block border-b border-border/60 py-2 text-sm"
+                          onClick={() => setOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      )}
+                    </div>
+                  ))
+                : // Submenu
+                  currentSubmenu?.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="-mx-2 border-b border-border/60 bg-muted/30 px-2 py-2 text-sm hover:bg-muted/60"
+                      onClick={() => setOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
             </nav>
           </aside>
         </div>
