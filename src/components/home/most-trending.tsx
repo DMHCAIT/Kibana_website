@@ -76,18 +76,18 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
           <button
             onClick={() => scroll("left")}
             aria-label="Previous"
-            className="absolute left-4 top-1/3 z-10 hidden -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600 sm:flex"
+            className="absolute left-1 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/85 p-1 text-gray-500 shadow-sm backdrop-blur transition-colors hover:text-gray-700 sm:left-2 md:left-4"
           >
-            <ChevronLeft className="h-8 w-8" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
           </button>
 
           {/* Right arrow */}
           <button
             onClick={() => scroll("right")}
             aria-label="Next"
-            className="absolute right-4 top-1/3 z-10 hidden -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600 sm:flex"
+            className="absolute right-1 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/85 p-1 text-gray-500 shadow-sm backdrop-blur transition-colors hover:text-gray-700 sm:right-2 md:right-4"
           >
-            <ChevronRight className="h-8 w-8" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
           </button>
         </div>
       </div>

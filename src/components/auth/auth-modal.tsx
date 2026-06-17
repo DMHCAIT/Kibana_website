@@ -18,6 +18,7 @@ export function AuthModal() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
   const [error, setError] = useState("");
@@ -29,17 +30,20 @@ export function AuthModal() {
 
   useEffect(() => {
     if (showAuthModal) {
+      const shouldOpenSignup = authModalMessage.toLowerCase().includes("sign up");
+      setTab(shouldOpenSignup ? "signup" : "login");
       setStep("email");
       setEmail("");
       setName("");
       setPhone("");
+      setAcceptedPolicy(false);
       setOtp(["", "", "", "", "", ""]);
       setError("");
       setLoading(false);
       setIsNewUser(false);
       setResendCooldown(0);
     }
-  }, [showAuthModal]);
+  }, [showAuthModal, authModalMessage]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -66,23 +70,27 @@ export function AuthModal() {
       setError("Please enter your phone number.");
       return;
     }
+    if (tab === "signup" && !acceptedPolicy) {
+      setError("Please accept Privacy Policy and T&Cs to continue.");
+      return;
+    }
 
     // Show visual feedback immediately
     setLoading(true);
-    
+
     // Move to OTP step immediately (optimistic update)
     setIsNewUser(tab === "signup");
     setStep("otp");
     setResendCooldown(30);
-    
+
     // Send OTP in background
     const result = await sendOtp(
-      cleaned, 
-      tab, 
+      cleaned,
+      tab,
       tab === "signup" ? phone.trim() : undefined,
-      tab === "signup" ? name.trim() : undefined
+      tab === "signup" ? name.trim() : undefined,
     );
-    
+
     setLoading(false);
 
     if (result.error === "not_found") {
@@ -121,12 +129,18 @@ export function AuthModal() {
     setLoading(true);
 
     // Verify OTP
-    const result = await verifyOtp(email, otpString, isNewUser ? { name: name.trim(), phone: phone.trim() } : undefined);
+    const result = await verifyOtp(
+      email,
+      otpString,
+      isNewUser ? { name: name.trim(), phone: phone.trim() } : undefined,
+    );
     setLoading(false);
 
     if (result.error) {
       if (result.error === "Invalid or expired verification code") {
-        setError("The code you entered is incorrect or has expired. Please check your latest email or resend a new code.");
+        setError(
+          "The code you entered is incorrect or has expired. Please check your latest email or resend a new code.",
+        );
       } else {
         setError(result.error);
       }
@@ -169,10 +183,10 @@ export function AuthModal() {
     setOtp(["", "", "", "", "", ""]);
     setLoading(true);
     const result = await sendOtp(
-      email, 
-      tab, 
+      email,
+      tab,
       tab === "signup" ? phone.trim() : undefined,
-      tab === "signup" ? name.trim() : undefined
+      tab === "signup" ? name.trim() : undefined,
     );
     setLoading(false);
     if (result.error) {
@@ -184,42 +198,56 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4">
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-2xl rounded-lg bg-white shadow-2xl max-h-[92vh] md:max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm sm:p-4">
+      <div className="relative max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-lg bg-white shadow-2xl sm:max-w-md md:max-h-[95vh] md:max-w-2xl">
         <button
           onClick={closeAuthModal}
-          className="absolute right-3 top-3 sm:right-4 sm:top-4 text-gray-400 hover:text-gray-700 transition-colors z-10"
+          className="absolute right-3 top-3 z-10 text-gray-400 transition-colors hover:text-gray-700 sm:right-4 sm:top-4"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-6">
-          <p className="font-display text-center tracking-[0.3em] text-xs sm:text-sm text-gray-500 mb-1">KIBANA</p>
-          <h2 className="text-center font-display text-xl sm:text-2xl tracking-wide mb-1">
-            {step === "email"
-              ? tab === "login" ? "Welcome Back" : "Create Account"
-              : "Check Your Email"}
+        <div className="px-4 pb-6 pt-6 sm:px-8 sm:pt-8">
+          <p className="mb-1 text-center font-display text-xs tracking-[0.3em] text-gray-500 sm:text-sm">
+            KIBANA
+          </p>
+          <h2 className="mb-1 text-center font-display text-xl tracking-wide sm:text-2xl">
+            {step === "email" ? (
+              tab === "login" ? (
+                <span className="inline-block px-1 text-base font-semibold tracking-[0.06em] text-amber-900 sm:text-lg">
+                  SIGN UP &amp; GET UPTO 10% OFF
+                </span>
+              ) : (
+                "Create Account"
+              )
+            ) : (
+              "Check Your Email"
+            )}
           </h2>
 
           {authModalMessage && (
-            <p className="text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-4 mt-2">
+            <p className="mb-4 mt-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-center text-sm text-amber-700">
               {authModalMessage}
             </p>
           )}
 
           {step === "email" && (
             <>
-              <div className="flex border-b border-gray-200 mb-6 mt-4">
+              <div className="mb-6 mt-4 flex border-b border-gray-200">
                 {(["login", "signup"] as const).map((t) => (
                   <button
                     key={t}
-                    onClick={() => { setTab(t); setError(""); }}
+                    onClick={() => {
+                      setTab(t);
+                      setError("");
+                      if (t === "login") setAcceptedPolicy(false);
+                    }}
                     className={cn(
                       "flex-1 pb-2 text-sm font-medium tracking-wide transition-colors",
                       tab === t
                         ? "border-b-2 border-gray-900 text-gray-900"
-                        : "text-gray-400 hover:text-gray-600"
+                        : "text-gray-400 hover:text-gray-600",
                     )}
                   >
                     {t === "login" ? "LOGIN" : "SIGN UP"}
@@ -231,7 +259,7 @@ export function AuthModal() {
                 {tab === "signup" && (
                   <>
                     <div>
-                      <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                      <label className="mb-1 block text-xs font-medium uppercase tracking-widest text-gray-500">
                         Full Name
                       </label>
                       <Input
@@ -244,7 +272,7 @@ export function AuthModal() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                      <label className="mb-1 block text-xs font-medium uppercase tracking-widest text-gray-500">
                         Phone Number
                       </label>
                       <Input
@@ -260,7 +288,7 @@ export function AuthModal() {
                 )}
 
                 <div>
-                  <label className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1 block">
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-widest text-gray-500">
                     Email Address
                   </label>
                   <Input
@@ -274,14 +302,30 @@ export function AuthModal() {
                   />
                 </div>
 
+                {tab === "signup" && (
+                  <label className="flex items-start gap-2 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={acceptedPolicy}
+                      onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-gray-900"
+                    />
+                    <span>
+                      I accept that I have read &amp; understood your Privacy Policy and T&amp;Cs.
+                    </span>
+                  </label>
+                )}
+
                 {error && (
-                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
+                  <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {error}
+                  </p>
                 )}
 
                 <Button
                   type="submit"
-                  disabled={loading}
-                  className="mt-1 h-10 sm:h-11 w-full bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase flex items-center justify-center gap-2"
+                  disabled={loading || (tab === "signup" && !acceptedPolicy)}
+                  className="mt-1 flex h-10 w-full items-center justify-center gap-2 bg-gray-900 text-xs font-medium uppercase tracking-widest text-white hover:bg-gray-700 sm:h-11"
                 >
                   <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   {loading ? "Sending..." : "Send code"}
@@ -292,14 +336,26 @@ export function AuthModal() {
                 {tab === "login" ? (
                   <>
                     Don&apos;t have an account?{" "}
-                    <button onClick={() => { setTab("signup"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
+                    <button
+                      onClick={() => {
+                        setTab("signup");
+                        setError("");
+                      }}
+                      className="text-gray-600 underline hover:text-gray-900"
+                    >
                       Sign up
                     </button>
                   </>
                 ) : (
                   <>
                     Already have an account?{" "}
-                    <button onClick={() => { setTab("login"); setError(""); }} className="underline text-gray-600 hover:text-gray-900">
+                    <button
+                      onClick={() => {
+                        setTab("login");
+                        setError("");
+                      }}
+                      className="text-gray-600 underline hover:text-gray-900"
+                    >
                       Log in
                     </button>
                   </>
@@ -309,14 +365,18 @@ export function AuthModal() {
           )}
 
           {step === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4 sm:gap-5 mt-4">
+            <form onSubmit={handleVerifyOtp} className="mt-4 flex flex-col gap-4 sm:gap-5">
               <div className="text-center">
-                <p className="text-xs sm:text-sm text-gray-500">We sent a 6-digit code to</p>
-                <p className="font-semibold text-gray-800 mt-0.5 text-sm break-all">{email}</p>
+                <p className="text-xs text-gray-500 sm:text-sm">We sent a 6-digit code to</p>
+                <p className="mt-0.5 break-all text-sm font-semibold text-gray-800">{email}</p>
                 <button
                   type="button"
-                  onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
-                  className="mt-1 text-xs underline text-gray-400 hover:text-gray-600"
+                  onClick={() => {
+                    setStep("email");
+                    setError("");
+                    setOtp(["", "", "", "", "", ""]);
+                  }}
+                  className="mt-1 text-xs text-gray-400 underline hover:text-gray-600"
                 >
                   Change email
                 </button>
@@ -330,28 +390,32 @@ export function AuthModal() {
                 {otp.map((digit, i) => (
                   <input
                     key={i}
-                    ref={(el) => { otpRefs.current[i] = el; }}
+                    ref={(el) => {
+                      otpRefs.current[i] = el;
+                    }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                    className="w-9 h-10 sm:w-11 sm:h-12 rounded text-center text-base sm:text-lg font-semibold border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 outline-none transition-colors"
+                    className="h-10 w-9 rounded border border-gray-300 text-center text-base font-semibold outline-none transition-colors focus:border-gray-900 focus:ring-1 focus:ring-gray-900 sm:h-12 sm:w-11 sm:text-lg"
                     aria-label={`Code digit ${i + 1}`}
                   />
                 ))}
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2 text-center">{error}</p>
+                <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-center text-sm text-red-600">
+                  {error}
+                </p>
               )}
 
               <Button
                 id="otp-submit-btn"
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="h-10 sm:h-11 w-full bg-gray-900 text-white hover:bg-gray-700 font-medium tracking-widest text-xs uppercase"
+                className="h-10 w-full bg-gray-900 text-xs font-medium uppercase tracking-widest text-white hover:bg-gray-700 sm:h-11"
               >
                 {loading ? "Verifying..." : isNewUser ? "Create Account" : "Verify & Login"}
               </Button>
@@ -363,10 +427,10 @@ export function AuthModal() {
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || loading}
                   className={cn(
-                    "underline transition-colors text-nowrap",
+                    "text-nowrap underline transition-colors",
                     resendCooldown > 0
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "cursor-not-allowed text-gray-300"
+                      : "text-gray-600 hover:text-gray-900",
                   )}
                 >
                   {resendCooldown > 0 ? (

@@ -18,7 +18,7 @@ const FALLBACK_TILES: { src: string; alt: string; label: string; href: string; v
 
 const badges = [
   { icon: Truck, label: "Delivery in 4 days" },
-  { icon: Zap, label: "Vegan Leather" },
+  { icon: Zap, label: "Premium Quality" },
   { icon: RotateCcw, label: "Easy Returns" },
 ];
 
@@ -120,19 +120,19 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
         {/* Left Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-2 top-[40%] z-10 hidden -translate-y-1/2 transition-all duration-300 hover:scale-110 sm:block lg:hidden"
+          className="absolute left-1 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/85 p-1 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 sm:left-2 lg:hidden"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="h-7 w-7 text-kibana-tan drop-shadow-lg hover:text-kibana-camel" />
+          <ChevronLeft className="h-5 w-5 text-kibana-tan drop-shadow-lg hover:text-kibana-camel sm:h-7 sm:w-7" />
         </button>
 
         {/* Right Arrow — hidden on mobile, visible on sm+, hidden on lg (6 cards fit without scrolling) */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-2 top-[40%] z-10 hidden -translate-y-1/2 transition-all duration-300 hover:scale-110 sm:block lg:hidden"
+          className="absolute right-1 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white/85 p-1 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 sm:right-2 lg:hidden"
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-7 w-7 text-kibana-tan drop-shadow-lg hover:text-kibana-camel" />
+          <ChevronRight className="h-5 w-5 text-kibana-tan drop-shadow-lg hover:text-kibana-camel sm:h-7 sm:w-7" />
         </button>
 
         {/* Carousel */}
@@ -147,21 +147,29 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
       </div>
 
       {/* Trust Badges — USP strip */}
-      <div className="mt-8 rounded-2xl border border-kibana-tan/25 bg-gradient-to-br from-kibana-tan/10 via-kibana-cream/40 to-kibana-camel/10 px-2 py-5 sm:mt-12 sm:px-8 sm:py-8">
-        <div className="grid grid-cols-3 gap-2 text-center sm:gap-8">
-          {badges.map((badge) => {
-            const Icon = badge.icon;
-            return (
-              <div key={badge.label} className="group flex flex-col items-center gap-2 sm:gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-kibana-tan/30 bg-white shadow-md transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16">
-                  <Icon className="h-5 w-5 text-kibana-tan sm:h-7 sm:w-7" />
+      <div className="relative mt-8 sm:mt-12">
+        <div className="relative rounded-2xl border border-kibana-tan/35 bg-gradient-to-br from-kibana-tan/20 via-kibana-cream/55 to-kibana-camel/20 px-2 py-5 shadow-[0_8px_20px_rgba(26,26,26,0.12),0_0_0_1px_rgba(185,142,90,0.18)] sm:px-8 sm:py-8">
+          <p className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.24em] text-black sm:mb-5 sm:text-sm">
+            Why Kibana
+          </p>
+          <div className="grid grid-cols-3 gap-2 text-center sm:gap-6">
+            {badges.map((badge) => {
+              const Icon = badge.icon;
+              return (
+                <div
+                  key={badge.label}
+                  className="group flex min-h-[94px] flex-col items-center justify-center gap-2 rounded-xl border border-kibana-tan/40 bg-white/80 px-1 py-2 shadow-[0_4px_10px_rgba(26,26,26,0.1),0_0_0_1px_rgba(185,142,90,0.16)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(26,26,26,0.14),0_0_0_1px_rgba(185,142,90,0.22)] sm:min-h-[132px] sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-4"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-kibana-tan/40 bg-white shadow-[0_4px_10px_rgba(185,142,90,0.18)] sm:h-14 sm:w-14">
+                    <Icon className="h-5 w-5 text-kibana-camel sm:h-7 sm:w-7" />
+                  </div>
+                  <p className="text-[9px] font-semibold uppercase leading-tight tracking-[0.08em] text-kibana-ink sm:whitespace-nowrap sm:text-[13px] sm:tracking-[0.16em]">
+                    {badge.label}
+                  </p>
                 </div>
-                <p className="whitespace-normal text-[9px] font-semibold uppercase leading-snug tracking-[0.08em] text-kibana-ink sm:whitespace-nowrap sm:text-sm sm:tracking-[0.18em]">
-                  {badge.label}
-                </p>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

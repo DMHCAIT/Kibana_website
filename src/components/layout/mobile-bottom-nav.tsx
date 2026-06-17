@@ -13,23 +13,34 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   const handleAccount = () => {
-    if (!user) { openAuthModal(); } else { router.push("/account"); }
+    if (!user) {
+      openAuthModal();
+    } else {
+      router.push("/account");
+    }
   };
 
   const handleWishlist = () => {
-    if (!user) { openAuthModal(); } else { router.push("/wishlist"); }
+    if (!user) {
+      openAuthModal();
+    } else {
+      router.push("/wishlist");
+    }
   };
 
   const navItems = [
     { label: "Home", icon: Home, href: "/" },
-    { label: "Shop", icon: Search, href: "/shop" },
+    { label: "All Products", icon: Search, href: "/shop" },
     { label: "Wishlist", icon: Heart, action: handleWishlist },
     { label: "Cart", icon: ShoppingBag, href: "/cart" },
-    { label: "Account", icon: User, action: handleAccount },
+    { label: user ? "Account" : "Login", icon: User, action: handleAccount },
   ];
 
   return (
-    <nav className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-sm" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-sm md:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       <ul className="grid grid-cols-5">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -45,7 +56,7 @@ export function MobileBottomNav() {
                   <Icon className="h-5 w-5" />
                   {item.label}
                   {item.href === "/cart" && count > 0 && (
-                    <span className="absolute top-1 right-2 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[9px] font-semibold text-primary-foreground">
+                    <span className="absolute right-2 top-1 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[9px] font-semibold text-primary-foreground">
                       {count}
                     </span>
                   )}

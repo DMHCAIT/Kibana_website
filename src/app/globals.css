@@ -94,7 +94,10 @@ body {
     overscroll-behavior-y: none;
     overflow-x: clip;
   }
-  /* Editorial body copy: paragraphs default to the Light cut of Canela Deck.
+  .font-logo {
+    font-family: var(--font-canela), Georgia, serif;
+  }
+  /* Editorial body copy defaults to the light cut of the site font.
      Any explicit font-* utility on a <p> still overrides this. */
   p {
     @apply font-light;
