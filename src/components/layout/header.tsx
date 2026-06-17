@@ -22,7 +22,6 @@ import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
 
 const mainMenu = [
-  { label: "Shop", submenu: null },
   {
     label: "Women Bags",
     submenu: [
@@ -45,6 +44,7 @@ const mainMenu = [
       { label: "Wallets", href: "/shop?cat=wallet" },
     ],
   },
+  { label: "All Products", submenu: null },
 ];
 
 const desktopNav = [
@@ -106,17 +106,17 @@ export function Header() {
           aria-label="Kibana home"
           className="absolute left-1/2 flex flex-shrink-0 -translate-x-1/2 items-center justify-center md:relative md:left-auto md:translate-x-0"
         >
-          <span className="font-display text-lg font-normal tracking-[0.25em] text-foreground md:text-xl lg:text-2xl">
+          <span className="font-logo text-lg font-normal tracking-[0.25em] text-foreground md:text-xl lg:text-2xl">
             KIBANA
           </span>
         </Link>
 
-        <nav className="ml-10 hidden items-center gap-5 whitespace-nowrap text-xs uppercase tracking-[0.12em] md:flex lg:ml-16 lg:gap-6">
+        <nav className="ml-10 hidden items-center gap-5 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] md:flex lg:ml-16 lg:gap-6">
           {desktopNav.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className="text-foreground/80 transition-colors hover:text-foreground"
+              className="text-foreground/95 transition-colors hover:text-foreground"
             >
               {n.label}
             </Link>
@@ -275,7 +275,7 @@ export function Header() {
           onClick={() => setOpen(false)}
         >
           <aside
-            className="absolute inset-y-0 left-0 flex w-72 max-w-[80%] flex-col bg-background p-5"
+            className="absolute inset-y-0 left-0 flex w-72 max-w-[80%] flex-col bg-background p-5 pb-24"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 flex items-center justify-between">
@@ -285,9 +285,9 @@ export function Header() {
                   Back
                 </button>
               )}
-              {!activeSubmenu && <span className="font-display tracking-[0.25em]">KIBANA</span>}
+              {!activeSubmenu && <span className="font-logo tracking-[0.25em]">KIBANA</span>}
               {activeSubmenu && (
-                <span className="font-display text-sm tracking-[0.15em]">{activeSubmenu}</span>
+                <span className="font-logo text-sm tracking-[0.15em]">{activeSubmenu}</span>
               )}
               <button
                 aria-label="Close menu"
@@ -300,7 +300,7 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1 uppercase tracking-[0.1em]">
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto uppercase tracking-[0.1em]">
               {!activeSubmenu
                 ? // Main menu
                   mainMenu.map((item) => (
@@ -310,7 +310,13 @@ export function Header() {
                           onClick={() => handleSubmenuOpen(item.label)}
                           className="-mx-2 flex w-full items-center justify-between border-b border-border/60 px-2 py-2 text-sm hover:bg-muted/50"
                         >
-                          <span>{item.label}</span>
+                          <span
+                            className={
+                              item.label === "All Products" ? "normal-case tracking-[0.1em]" : ""
+                            }
+                          >
+                            {item.label}
+                          </span>
                           <ChevronRight className="h-4 w-4" />
                         </button>
                       ) : (
@@ -319,7 +325,13 @@ export function Header() {
                           className="block border-b border-border/60 py-2 text-sm"
                           onClick={() => setOpen(false)}
                         >
-                          {item.label}
+                          <span
+                            className={
+                              item.label === "All Products" ? "normal-case tracking-[0.1em]" : ""
+                            }
+                          >
+                            {item.label}
+                          </span>
                         </Link>
                       )}
                     </div>
@@ -336,6 +348,38 @@ export function Header() {
                     </Link>
                   ))}
             </nav>
+            <div className="mt-3 border-t border-border/60 pt-4">
+              {user ? (
+                <Link
+                  href="/account"
+                  onClick={() => setOpen(false)}
+                  className="block rounded border border-border px-3 py-2 text-sm hover:bg-muted/50"
+                >
+                  My Account
+                </Link>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      openAuthModal();
+                    }}
+                    className="w-full rounded border border-kibana-ink bg-kibana-ink px-3 py-2 text-center text-sm text-white hover:bg-black"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      openAuthModal("Sign up to create your Kibana account.");
+                    }}
+                    className="w-full rounded border border-kibana-ink bg-kibana-ink px-3 py-2 text-center text-sm text-white hover:bg-black"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+            </div>
           </aside>
         </div>
       )}

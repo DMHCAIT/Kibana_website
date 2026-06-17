@@ -38,6 +38,18 @@ const canela = localFont({
   display: "swap",
 });
 
+const poppins = localFont({
+  src: [
+    { path: "../../public/poppins/Poppins-Light.ttf", weight: "300", style: "normal" },
+    { path: "../../public/poppins/Poppins-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../../public/poppins/Poppins-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../../public/poppins/Poppins-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../../public/poppins/Poppins-Bold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Kibana — Pure. Minimal. Luxe.",
   description:
@@ -77,7 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     FALLBACK_CONFIG,
   );
   return (
-    <html lang="en" className={canela.variable}>
+    <html lang="en" className={`${canela.variable} ${poppins.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <Providers>
           <Header />

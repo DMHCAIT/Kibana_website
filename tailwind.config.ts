@@ -57,16 +57,14 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-canela)", "Georgia", "serif"],
-        display: ["var(--font-canela)", "Georgia", "serif"],
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        display: ["var(--font-poppins)", "system-ui", "sans-serif"],
       },
-      // Canela Deck only ships 300/400/500/700 cuts. Semibold renders as the
-      // Medium cut so labels/buttons stay elegant; true Bold is reserved for headings.
       fontWeight: {
         light: "300",
         normal: "400",
         medium: "500",
-        semibold: "500",
+        semibold: "600",
         bold: "700",
       },
       borderRadius: {

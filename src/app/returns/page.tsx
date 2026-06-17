@@ -11,21 +11,25 @@ export const metadata: Metadata = {
 export default function ReturnsPage() {
   return (
     <main className="bg-kibana-cream text-kibana-ink">
-
       {/* ── Hero ── */}
       <section className="bg-kibana-ink">
-        <div className="container py-10 md:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="container flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between md:py-14">
           <div className="max-w-xl">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-4 flex items-center gap-3">
               <span className="h-px w-6 bg-kibana-tan" />
-              <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-kibana-tan">Policies</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-kibana-tan">
+                Policies
+              </p>
             </div>
-            <h1 className="font-bold uppercase tracking-[0.12em] text-2xl sm:text-3xl text-kibana-cream leading-tight">
-              Returns &amp; Refunds<br />
-              <span className="text-kibana-tan">Exchanges</span> &amp; Cancellations
+            <h1 className="text-2xl font-bold uppercase leading-tight tracking-[0.12em] text-kibana-cream sm:text-3xl">
+              Returns &amp; Refunds
+              <br />
+              <span className="text-kibana-tan">Exchanges</span>{" "}
+              <span className="text-kibana-tan">Policy</span>
             </h1>
-            <p className="text-kibana-cream/70 text-sm mt-4 max-w-sm leading-relaxed">
-              We want you to love every Kibana product. If something isn't right, here's everything you need to know.
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-kibana-cream/70">
+              We want you to love every Kibana product. If something isn't right, here's everything
+              you need to know.
             </p>
           </div>
           {/* Timeline stats */}
@@ -35,10 +39,19 @@ export default function ReturnsPage() {
               { n: "48", unit: "Hours", label: "Exchange window" },
               { n: "3–4", unit: "Days", label: "Refund processing" },
             ].map((s) => (
-              <div key={s.label} className="flex-1 md:flex-none border border-kibana-cream/10 rounded px-4 py-3 text-center bg-kibana-cream/5 min-w-[80px]">
-                <div className="text-kibana-tan font-bold text-xl md:text-2xl leading-none">{s.n}</div>
-                <div className="text-kibana-cream/60 text-[9px] uppercase tracking-[0.2em] mt-0.5">{s.unit}</div>
-                <div className="text-kibana-cream/35 text-[8px] uppercase tracking-[0.15em] mt-1 hidden md:block">{s.label}</div>
+              <div
+                key={s.label}
+                className="min-w-[80px] flex-1 rounded border border-kibana-cream/10 bg-kibana-cream/5 px-4 py-3 text-center md:flex-none"
+              >
+                <div className="text-xl font-bold leading-none text-kibana-tan md:text-2xl">
+                  {s.n}
+                </div>
+                <div className="mt-0.5 text-[9px] uppercase tracking-[0.2em] text-kibana-cream/60">
+                  {s.unit}
+                </div>
+                <div className="mt-1 hidden text-[8px] uppercase tracking-[0.15em] text-kibana-cream/35 md:block">
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
@@ -46,9 +59,9 @@ export default function ReturnsPage() {
       </section>
 
       {/* ── Quick nav ── */}
-      <div className="border-b border-kibana-ink/10 bg-kibana-stone sticky top-[110px] md:top-16 z-10">
+      <div className="sticky top-[110px] z-10 border-b border-kibana-ink/10 bg-kibana-stone md:top-16">
         <div className="container">
-          <div className="flex overflow-x-auto scrollbar-hide">
+          <div className="scrollbar-hide flex overflow-x-auto">
             {[
               { id: "return", label: "Return" },
               { id: "refund", label: "Refund" },
@@ -60,7 +73,7 @@ export default function ReturnsPage() {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className="flex-shrink-0 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-kibana-ink/50 hover:text-kibana-ink border-b-2 border-transparent hover:border-kibana-tan/60 transition-all whitespace-nowrap"
+                className="flex-shrink-0 whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-kibana-ink/50 transition-all hover:border-kibana-tan/60 hover:text-kibana-ink"
               >
                 {item.label}
               </a>
@@ -70,22 +83,26 @@ export default function ReturnsPage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="container py-12 md:py-16 max-w-3xl space-y-16">
-
+      <div className="container max-w-3xl space-y-16 py-12 md:py-16">
         {/* ─ Return ─ */}
         <section id="return" className="scroll-mt-40 md:scroll-mt-28">
           <SectionHeader icon={RotateCcw} num="01" tag="Return" title="Return Policy" />
           <div className="space-y-6">
             <ImportantBanner text="Items purchased during sales or special events are not eligible for return or refund." />
-            <SubSection title="Eligibility Criteria" points={[
-              "The item must be unused, unworn, and in original condition.",
-              "All original packaging must be intact, including dust bags, tags, and accessories.",
-              "The return request must be initiated within 7 days of delivery.",
-              "A valid proof of purchase (order number or receipt) must be provided.",
-            ]} />
-            <SubSection title="Non-Returnable Items" dotColor="red" points={[
-              "Items that show signs of use, damage, or odor.",
-            ]} />
+            <SubSection
+              title="Eligibility Criteria"
+              points={[
+                "The item must be unused, unworn, and in original condition.",
+                "All original packaging must be intact, including dust bags, tags, and accessories.",
+                "The return request must be initiated within 7 days of delivery.",
+                "A valid proof of purchase (order number or receipt) must be provided.",
+              ]}
+            />
+            <SubSection
+              title="Non-Returnable Items"
+              dotColor="red"
+              points={["Items that show signs of use, damage, or odor."]}
+            />
           </div>
         </section>
 
@@ -94,14 +111,20 @@ export default function ReturnsPage() {
           <SectionHeader icon={RefreshCcw} num="02" tag="Refund" title="Refund Policy" />
           <div className="space-y-6">
             <ImportantBanner text="Items purchased during sales or special events are not eligible for return or refund." />
-            <SubSection title="Inspection Process" points={[
-              "All returned items are subject to quality inspection upon receipt.",
-              "Customers will be notified of the approval or rejection of their refund request.",
-            ]} />
-            <SubSection title="Refund Process" points={[
-              "Approved refunds will be credited to the original payment method.",
-              "Refunds are typically processed within 3–4 business days after approval.",
-            ]} />
+            <SubSection
+              title="Inspection Process"
+              points={[
+                "All returned items are subject to quality inspection upon receipt.",
+                "Customers will be notified of the approval or rejection of their refund request.",
+              ]}
+            />
+            <SubSection
+              title="Refund Process"
+              points={[
+                "Approved refunds will be credited to the original payment method.",
+                "Refunds are typically processed within 3–4 business days after approval.",
+              ]}
+            />
             <SubSection
               title="Applicable Deductions"
               note="Refund amounts may exclude:"
@@ -121,24 +144,32 @@ export default function ReturnsPage() {
               ]}
             />
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan mb-3">Return Shipping Guidelines</p>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan">
+                Return Shipping Guidelines
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
                 {[
                   "Ensure the item is securely packed in its original packaging.",
                   "Include your order number and contact information within the package.",
                   "Use a trackable and insured shipping service.",
                   "KIBANA shall not be liable for lost or undelivered return shipments.",
                 ].map((p) => (
-                  <div key={p} className="flex items-start gap-2.5 bg-kibana-stone px-3 py-3 border border-kibana-ink/8">
+                  <div
+                    key={p}
+                    className="border-kibana-ink/8 flex items-start gap-2.5 border bg-kibana-stone px-3 py-3"
+                  >
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-kibana-tan" />
-                    <span className="text-sm text-kibana-ink/75 leading-snug">{p}</span>
+                    <span className="text-sm leading-snug text-kibana-ink/75">{p}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-3 border border-kibana-tan/30 bg-kibana-tan/5 px-4 py-4">
-                <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-kibana-tan mb-1.5">Send Returns To</p>
-                <p className="text-sm text-kibana-ink/80 leading-relaxed">
-                  House No. 1, 2nd Floor, KH.No. 581/2,<br />
+                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.25em] text-kibana-tan">
+                  Send Returns To
+                </p>
+                <p className="text-sm leading-relaxed text-kibana-ink/80">
+                  House No. 1, 2nd Floor, KH.No. 581/2,
+                  <br />
                   Village Sultanpur, New Delhi – 110030
                 </p>
               </div>
@@ -150,20 +181,29 @@ export default function ReturnsPage() {
         <section id="exchange" className="scroll-mt-40 md:scroll-mt-28">
           <SectionHeader icon={RefreshCcw} num="03" tag="Exchange" title="Exchange Policy" />
           <div className="space-y-6">
-            <SubSection title="Eligible Conditions" points={[
-              "Incorrect item received.",
-              "Items received are defective or damaged.",
-              "Size or color exchange, subject to stock availability.",
-            ]} />
-            <SubSection title="Request Timeline" points={[
-              "Exchange requests must be raised within 48 hours of delivery.",
-              "For damaged or incorrect items, customers must share clear photographs and an unboxing video as proof.",
-            ]} />
-            <SubSection title="Damaged or Defective Items" points={[
-              "Capture clear photos and an unboxing video of the damaged item, including the product and packaging.",
-              "Email us within 48 hours of delivery at support@kibanalife.com with the evidence.",
-              "Upon verification, we will arrange a replacement or full refund at no additional cost.",
-            ]} />
+            <SubSection
+              title="Eligible Conditions"
+              points={[
+                "Incorrect item received.",
+                "Items received are defective or damaged.",
+                "Size or color exchange, subject to stock availability.",
+              ]}
+            />
+            <SubSection
+              title="Request Timeline"
+              points={[
+                "Exchange requests must be raised within 48 hours of delivery.",
+                "For damaged or incorrect items, customers must share clear photographs and an unboxing video as proof.",
+              ]}
+            />
+            <SubSection
+              title="Damaged or Defective Items"
+              points={[
+                "Capture clear photos and an unboxing video of the damaged item, including the product and packaging.",
+                "Email us within 48 hours of delivery at support@kibanalife.com with the evidence.",
+                "Upon verification, we will arrange a replacement or full refund at no additional cost.",
+              ]}
+            />
           </div>
         </section>
 
@@ -171,34 +211,52 @@ export default function ReturnsPage() {
         <section id="international" className="scroll-mt-40 md:scroll-mt-28">
           <SectionHeader icon={Globe} num="04" tag="International" title="International Policy" />
           <div className="space-y-6">
-            <div className="flex items-start gap-3 bg-red-50 border border-red-200 px-4 py-3">
-              <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-              <p className="text-sm font-semibold text-red-700">Kibana does NOT accept international returns.</p>
+            <div className="flex items-start gap-3 border border-red-200 bg-red-50 px-4 py-3">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+              <p className="text-sm font-semibold text-red-700">
+                Kibana does NOT accept international returns.
+              </p>
             </div>
-            <SubSection title="Refund Policy" points={[
-              "Refund only after inspection / quality check.",
-              "Refund goes to original payment method.",
-              "Processing time: Usually 5–14 days after approval.",
-            ]} />
-            <SubSection title="Important — Refund Exclusions" dotColor="red" points={[
-              "Shipping charges are mostly non-refundable.",
-              "Import taxes / customs are never refunded.",
-            ]} />
+            <SubSection
+              title="Refund Policy"
+              points={[
+                "Refund only after inspection / quality check.",
+                "Refund goes to original payment method.",
+                "Processing time: Usually 5–14 days after approval.",
+              ]}
+            />
+            <SubSection
+              title="Important — Refund Exclusions"
+              dotColor="red"
+              points={[
+                "Shipping charges are mostly non-refundable.",
+                "Import taxes / customs are never refunded.",
+              ]}
+            />
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan mb-3">Exchange Policy</p>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan">
+                Exchange Policy
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-ink/50 mb-2">Allowed When</p>
+                  <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-ink/50">
+                    Allowed When
+                  </p>
                   <ul className="space-y-2">
-                    {["You received a damaged item.", "You received the wrong product."].map((p) => (
-                      <li key={p} className="flex items-start gap-2 text-sm text-kibana-ink/75">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-kibana-tan" />{p}
-                      </li>
-                    ))}
+                    {["You received a damaged item.", "You received the wrong product."].map(
+                      (p) => (
+                        <li key={p} className="flex items-start gap-2 text-sm text-kibana-ink/75">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-kibana-tan" />
+                          {p}
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-ink/50 mb-2">Restrictions</p>
+                  <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-ink/50">
+                    Restrictions
+                  </p>
                   <ul className="space-y-2">
                     {[
                       "Exchange is one-time only.",
@@ -206,7 +264,8 @@ export default function ReturnsPage() {
                       "Customs duties are NOT paid by us.",
                     ].map((p) => (
                       <li key={p} className="flex items-start gap-2 text-sm text-kibana-ink/75">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />{p}
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+                        {p}
                       </li>
                     ))}
                   </ul>
@@ -219,30 +278,41 @@ export default function ReturnsPage() {
         {/* ─ Cancellation ─ */}
         <section id="cancellation" className="scroll-mt-40 md:scroll-mt-28">
           <SectionHeader icon={XCircle} num="05" tag="Cancellation" title="Cancellation Policy" />
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="border border-kibana-ink/10 overflow-hidden">
-              <div className="bg-kibana-ink px-4 py-3 flex items-center gap-2">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="overflow-hidden border border-kibana-ink/10">
+              <div className="flex items-center gap-2 bg-kibana-ink px-4 py-3">
                 <span className="h-1.5 w-1.5 rounded-full bg-kibana-tan" />
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-kibana-cream">Before Shipment</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-kibana-cream">
+                  Before Shipment
+                </p>
               </div>
-              <div className="px-4 py-4 bg-white/40">
-                <p className="text-sm text-kibana-ink/75 leading-relaxed">
-                  Orders can be canceled within <strong className="text-kibana-ink">12 hours</strong> of placement by contacting{" "}
-                  <a href="mailto:support@kibanalife.com" className="text-kibana-camel underline underline-offset-2 break-all">
+              <div className="bg-white/40 px-4 py-4">
+                <p className="text-sm leading-relaxed text-kibana-ink/75">
+                  Orders can be canceled within{" "}
+                  <strong className="text-kibana-ink">12 hours</strong> of placement by contacting{" "}
+                  <a
+                    href="mailto:support@kibanalife.com"
+                    className="break-all text-kibana-camel underline underline-offset-2"
+                  >
                     support@kibanalife.com
                   </a>{" "}
-                  with your order number. A full refund will be issued if the order has not been processed or shipped.
+                  with your order number. A full refund will be issued if the order has not been
+                  processed or shipped.
                 </p>
               </div>
             </div>
-            <div className="border border-kibana-ink/10 overflow-hidden">
-              <div className="bg-kibana-stone px-4 py-3 flex items-center gap-2 border-b border-kibana-ink/10">
+            <div className="overflow-hidden border border-kibana-ink/10">
+              <div className="flex items-center gap-2 border-b border-kibana-ink/10 bg-kibana-stone px-4 py-3">
                 <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-kibana-ink/70">After Shipment</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-kibana-ink/70">
+                  After Shipment
+                </p>
               </div>
-              <div className="px-4 py-4 bg-white/40">
-                <p className="text-sm text-kibana-ink/75 leading-relaxed">
-                  Orders <strong className="text-kibana-ink">cannot be canceled</strong> once shipped. However, returns can be requested after delivery as per our Return &amp; Refund Policy.
+              <div className="bg-white/40 px-4 py-4">
+                <p className="text-sm leading-relaxed text-kibana-ink/75">
+                  Orders <strong className="text-kibana-ink">cannot be canceled</strong> once
+                  shipped. However, returns can be requested after delivery as per our Return &amp;
+                  Refund Policy.
                 </p>
               </div>
             </div>
@@ -259,39 +329,48 @@ export default function ReturnsPage() {
               "If the outer packaging is slightly damaged, please ensure the delivery agent records it on the delivery slip at the time of acceptance.",
               "Once a delivery is accepted without proper documentation, we may not be able to process damage-related claims.",
             ].map((p) => (
-              <li key={p} className="flex items-start gap-3 border-l-2 border-kibana-tan bg-kibana-tan/5 px-4 py-3">
+              <li
+                key={p}
+                className="flex items-start gap-3 border-l-2 border-kibana-tan bg-kibana-tan/5 px-4 py-3"
+              >
                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-kibana-tan" />
-                <span className="text-sm text-kibana-ink/80 leading-relaxed">{p}</span>
+                <span className="text-sm leading-relaxed text-kibana-ink/80">{p}</span>
               </li>
             ))}
           </ul>
         </section>
-
       </div>
 
       {/* ── Contact CTA ── */}
       <section className="bg-kibana-ink">
         <div className="container py-10 md:py-14">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="mb-4 flex items-center gap-3">
             <span className="h-px w-6 bg-kibana-tan" />
-            <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-kibana-tan">Need Help?</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-kibana-tan">
+              Need Help?
+            </p>
           </div>
-          <h2 className="font-bold uppercase tracking-[0.15em] text-lg sm:text-xl text-kibana-cream mb-6">
+          <h2 className="mb-6 text-lg font-bold uppercase tracking-[0.15em] text-kibana-cream sm:text-xl">
             Any Issue? We're Here to Help.
           </h2>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a href="mailto:support@kibanalife.com" className="inline-flex items-center gap-3 border border-kibana-cream/20 px-5 py-3 text-sm text-kibana-cream hover:bg-kibana-cream/10 transition-colors">
-              <Mail className="h-4 w-4 text-kibana-tan shrink-0" />
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a
+              href="mailto:support@kibanalife.com"
+              className="inline-flex items-center gap-3 border border-kibana-cream/20 px-5 py-3 text-sm text-kibana-cream transition-colors hover:bg-kibana-cream/10"
+            >
+              <Mail className="h-4 w-4 shrink-0 text-kibana-tan" />
               support@kibanalife.com
             </a>
-            <a href="tel:+919711414110" className="inline-flex items-center gap-3 border border-kibana-cream/20 px-5 py-3 text-sm text-kibana-cream hover:bg-kibana-cream/10 transition-colors">
-              <Phone className="h-4 w-4 text-kibana-tan shrink-0" />
+            <a
+              href="tel:+919711414110"
+              className="inline-flex items-center gap-3 border border-kibana-cream/20 px-5 py-3 text-sm text-kibana-cream transition-colors hover:bg-kibana-cream/10"
+            >
+              <Phone className="h-4 w-4 shrink-0 text-kibana-tan" />
               +91 9711414110
             </a>
           </div>
         </div>
       </section>
-
     </main>
   );
 }
@@ -310,15 +389,15 @@ function SectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-4 mb-7 pb-5 border-b border-kibana-ink/10">
-      <div className="w-10 h-10 bg-kibana-ink flex items-center justify-center shrink-0">
+    <div className="mb-7 flex items-center gap-4 border-b border-kibana-ink/10 pb-5">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-kibana-ink">
         <Icon className="h-4 w-4 text-kibana-tan" />
       </div>
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-kibana-tan mb-0.5">
+        <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.35em] text-kibana-tan">
           {num} — {tag}
         </p>
-        <h2 className="font-bold uppercase tracking-[0.15em] text-base sm:text-lg text-kibana-ink">
+        <h2 className="text-base font-bold uppercase tracking-[0.15em] text-kibana-ink sm:text-lg">
           {title}
         </h2>
       </div>
@@ -328,10 +407,12 @@ function SectionHeader({
 
 function ImportantBanner({ text }: { text: string }) {
   return (
-    <div className="flex items-start gap-3 bg-kibana-tan/10 border-l-2 border-kibana-tan px-4 py-3">
-      <AlertTriangle className="h-4 w-4 text-kibana-tan mt-0.5 shrink-0" />
+    <div className="flex items-start gap-3 border-l-2 border-kibana-tan bg-kibana-tan/10 px-4 py-3">
+      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-kibana-tan" />
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-camel mb-1">Important</p>
+        <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.2em] text-kibana-camel">
+          Important
+        </p>
         <p className="text-sm text-kibana-ink/80">{text}</p>
       </div>
     </div>
@@ -351,12 +432,16 @@ function SubSection({
 }) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan mb-3">{title}</p>
-      {note && <p className="text-xs text-kibana-ink/50 mb-2">{note}</p>}
+      <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-kibana-tan">
+        {title}
+      </p>
+      {note && <p className="mb-2 text-xs text-kibana-ink/50">{note}</p>}
       <ul className="space-y-2">
         {points.map((p) => (
           <li key={p} className="flex items-start gap-2.5 text-sm text-kibana-ink/75">
-            <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dotColor === "red" ? "bg-red-400" : "bg-kibana-tan"}`} />
+            <span
+              className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dotColor === "red" ? "bg-red-400" : "bg-kibana-tan"}`}
+            />
             {p}
           </li>
         ))}
