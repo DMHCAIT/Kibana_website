@@ -1,20 +1,121 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
 import { Truck, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { Product } from "@/types/product";
 
-const FALLBACK_TILES: { src: string; alt: string; label: string; href: string; video?: string }[] =
-  [
-    { src: "/extracted/img-030.jpg", alt: "Beauto styling", label: "BEAUTO", href: "/shop" },
-    { src: "/extracted/img-040.jpg", alt: "Fabulous styling", label: "FABULOUS", href: "/shop" },
-    { src: "/extracted/img-050.jpg", alt: "Luxury styling", label: "Luxury", href: "/shop" },
-    { src: "/extracted/img-100.jpg", alt: "Elegant styling", label: "ELEGANT", href: "/shop" },
-    { src: "/extracted/img-110.jpg", alt: "Classic styling", label: "CLASSIC", href: "/shop" },
-  ];
+const DEFAULT_VIDEO_POOL = [
+  "/videos/compressed/Guneet_Kaur_Draft.mp4",
+  "/videos/compressed/IMG_0765.mp4",
+  "/videos/compressed/IMG_2924.mp4",
+  "/videos/compressed/IMG_3139.mp4",
+  "/videos/compressed/IMG_3237.mp4",
+  "/videos/compressed/IMG_3547.mp4",
+  "/videos/compressed/IMG_4378.mp4",
+  "/videos/compressed/IMG_4481.mp4",
+  "/videos/compressed/IMG_4484.mp4",
+  "/videos/compressed/IMG_4513.mp4",
+  "/videos/compressed/IMG_5514.mp4",
+  "/videos/compressed/IMG_5878.mp4",
+  "/videos/compressed/01_KIBANA_BAG_4K_F.mp4",
+  "/videos/compressed/Sony_Kibana_Compressed.mp4",
+  "/videos/compressed/IMG_8582.mp4",
+];
+
+const FALLBACK_TILES: { alt: string; label: string; href: string; video?: string }[] = [
+  {
+    alt: "Kibana style in motion 4",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/Guneet_Kaur_Draft.mp4",
+  },
+  {
+    alt: "Kibana style in motion 5",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_0765.mp4",
+  },
+  {
+    alt: "Kibana style in motion 6",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_2924.mp4",
+  },
+  {
+    alt: "Kibana style in motion 7",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_3139.mp4",
+  },
+  {
+    alt: "Kibana style in motion 8",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_3237.mp4",
+  },
+  {
+    alt: "Kibana style in motion 9",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_3547.mp4",
+  },
+  {
+    alt: "Kibana style in motion 10",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_4378.mp4",
+  },
+  {
+    alt: "Kibana style in motion 11",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_4481.mp4",
+  },
+  {
+    alt: "Kibana style in motion 12",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_4484.mp4",
+  },
+  {
+    alt: "Kibana style in motion 13",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_4513.mp4",
+  },
+  {
+    alt: "Kibana style in motion 14",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_5514.mp4",
+  },
+  {
+    alt: "Kibana style in motion 15",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_5878.mp4",
+  },
+  {
+    alt: "Kibana style in motion 1",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/01_KIBANA_BAG_4K_F.mp4",
+  },
+  {
+    alt: "Kibana style in motion 2",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/Sony_Kibana_Compressed.mp4",
+  },
+  {
+    alt: "Kibana style in motion 3",
+    label: "KIBANA",
+    href: "/shop",
+    video: "/videos/compressed/IMG_8582.mp4",
+  },
+];
 
 const badges = [
   { icon: Truck, label: "Delivery in 4 days" },
@@ -22,61 +123,61 @@ const badges = [
   { icon: RotateCcw, label: "Easy Returns" },
 ];
 
-type Tile = { src: string; alt: string; label: string; href: string; video?: string };
+type Tile = { alt: string; label: string; href: string; video?: string };
 
-/** Individual card: shows image, plays video (with sound) on hover once, navigates on click */
+/** Individual card: autoplays while visible and keeps original tile size/layout */
 function TileCard({ tile }: { tile: Tile }) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hovered, setHovered] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
-  const handleMouseEnter = useCallback(() => {
-    if (!tile.video) return;
-    setHovered(true);
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
-    }
+  useEffect(() => {
+    if (!tile.video || !cardRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.35 },
+    );
+
+    observer.observe(cardRef.current);
+    return () => {
+      observer.disconnect();
+    };
   }, [tile.video]);
 
-  const handleMouseLeave = useCallback(() => {
-    setHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  }, []);
+  useEffect(() => {
+    if (!tile.video || !videoRef.current) return;
 
-  const handleEnded = useCallback(() => {
-    setHovered(false);
-  }, []);
+    if (isInView) {
+      videoRef.current.play().catch(() => {});
+      return;
+    }
+
+    videoRef.current.pause();
+  }, [isInView, tile.video]);
 
   return (
     <Link
+      ref={cardRef}
       href={tile.href}
       data-card
       className="group relative block h-[330px] w-[180px] flex-shrink-0 cursor-pointer snap-start overflow-hidden rounded-xl bg-kibana-cream shadow-lg transition-all duration-300 hover:shadow-2xl sm:h-[420px] sm:w-[230px]"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      {/* Always-visible product image */}
-      <Image
-        src={tile.src}
-        alt={tile.alt}
-        fill
-        sizes="230px"
-        className="object-cover transition-transform duration-500 group-hover:scale-110"
-      />
-
-      {/* Video overlay — shown on hover, plays once with sound, no controls */}
       {tile.video && (
         <video
           ref={videoRef}
           src={tile.video}
+          muted
+          autoPlay
+          loop
           playsInline
-          onEnded={handleEnded}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
+          preload="none"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
       )}
+      {!tile.video && <div className="absolute inset-0 bg-black/70" />}
 
       {/* Bottom label */}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent px-3 pb-3 pt-12">
@@ -101,15 +202,13 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
     });
   };
 
-  // Use admin-assigned products as tiles if available; otherwise fall back to defaults
   const tiles: Tile[] =
     products.length > 0
-      ? products.map((p) => ({
-          src: p.image,
+      ? products.map((p, index) => ({
           alt: p.name,
           label: p.name,
           href: `/shop/${p.slug}`,
-          video: p.video,
+          video: p.video || DEFAULT_VIDEO_POOL[index % DEFAULT_VIDEO_POOL.length],
         }))
       : FALLBACK_TILES;
 
