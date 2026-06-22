@@ -26,7 +26,11 @@ export function BestSellers({
         <SectionHeading title="Best Sellers" className="font-bold uppercase tracking-[0.15em]" />
 
         {/* Full-width banner — aspect matches image's natural 1816×866 ratio on mobile */}
-        <div className="relative aspect-[21/10] w-full overflow-hidden rounded sm:aspect-[16/9] md:aspect-[16/7]">
+        <Link
+          href="/shop"
+          aria-label="Shop best sellers"
+          className="group relative block aspect-[21/10] w-full overflow-hidden rounded sm:aspect-[16/9] md:aspect-[16/7]"
+        >
           <Image
             src={bannerImage}
             alt="Best Sellers"
@@ -37,15 +41,12 @@ export function BestSellers({
             className="object-cover object-left-top sm:object-center"
           />
           {/* Shop Now overlay — responsive positioning across all breakpoints */}
-          <div className="absolute left-[calc(12%-0.5rem)] top-1/2 -translate-y-1/2 sm:left-[calc(16%-0.5rem)] sm:top-[44%] sm:translate-y-0 md:left-[calc(18%-0.5rem)] md:top-[46%]">
-            <Link
-              href="/shop"
-              className="inline-block whitespace-nowrap bg-[#7C4A22] px-2 py-0.5 text-[7px] font-semibold uppercase tracking-[0.15em] text-white transition-colors duration-200 hover:bg-[#5E3518] sm:px-5 sm:py-2.5 sm:text-xs md:px-7 md:py-3 md:text-sm"
-            >
+          <div className="pointer-events-none absolute left-[calc(12%-0.5rem)] top-1/2 -translate-y-1/2 sm:left-[calc(16%-0.5rem)] sm:top-[44%] sm:translate-y-0 md:left-[calc(18%-0.5rem)] md:top-[46%]">
+            <span className="inline-block whitespace-nowrap bg-[#7C4A22] px-2 py-0.5 text-[7px] font-semibold uppercase tracking-[0.15em] text-white transition-colors duration-200 group-hover:bg-[#5E3518] sm:px-5 sm:py-2.5 sm:text-xs md:px-7 md:py-3 md:text-sm">
               Shop Now
-            </Link>
+            </span>
           </div>
-        </div>
+        </Link>
       </div>
     </section>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Hero banner images — mobile and desktop versions per slide
 const heroSlides = [
@@ -9,11 +10,13 @@ const heroSlides = [
     mobile: "/mv/hero1.jpg.jpeg",
     desktop: "/mv/women-hero-desktop.jpg.jpeg",
     alt: "Women collection",
+    href: "/shop?gender=women",
   },
   {
     mobile: "/mv/hero2.jpg.jpeg",
     desktop: "/mv/men-hero-desktop.jpg.jpeg",
     alt: "Men collection",
+    href: "/shop?title=Men%20Collection&gender=men",
   },
 ];
 
@@ -22,6 +25,7 @@ const INTERVAL_MS = 5000;
 const SWIPE_THRESHOLD = 48;
 
 export function HeroBanner() {
+  const router = useRouter();
   const [currentImage, setCurrentImage] = useState(0);
   const [prevImage, setPrevImage] = useState<number | null>(null);
   const [fading, setFading] = useState(false);
@@ -92,13 +96,23 @@ export function HeroBanner() {
     draggable: false,
   };
 
+  const handleBannerClick = () => {
+    if (isSwiping.current) {
+      isSwiping.current = false;
+      return;
+    }
+    const href = heroSlides[currentImage]?.href;
+    if (href) router.push(href);
+  };
+
   return (
     <section className="relative w-full bg-kibana-cream">
       {/* ── MOBILE — matches 1122×1402 image ratio ── */}
       <div
         {...slideProps}
-        className={`${slideProps.className} block md:hidden`}
+        className={`${slideProps.className} block cursor-pointer md:hidden`}
         style={{ aspectRatio: "1122/1402" }}
+        onClick={handleBannerClick}
       >
         {prevImage !== null && (
           <Image
@@ -121,7 +135,10 @@ export function HeroBanner() {
           {heroSlides.map((_, index) => (
             <button
               key={index}
-              onClick={() => goTo(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                goTo(index);
+              }}
               className={`h-2 w-2 cursor-pointer transition-all ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
               aria-label={`View image ${index + 1}`}
             />
@@ -132,8 +149,9 @@ export function HeroBanner() {
       {/* ── DESKTOP / TABLET — matches 2172×724 image ratio ── */}
       <div
         {...slideProps}
-        className={`${slideProps.className} hidden md:block`}
+        className={`${slideProps.className} hidden cursor-pointer md:block`}
         style={{ aspectRatio: "2172/724" }}
+        onClick={handleBannerClick}
       >
         {prevImage !== null && (
           <Image
@@ -156,7 +174,10 @@ export function HeroBanner() {
           {heroSlides.map((_, index) => (
             <button
               key={index}
-              onClick={() => goTo(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                goTo(index);
+              }}
               className={`h-1.5 w-1.5 cursor-pointer transition-all sm:h-2 sm:w-2 ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
               aria-label={`View image ${index + 1}`}
             />

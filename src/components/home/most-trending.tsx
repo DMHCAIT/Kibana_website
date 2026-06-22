@@ -8,13 +8,17 @@ import { products as staticProducts } from "@/lib/data";
 import { SectionHeading } from "./section-heading";
 import type { Product } from "@/types/product";
 
-const TREND_IMAGES: Record<string, string> = {
+const TREND_CARD_IMAGES: Record<string, string> = {
   p1: "/mv/Trend1.webp",
-  p2: "/mv/Trend2.webp",
+  p2: "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/7.webp",
   p7: "/mv/Trend3.webp",
   p9: "/mv/Trend4.webp",
   p10: "/mv/Trend5.webp",
   p11: "/mv/Trend6.webp",
+};
+
+const TREND_CARD_LINKS: Record<string, string> = {
+  p2: "/shop/prizma-sling-bag?color=teal-blue",
 };
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
@@ -26,7 +30,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
       return n(a.id) - n(b.id);
     })
     .slice(0, 6)
-    .map((p) => ({ ...p, image: TREND_IMAGES[p.id] ?? p.image }));
+    .map((p) => ({ ...p, image: TREND_CARD_IMAGES[p.id] ?? p.image }));
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -47,18 +51,20 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
             className="scrollbar-hide flex w-full gap-3 overflow-x-auto scroll-smooth pl-4 pr-6 sm:gap-4 sm:pl-0 sm:pr-4 md:gap-3 md:pl-0 md:pr-2"
             style={{ scrollSnapType: "x mandatory" }}
           >
-            {trendingProducts.map((p) => (
+            {trendingProducts.map((p, index) => (
               <Link
                 key={p.id}
-                href={`/shop/${p.slug}`}
+                href={TREND_CARD_LINKS[p.id] ?? `/shop/${p.slug}`}
                 data-card
-                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden rounded-xl shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
+                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
                 style={{ scrollSnapAlign: "start" }}
               >
                 <Image
                   src={p.image}
                   alt={p.name}
                   fill
+                  priority={index === 0}
+                  quality={70}
                   sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />

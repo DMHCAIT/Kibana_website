@@ -16,9 +16,16 @@ type Props = {
   variant?: "compact" | "full" | "minimal";
   className?: string;
   imageClassName?: string;
+  href?: string;
 };
 
-export function ProductCard({ product, variant = "compact", className, imageClassName }: Props) {
+export function ProductCard({
+  product,
+  variant = "compact",
+  className,
+  imageClassName,
+  href,
+}: Props) {
   const add = useCart((s) => s.add);
   const { has: isInWishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
   const { user, openAuthModal } = useAuth();
@@ -29,6 +36,15 @@ export function ProductCard({ product, variant = "compact", className, imageClas
   }, [product.id, isInWishlist]);
 
   const pct = discountPct(product.price, product.compareAtPrice);
+  const productHref = href ?? `/shop/${product.slug}`;
+  const visibleColorVariants = product.colorVariants?.length
+    ? product.colorVariants
+    : product.colors.map((color) => ({
+        color,
+        slug: color.toLowerCase().replace(/\s+/g, "-"),
+        image: product.image,
+        hex: undefined,
+      }));
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,8 +64,11 @@ export function ProductCard({ product, variant = "compact", className, imageClas
   return (
     <div className={cn("group flex flex-col", className)}>
       <Link
-        href={`/shop/${product.slug}`}
-        className={cn("relative block overflow-hidden rounded-lg bg-kibana-cream", imageClassName ?? "aspect-[5/6]")}
+        href={productHref}
+        className={cn(
+          "relative block overflow-hidden rounded-lg bg-kibana-cream",
+          imageClassName ?? "aspect-[5/6]",
+        )}
       >
         <Image
           src={product.image}
@@ -60,47 +79,64 @@ export function ProductCard({ product, variant = "compact", className, imageClas
         />
         {/* Discount badge — top left on image */}
         {pct > 0 && variant !== "minimal" && (
-          <span className="absolute left-2 top-2 bg-gray-900 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 tracking-wide">
+          <span className="absolute left-2 top-2 bg-gray-900 px-1.5 py-0.5 text-[9px] tracking-wide text-white sm:text-[10px]">
             {pct}% OFF
           </span>
         )}
         <button
           aria-label="Add to wishlist"
-          className="absolute right-2 top-2 inline-flex h-7 sm:h-8 w-7 sm:w-8 items-center justify-center transition-all hover:scale-110"
+          className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center transition-all hover:scale-110 sm:h-8 sm:w-8"
           onClick={toggleWishlist}
         >
-          <Heart 
+          <Heart
             className={cn(
-              "h-5 sm:h-6 w-5 sm:w-6 transition-colors",
-              inWishlist ? "text-red-500" : "text-gray-400 hover:text-gray-600"
+              "h-5 w-5 transition-colors sm:h-6 sm:w-6",
+              inWishlist ? "text-red-500" : "text-gray-400 hover:text-gray-600",
             )}
             fill={inWishlist ? "currentColor" : "none"}
           />
         </button>
       </Link>
 
-      <div className="pt-1.5 flex flex-col gap-0.5">
+      <div className="flex flex-col gap-0.5 pt-1.5">
         <Link
-          href={`/shop/${product.slug}`}
-          className="line-clamp-1 text-xs sm:text-sm md:text-base leading-snug hover:underline"
+          href={productHref}
+          className="line-clamp-1 text-xs leading-snug hover:underline sm:text-sm md:text-base"
         >
           {product.name}
         </Link>
         {variant !== "minimal" && (
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex flex-wrap items-center gap-1">
             <span className="text-[12px] sm:text-sm md:text-lg">{formatINR(product.price)}</span>
             {product.compareAtPrice && (
-              <span className="text-[11px] sm:text-xs md:text-base text-muted-foreground line-through">
+              <span className="text-[11px] text-muted-foreground line-through sm:text-xs md:text-base">
                 {formatINR(product.compareAtPrice)}
               </span>
             )}
+          </div>
+        )}
+        {variant === "full" && visibleColorVariants.length > 0 && (
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <div className="flex items-center">
+              {visibleColorVariants.slice(0, 6).map((variantColor) => (
+                <span
+                  key={variantColor.slug}
+                  className="-ml-1 h-3.5 w-3.5 rounded-full border border-white shadow-sm first:ml-0"
+                  style={{ backgroundColor: variantColor.hex || variantColor.color }}
+                  title={variantColor.color}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              {visibleColorVariants.length} colors
+            </span>
           </div>
         )}
         {variant === "full" && (
           <Button
             size="sm"
             variant="outline"
-            className="mt-1 w-full text-[10px] sm:text-xs h-7 sm:h-8"
+            className="mt-1 h-7 w-full text-[10px] sm:h-8 sm:text-xs"
             onClick={() => add(product)}
           >
             <ShoppingBag className="h-3 w-3" />
