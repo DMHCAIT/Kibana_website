@@ -17,6 +17,7 @@ type Props = {
   className?: string;
   imageClassName?: string;
   href?: string;
+  priority?: boolean;
 };
 
 export function ProductCard({
@@ -25,6 +26,7 @@ export function ProductCard({
   className,
   imageClassName,
   href,
+  priority = false,
 }: Props) {
   const add = useCart((s) => s.add);
   const { has: isInWishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
@@ -74,7 +76,11 @@ export function ProductCard({
           src={product.image}
           alt={product.name}
           fill
+          priority={priority}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          quality={70}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {/* Discount badge — top left on image */}

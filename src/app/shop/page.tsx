@@ -1,9 +1,25 @@
-export const dynamic = "force-dynamic";
+import type { Metadata } from "next";
 
 import { getProducts, getCategories } from "@/lib/server-data";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopByGender } from "@/components/product/shop-by-gender";
 import { ShopHeader } from "@/components/shop/shop-header";
+
+export const metadata: Metadata = {
+  title: "Shop Premium Bags | Kibana",
+  description:
+    "Explore Kibana's premium vegan-leather handbags, totes, sling bags, backpacks, and wallets.",
+  alternates: {
+    canonical: "/shop",
+  },
+  openGraph: {
+    title: "Shop Premium Bags | Kibana",
+    description:
+      "Explore Kibana's premium vegan-leather handbags, totes, sling bags, backpacks, and wallets.",
+    type: "website",
+    url: "/shop",
+  },
+};
 
 type SearchParams = {
   cat?: string;

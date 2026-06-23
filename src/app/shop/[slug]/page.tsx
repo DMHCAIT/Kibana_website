@@ -1,8 +1,8 @@
-export const dynamic = "force-dynamic";
-
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Check, Star } from "lucide-react";
-import { getProducts, getCategories } from "@/lib/server-data";
+import { getProductBySlug, getProducts } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { ProductGrid } from "@/components/product/product-grid";
 import { AddToCartButton } from "./add-to-cart";
@@ -10,6 +10,67 @@ import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
 import { WhatsAppShare } from "./whatsapp-share";
 import { ShopHeader } from "@/components/shop/shop-header";
+import type { Product } from "@/types/product";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: "Product Not Found | Kibana",
+      description: "The requested product does not exist.",
+    };
+  }
+
+  return {
+    title: `${product.name} | Kibana`,
+    description: product.description,
+    alternates: {
+      canonical: `/shop/${product.slug}`,
+    },
+    openGraph: {
+      title: `${product.name} | Kibana`,
+      description: product.description,
+      type: "website",
+      url: `/shop/${product.slug}`,
+      images: [{ url: product.image }],
+    },
+  };
+}
+
+const CATEGORY_LABELS: Record<Product["category"], string> = {
+  "tote-bag": "Tote Bag",
+  handbag: "Handbag",
+  "laptop-bag": "Laptop Bag",
+  "sling-bag": "Sling Bag",
+  clutch: "Clutch",
+  backpack: "Backpack",
+  wallet: "Wallet",
+};
+
+async function RelatedProducts({
+  category,
+  productId,
+}: {
+  category: Product["category"];
+  productId: string;
+}) {
+  const products = await getProducts();
+  const related = products.filter((p) => p.category === category && p.id !== productId).slice(0, 4);
+  if (related.length === 0) return null;
+
+  return (
+    <section className="container py-2 pb-20 sm:py-3 sm:pb-8 md:py-14">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em]">You may also like</h2>
+      <ProductGrid products={related} />
+    </section>
+  );
+}
 
 export default async function ProductDetailPage({
   params,
@@ -20,9 +81,7 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const { color } = await searchParams;
-  const products = await getProducts();
-  const categories = await getCategories();
-  const product = products.find((p) => p.slug === slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   const activeVariant =
@@ -43,10 +102,7 @@ export default async function ProductDetailPage({
       ? activeVariant.specs
       : product.specs;
   const pct = discountPct(product.price, product.compareAtPrice);
-  const related = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
-  const catProductCount = products.filter((p) => p.category === product.category).length;
+  const categoryLabel = CATEGORY_LABELS[product.category] ?? "Shop all bags";
 
   return (
     <>
@@ -54,11 +110,7 @@ export default async function ProductDetailPage({
         <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-8 sm:px-4 md:px-8 lg:grid-cols-[minmax(0,620px)_1fr] lg:gap-12">
           {/* Gallery Column with Header */}
           <div className="w-full min-w-0">
-            <ShopHeader
-              heading={categories.find((c) => c.slug === product.category)?.name ?? "Shop all bags"}
-              count={catProductCount}
-              showSort={false}
-            />
+            <ShopHeader heading={categoryLabel} showSort={false} />
             <ProductGallery images={allImages} productName={product.name} discountPct={pct} />
           </div>
 
@@ -228,14 +280,9 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {related.length > 0 && (
-        <section className="container py-2 pb-20 sm:py-3 sm:pb-8 md:py-14">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em]">
-            You may also like
-          </h2>
-          <ProductGrid products={related} />
-        </section>
-      )}
+      <Suspense fallback={null}>
+        <RelatedProducts category={product.category} productId={product.id} />
+      </Suspense>
     </>
   );
 }

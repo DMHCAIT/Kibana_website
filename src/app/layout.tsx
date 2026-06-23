@@ -51,9 +51,17 @@ const poppins = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kibanaindia.com"),
   title: "Kibana — Pure. Minimal. Luxe.",
   description:
     "Premium vegan-leather handbags, totes, slings and backpacks. Hand-finished, every day.",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: "/favicon-16x16.png",
     shortcut: "/favicon-16x16.png",

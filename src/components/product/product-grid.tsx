@@ -19,8 +19,8 @@ export function ProductGrid({ products, variant = "compact", columns = "2-4", cl
         className,
       )}
     >
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} variant={variant} />
+      {products.map((p, index) => (
+        <ProductCard key={p.id} product={p} variant={variant} priority={index < 4} />
       ))}
     </div>
   );
