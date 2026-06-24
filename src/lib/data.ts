@@ -1,7 +1,7 @@
 import type { Product, Category } from "@/types/product";
 import productsData from "@/data/products.json";
 
-export const products: Product[] = productsData as Product[];
+export const products: Product[] = productsData as unknown as Product[];
 
 export const categories: Category[] = [
   { slug: "tote-bag", name: "Tote Bag", image: "/mv/cat-5.jpeg" },
