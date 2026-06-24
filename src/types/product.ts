@@ -31,6 +31,8 @@ export const ProductSchema = z.object({
         slug: z.string(),
         image: z.string(),
         gallery: z.array(z.string()).optional(),
+        productTitle: z.string().optional(),
+        stockQty: z.number().int().nonnegative().optional(),
         price: z.number().optional(),
         compareAtPrice: z.number().optional(),
         inStock: z.boolean().optional(),
@@ -38,7 +40,7 @@ export const ProductSchema = z.object({
         description: z.string().optional(),
         features: z.array(z.string()).optional(),
         specs: z.record(z.string(), z.string()).optional(),
-      })
+      }),
     )
     .default([]),
   features: z.array(z.string()).default([]),
@@ -51,15 +53,7 @@ export const ProductSchema = z.object({
 export type Product = z.infer<typeof ProductSchema>;
 
 export const CategorySchema = z.object({
-  slug: z.enum([
-    "tote-bag",
-    "handbag",
-    "laptop-bag",
-    "sling-bag",
-    "clutch",
-    "backpack",
-    "wallet",
-  ]),
+  slug: z.enum(["tote-bag", "handbag", "laptop-bag", "sling-bag", "clutch", "backpack", "wallet"]),
   name: z.string(),
   image: z.string(),
 });

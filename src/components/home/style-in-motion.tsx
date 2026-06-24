@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { SectionHeading } from "./section-heading";
 import { Truck, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
@@ -127,7 +126,7 @@ type Tile = { alt: string; label: string; href: string; video?: string };
 
 /** Individual card: autoplays while visible and keeps original tile size/layout */
 function TileCard({ tile }: { tile: Tile }) {
-  const cardRef = useRef<HTMLAnchorElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInView, setIsInView] = useState(false);
 
@@ -159,11 +158,10 @@ function TileCard({ tile }: { tile: Tile }) {
   }, [isInView, tile.video]);
 
   return (
-    <Link
+    <div
       ref={cardRef}
-      href={tile.href}
       data-card
-      className="group relative block h-[330px] w-[180px] flex-shrink-0 cursor-pointer snap-start overflow-hidden rounded-xl bg-kibana-cream shadow-lg transition-all duration-300 hover:shadow-2xl sm:h-[420px] sm:w-[230px]"
+      className="group relative block h-[330px] w-[180px] flex-shrink-0 snap-start overflow-hidden rounded-xl bg-kibana-cream shadow-lg transition-all duration-300 hover:shadow-2xl sm:h-[420px] sm:w-[230px]"
     >
       {tile.video && (
         <video
@@ -185,7 +183,7 @@ function TileCard({ tile }: { tile: Tile }) {
           {tile.label}
         </span>
       </div>
-    </Link>
+    </div>
   );
 }
 

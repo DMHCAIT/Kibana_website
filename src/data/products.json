@@ -3,7 +3,7 @@
     "id": "p1",
     "slug": "vistara-tote-bag",
     "name": "Vistara Tote Bag",
-    "description": "Spacious vegan leather tote with dual handles and a magnetic closure. Available in four fresh colourways \u2014 ideal for work and everyday carry.",
+    "description": "Elevate your everyday style with the KIBANA Vistara Tote Bag - a perfect blend of modern sophistication and conscious luxury. This premium vegan leather tote features geometric chevron stitching and is ideal for office, college, and travel.",
     "price": 4999,
     "compareAtPrice": 6499,
     "image": "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/09-10-2025-product%20shoot00103_result.webp",
@@ -26,6 +26,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Vistara Geometric Vegan Leather Tote Bag - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/09-10-2025-product%20shoot00103_result.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/09-10-2025-product%20shoot00104_result.webp",
@@ -41,6 +43,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Vistara Geometric Vegan Leather Tote Bag - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Vistara%20tote/Mint%20green/09-10-2025-product%20shoot00135_result.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistara%20tote/Mint%20green/09-10-2025-product%20shoot00136_result.webp",
@@ -56,6 +60,8 @@
         "color": "#2D8B8B",
         "hex": "#2D8B8B",
         "slug": "teal-blue",
+        "productTitle": "Vistara Geometric Vegan Leather Tote Bag - [Teal Blue]",
+        "stockQty": 1,
         "image": "/kibana_product_images/1%20collection/Vistara%20tote/Teal%20Blue/09-10-2025-product%20shoot00113_result.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistara%20tote/Teal%20Blue/09-10-2025-product%20shoot00114_result.webp",
@@ -72,6 +78,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Vistara Geometric Vegan Leather Tote Bag - [Mocha]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Vistara%20tote/Ten/09-10-2025-product%20shoot00122_result.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistara%20tote/Ten/09-10-2025-product%20shoot00123_result.webp",
@@ -92,10 +100,12 @@
       "Spacious main compartment"
     ],
     "specs": {
-      "Dimensions": "16 \u00d7 13 \u00d7 4 inches",
+      "Dimensions": "16 (L) x 13 (H) x 4 (W) Inches",
       "Weight": "697g",
-      "Material": "Vegan Leather",
-      "Closure": "Magnetic Snap"
+      "Material": "100% Premium Vegan Leather",
+      "Closure": "Smooth Main Zipper with Magnetic Closure",
+      "Hardware & Fittings": "Premium Metal Accents in Light Gold Finish",
+      "Handle Type": "Sturdy Vegan Leather Shoulder Handles"
     },
     "rating": 4.6,
     "reviewCount": 94,
@@ -105,7 +115,7 @@
     "id": "p2",
     "slug": "prizma-sling-bag",
     "name": "Prizma Sling Bag",
-    "description": "Compact vegan leather sling bag with an adjustable crossbody strap and top zip closure. Four vibrant colourways.",
+    "description": "Make a bold statement with the Prizma Hexagon Vegan Leather Sling Crossbody Bag. This structured sling bag features a unique hexagonal design, elegant top handle, premium gold hardware, and a detachable adjustable strap.",
     "price": 4999,
     "compareAtPrice": 6499,
     "image": "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/1.webp",
@@ -128,6 +138,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Prizma Hexagon Structured Vegan Leather Sling Crossbody Bag - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/2.webp",
@@ -143,6 +155,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Prizma Hexagon Structured Vegan Leather Sling Crossbody Bag - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Prizma%20Sling/mint%20green/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Prizma%20Sling/mint%20green/2.webp",
@@ -158,6 +172,8 @@
         "color": "#2D8B8B",
         "hex": "#2D8B8B",
         "slug": "teal-blue",
+        "productTitle": "Prizma Hexagon Structured Vegan Leather Sling Crossbody Bag - [Teal Blue]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/2.webp",
@@ -173,6 +189,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Prizma Hexagon Structured Vegan Leather Sling Crossbody Bag - [Mocha]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Prizma%20Sling/Ten/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Prizma%20Sling/Ten/2.webp",
@@ -193,10 +211,12 @@
       "Compact & lightweight"
     ],
     "specs": {
-      "Dimensions": "12 \u00d7 7 \u00d7 4 inches",
+      "Dimensions": "12 x 7 x 4 (L x H x W) Inches",
       "Weight": "529g",
-      "Material": "Vegan Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% Premium Vegan Leather",
+      "Closure": "Secure Front Flap with Magnetic Lock",
+      "Strap & Handle": "Adjustable Crossbody Strap (56 cm drop) and Top Handle (3 cm drop)",
+      "Hardware": "Elegant Metal Accents with Premium Gold-Tone Finish"
     },
     "rating": 4.6,
     "reviewCount": 78,
@@ -206,7 +226,7 @@
     "id": "p3",
     "slug": "vistapack",
     "name": "Vistapack",
-    "description": "Structured vegan leather backpack with a padded back panel and dedicated laptop sleeve. Four colourways.",
+    "description": "Discover the ultimate blend of style and utility with the Vistapack Chevron Quilted Vegan Leather Backpack. Designed for office, college, and weekend travel with a secure envelope flap and spacious interior.",
     "price": 5499,
     "compareAtPrice": 6999,
     "image": "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/1.webp",
@@ -228,6 +248,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Vistapack Structured Faux Leather Backpack with Envelope Flap - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/2.webp",
@@ -243,6 +265,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Vistapack Structured Faux Leather Backpack with Envelope Flap - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Vistapack/Mint%20green/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistapack/Mint%20green/2.webp",
@@ -257,6 +281,8 @@
         "color": "#2D8B8B",
         "hex": "#2D8B8B",
         "slug": "teal-blue",
+        "productTitle": "Vistapack Structured Faux Leather Backpack with Envelope Flap - [Teal Blue]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Vistapack/Teal%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistapack/Teal%20Blue/2.webp",
@@ -272,6 +298,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Vistapack Structured Faux Leather Backpack with Envelope Flap - [Mocha Tan]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Vistapack/Ten/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Vistapack/Ten/2.webp",
@@ -292,10 +320,12 @@
       "Ergonomic back panel"
     ],
     "specs": {
-      "Dimensions": "12 \u00d7 8 \u00d7 4 inches",
+      "Dimensions": "12 x 8 x 4 (L x H x W) Inches",
       "Weight": "770g",
-      "Material": "Vegan Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% Premium Vegan Leather",
+      "Closure": "Envelope Flap with Secure Magnetic Snap",
+      "Hardware": "High-Quality Metal Fittings in Gold-Toned Finish",
+      "Handle & Straps": "10-inch handle drop with adjustable shoulder straps"
     },
     "rating": 4.7,
     "reviewCount": 112,
@@ -305,7 +335,7 @@
     "id": "p4",
     "slug": "sandesh-laptop-bag",
     "name": "Sandesh Laptop Bag",
-    "description": "Premium vegan leather laptop bag with a dedicated padded sleeve for up to 15\" laptops. Four colourways.",
+    "description": "Streamline your workday with the Sandesh Geometric Vegan Leather Laptop Briefcase Bag. This sleek office bag has top handles, an adjustable shoulder strap, and space for 14-inch to 15.5-inch laptops.",
     "price": 6999,
     "compareAtPrice": 8999,
     "image": "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/1.webp",
@@ -325,6 +355,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Sandesh Unisex Geometric Vegan Leather Laptop Briefcase Bag - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/2.webp",
@@ -338,6 +370,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Sandesh Unisex Geometric Vegan Leather Laptop Briefcase Bag - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/2.webp",
@@ -353,6 +387,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Sandesh Unisex Geometric Vegan Leather Laptop Briefcase Bag - [Mocha Tan]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/laptop%20bag/tan/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/laptop%20bag/tan/2.webp",
@@ -367,6 +403,8 @@
         "color": "#2D8B8B",
         "hex": "#2D8B8B",
         "slug": "teal-blue",
+        "productTitle": "Sandesh Unisex Geometric Vegan Leather Laptop Briefcase Bag - [Teal Blue]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/laptop%20bag/Teal%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/laptop%20bag/Teal%20Blue/2.webp",
@@ -386,10 +424,12 @@
       "Detachable shoulder strap"
     ],
     "specs": {
-      "Dimensions": "12 \u00d7 8 \u00d7 4 inches",
+      "Dimensions": "12 x 8 x 4 (L x H x W) Inches",
       "Weight": "1340g",
-      "Material": "Vegan Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% Premium Vegan Leather",
+      "Closure": "Top Zipper with Magnetic Snap Flap",
+      "Storage & Pockets": "Spacious main compartment with multiple internal pockets",
+      "Handles & Straps": "10-inch handle drop with adjustable detachable shoulder strap"
     },
     "rating": 4.7,
     "reviewCount": 96,
@@ -399,7 +439,7 @@
     "id": "p5",
     "slug": "lekha-wallet",
     "name": "Lekha Wallet",
-    "description": "Compact vegan leather wallet with multiple card slots and a zippered coin pocket. Four fresh colourways.",
+    "description": "Organize your essentials in style with the Lekha Envelope Vegan Leather Women's Wallet. This chic zip-around wallet offers multiple card slots and spacious compartments for cash, cards, and coins.",
     "price": 2199,
     "compareAtPrice": 2999,
     "image": "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/1.webp",
@@ -419,6 +459,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/2.webp",
@@ -433,6 +475,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/2.webp",
@@ -446,6 +490,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Mocha]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Lekha%20Wallet/Ten/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Ten/2.webp",
@@ -460,6 +506,8 @@
         "color": "#40E0D0",
         "hex": "#40E0D0",
         "slug": "turquoise-blue",
+        "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Turquoise Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Lekha%20Wallet/Turquoise%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Turquoise%20Blue/2.webp",
@@ -493,10 +541,11 @@
       "Compact bi-fold design"
     ],
     "specs": {
-      "Dimensions": "8.5 \u00d7 4.5 inches",
+      "Dimensions": "8.5 x 4.5 (L x H) Inches",
       "Weight": "263g",
-      "Material": "Vegan Leather",
-      "Closure": "Bi-fold"
+      "Material": "100% Premium Vegan Leather",
+      "Closure": "Secure Zip Around Closure",
+      "Hardware": "Refined Metal Fittings with Gold-Tone Accents"
     },
     "rating": 4.4,
     "reviewCount": 58,
@@ -506,7 +555,7 @@
     "id": "p6",
     "slug": "zippy-wallet",
     "name": "Zippy Wallet",
-    "description": "Zip-around wallet in vegan leather with a full-length bill compartment and card slots. Four colourways.",
+    "description": "Organize your daily essentials effortlessly with the Classic Vegan Leather Zip Wallet. It features multiple card slots, secure storage, and a slim profile suitable as a clutch or handbag organizer.",
     "price": 1999,
     "compareAtPrice": 2699,
     "image": "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/1.webp",
@@ -526,6 +575,8 @@
         "color": "#98D8C8",
         "hex": "#98D8C8",
         "slug": "mint-green",
+        "productTitle": "Classic Vegan Leather Zip Around Wallet - [Mint Green]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/2.webp",
@@ -540,6 +591,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Classic Vegan Leather Zip Around Wallet - [Milky Blue]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Zippy%20Wallet/New%20folder/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Zippy%20Wallet/New%20folder/2.webp",
@@ -554,6 +607,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Classic Vegan Leather Zip Around Wallet - [Mocha Tan]",
+        "stockQty": 50,
         "image": "/kibana_product_images/1%20collection/Zippy%20Wallet/tan/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Zippy%20Wallet/tan/2.webp",
@@ -567,6 +622,8 @@
         "color": "#40E0D0",
         "hex": "#40E0D0",
         "slug": "turquoise-blue",
+        "productTitle": "Classic Vegan Leather Zip Around Wallet - [Teal Blue]",
+        "stockQty": 2,
         "image": "/kibana_product_images/1%20collection/Zippy%20Wallet/Turquoise%20Blue/1.webp",
         "gallery": [
           "/kibana_product_images/1%20collection/Zippy%20Wallet/Turquoise%20Blue/2.webp",
@@ -586,10 +643,11 @@
       "Vegan leather exterior"
     ],
     "specs": {
-      "Dimensions": "12 \u00d7 8 \u00d7 4 inches",
+      "Dimensions": "12 x 8 x 4 (L x H x W) Inches",
       "Weight": "99g",
-      "Material": "100% PU Leather",
-      "Closure": "Zip Around"
+      "Material": "100% Premium PU Leather",
+      "Closure": "Quick-Access and Secure Magnetic Snap Closure",
+      "Hardware": "Premium Metal Fittings in Gold-Tone Finish"
     },
     "rating": 4.3,
     "reviewCount": 62,
@@ -599,7 +657,7 @@
     "id": "p7",
     "slug": "large-aurelia-fan-tote",
     "name": "Large Aurelia Fan Tote",
-    "description": "Statement large tote with a distinctive fan design in 100% PU leather. Two rich colourways.",
+    "description": "Redefine your everyday style with the Aurelia Structured Fan Handbag. Crafted from durable faux leather, this modern tote offers a striking geometric silhouette, secure closure, and spacious carry capacity.",
     "price": 3499,
     "compareAtPrice": 4999,
     "image": "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp",
@@ -620,6 +678,8 @@
         "color": "#8B6456",
         "hex": "#8B6456",
         "slug": "mocha",
+        "productTitle": "Aurelia Fan Silhouette Structured Tote Bag - [Mocha]",
+        "stockQty": 11,
         "image": "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06478_result.webp",
@@ -634,6 +694,8 @@
         "color": "#722F37",
         "hex": "#722F37",
         "slug": "wine",
+        "productTitle": "Aurelia Fan Silhouette Structured Tote Bag - [Wine]",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/02-04-2026--paulina06310_result.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/02-04-2026--paulina06342_result.webp",
@@ -654,10 +716,11 @@
       "Dual top handles"
     ],
     "specs": {
-      "Dimensions": "21 \u00d7 12.5 \u00d7 4 inches",
+      "Dimensions": "21 x 12.5 x 4 (L x H x W) Inches",
       "Weight": "638g",
-      "Material": "100% PU Leather",
-      "Closure": "Magnetic Snap"
+      "Material": "100% Premium PU Leather",
+      "Closure": "Quick-Access and Secure Magnetic Snap Closure",
+      "Hardware": "High-Quality Metal Fittings in Gold-Tone Finish"
     },
     "rating": 4.5,
     "reviewCount": 84,
@@ -667,7 +730,7 @@
     "id": "p8",
     "slug": "mini-aurelia-fan-tote",
     "name": "Mini Aurelia Fan Tote",
-    "description": "Compact mini tote with a distinctive fan design in 100% PU leather. Two rich colourways.",
+    "description": "Redefine your everyday style with the Mini Aurelia Structured Fan Handbag. Crafted from premium faux leather, this compact tote combines signature fan styling with practical storage.",
     "price": 3499,
     "compareAtPrice": 4499,
     "image": "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/1.webp",
@@ -687,6 +750,8 @@
         "color": "#8B6456",
         "hex": "#8B6456",
         "slug": "mocha",
+        "productTitle": "Aurelia Fan Silhouette Structured Tote Bag - [Mocha]",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/1.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/2.webp",
@@ -706,10 +771,11 @@
       "Dual top handles"
     ],
     "specs": {
-      "Dimensions": "16.5 \u00d7 7.5 \u00d7 3 inches",
+      "Dimensions": "16.5 x 7.5 x 3 (L x H x W) Inches",
       "Weight": "440g",
-      "Material": "100% PU Leather",
-      "Closure": "Magnetic Snap"
+      "Material": "100% Premium PU Leather",
+      "Closure": "Quick-Access and Secure Magnetic Snap Closure",
+      "Hardware": "High-Quality Metal Fittings in Gold-Tone Finish"
     },
     "rating": 4.4,
     "reviewCount": 55,
@@ -719,7 +785,7 @@
     "id": "p9",
     "slug": "valera-dome",
     "name": "Valera Dome",
-    "description": "Dome-shaped sling bag in 100% PU leather with a top zip and detachable crossbody strap. Four colourways.",
+    "description": "Upgrade your everyday style with the Valera Dome Sling Bag. Crafted from premium cruelty-free vegan leather, this chic crossbody features a dome shape, adjustable strap, and secure closure.",
     "price": 3249,
     "compareAtPrice": 4299,
     "image": "/kibana_product_images/2%20collection/Valera%20Dome/black/Image01.webp",
@@ -739,6 +805,8 @@
         "color": "#1A1A1A",
         "hex": "#1A1A1A",
         "slug": "black",
+        "productTitle": "Valera Dome Vegan Leather Crossbody Sling Bag - Black",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Valera%20Dome/black/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Valera%20Dome/black/Image02.webp",
@@ -752,6 +820,8 @@
         "color": "#3C7A5A",
         "hex": "#3C7A5A",
         "slug": "forest-green",
+        "productTitle": "Valera Dome Vegan Leather Crossbody Sling Bag - Forest Green",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image02.webp",
@@ -765,6 +835,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Valera Dome Vegan Leather Crossbody Sling Bag - Milky Blue",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Valera%20Dome/Milky%20Blue/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Valera%20Dome/Milky%20Blue/Image02.webp",
@@ -778,6 +850,8 @@
         "color": "#4169E1",
         "hex": "#4169E1",
         "slug": "royal-blue",
+        "productTitle": "Valera Dome Vegan Leather Crossbody Sling Bag - Royal Blue",
+        "stockQty": 100,
         "image": "/kibana_product_images/2%20collection/Valera%20Dome/Royal%20Blue/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Valera%20Dome/Royal%20Blue/Image02.webp",
@@ -796,10 +870,12 @@
       "Interior slip pocket"
     ],
     "specs": {
-      "Dimensions": "14 \u00d7 6 \u00d7 4 inches",
+      "Dimensions": "14 (L) x 6 (H) x 4 (W) Inches",
       "Weight": "470g",
-      "Material": "100% PU Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% High-Quality PU Vegan Leather",
+      "Closure": "Quick and Easy Magnetic Snap Closure",
+      "Hardware": "Elegant Gold-Tone Accents",
+      "Care Instructions": "Wipe clean with a soft damp cloth"
     },
     "rating": 4.5,
     "reviewCount": 89,
@@ -809,7 +885,7 @@
     "id": "p10",
     "slug": "cordia-bag",
     "name": "Cordia Bag",
-    "description": "Structured tote in 100% PU leather with dual handles and a top zip closure. Four bold colourways.",
+    "description": "Upgrade your look with the Cordia Oval Shoulder Bag. Crafted from premium vegan leather, this elegant handbag features a modern knotted strap and stylish striped lining.",
     "price": 2999,
     "compareAtPrice": 3999,
     "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image01.webp",
@@ -829,6 +905,8 @@
         "color": "#1A1A1A",
         "hex": "#1A1A1A",
         "slug": "black",
+        "productTitle": "Women's Aesthetic Vegan Shoulder Purse Cordia Style - Black",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image02.webp",
@@ -842,6 +920,8 @@
         "color": "#C8A2C8",
         "hex": "#C8A2C8",
         "slug": "light-purple",
+        "productTitle": "Women's Aesthetic Vegan Shoulder Purse Cordia Style - Light Purple",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/Light%20Purple/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Light%20Purple/Image02.webp",
@@ -855,6 +935,8 @@
         "color": "#D9E76A",
         "hex": "#D9E76A",
         "slug": "lime-yellow",
+        "productTitle": "Women's Aesthetic Vegan Shoulder Purse Cordia Style - Lime Yellow",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image02.webp",
@@ -868,6 +950,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Women's Aesthetic Vegan Shoulder Purse Cordia Style - Mocha Tan",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/tan/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/CORDIA%20BAG/tan/Image02.webp",
@@ -886,10 +970,12 @@
       "Fully lined interior"
     ],
     "specs": {
-      "Dimensions": "14.5 \u00d7 6.5 \u00d7 3.5 inches",
+      "Dimensions": "14.5 x 6.5 x 3.5 (L x H x W) Inches",
       "Weight": "472g",
-      "Material": "100% PU Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% High-Quality PU Vegan Leather",
+      "Closure": "Smooth Top Zipper Closure",
+      "Handle Drop": "14-inch drop length",
+      "Hardware": "Elegant Gold-Tone Accents"
     },
     "rating": 4.5,
     "reviewCount": 73,
@@ -899,7 +985,7 @@
     "id": "p11",
     "slug": "halo-mini",
     "name": "Halo Mini",
-    "description": "Mini structured sling bag in 100% PU leather. Compact, chic, and versatile for any occasion. Five colourways.",
+    "description": "Meet the Halo Mini Crossbody Sling - your new go-to bag. Made from high-quality vegan leather, it combines an elegant chain handle with practical everyday carry and a chic striped lining.",
     "price": 4499,
     "compareAtPrice": 5999,
     "image": "/kibana_product_images/2%20collection/halo%20mini/black/Image06.webp",
@@ -920,6 +1006,8 @@
         "color": "#1A1A1A",
         "hex": "#1A1A1A",
         "slug": "black",
+        "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Black",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/halo%20mini/black/Image06.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/halo%20mini/black/Image01.webp",
@@ -933,6 +1021,8 @@
         "color": "#3C7A5A",
         "hex": "#3C7A5A",
         "slug": "forest-green",
+        "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Forest Green",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/halo%20mini/green/1_result.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/halo%20mini/green/2_result.webp",
@@ -946,6 +1036,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Tan",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/halo%20mini/tan/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/halo%20mini/tan/Image02.webp",
@@ -959,6 +1051,8 @@
         "color": "#40E0D0",
         "hex": "#40E0D0",
         "slug": "turquoise-blue",
+        "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Turquoise Blue",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/halo%20mini/Turquoise%20Blue/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/halo%20mini/Turquoise%20Blue/Image02.webp",
@@ -972,6 +1066,8 @@
         "color": "#722F37",
         "hex": "#722F37",
         "slug": "wine",
+        "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Wine",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/halo%20mini/wine/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/halo%20mini/wine/Image02.webp",
@@ -990,10 +1086,11 @@
       "Card & phone interior slots"
     ],
     "specs": {
-      "Dimensions": "20.3 \u00d7 10.2 \u00d7 20.3 cm",
+      "Dimensions": "20.3 x 10.2 x 20.3 cm (L x W x H)",
       "Weight": "442g",
-      "Material": "100% PU Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% High-Quality PU Vegan Leather",
+      "Closure": "Quick and Secure Magnetic Snap Closure",
+      "Hardware": "Elegant Gold-Tone Accents"
     },
     "rating": 4.6,
     "reviewCount": 91,
@@ -1003,7 +1100,7 @@
     "id": "p12",
     "slug": "orwyn-backpack",
     "name": "Orwyn Backpack",
-    "description": "Full-size vegan leather backpack with multiple compartments and padded straps. Two classic colourways.",
+    "description": "Upgrade your daily commute with the Orwyn Laptop Backpack. Crafted from premium textured vegan leather, it comfortably fits up to a 15-inch laptop and includes padded adjustable straps.",
     "price": 4499,
     "compareAtPrice": 5999,
     "image": "/kibana_product_images/2%20collection/bag%20pack/black/1.webp",
@@ -1023,6 +1120,8 @@
         "color": "#1A1A1A",
         "hex": "#1A1A1A",
         "slug": "black",
+        "productTitle": "Orwyn Vegan Leather Laptop Backpack (15 inch Laptop Fits) - Black",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/bag%20pack/black/1.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/bag%20pack/black/2.webp",
@@ -1036,6 +1135,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Orwyn Vegan Leather Laptop Backpack (15 inch Laptop Fits) - Tan",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/bag%20pack/tan/1.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/bag%20pack/tan/2.webp",
@@ -1054,10 +1155,12 @@
       "Adjustable padded straps"
     ],
     "specs": {
-      "Dimensions": "11.43 \u00d7 30.48 \u00d7 41.91 cm",
+      "Dimensions": "11.43 x 30.48 x 41.91 cm (L x W x H)",
       "Weight": "1046g",
-      "Material": "Vegan Leather",
-      "Closure": "Top Zipper"
+      "Material": "High-Quality Textured Grain Vegan Leather",
+      "Closure": "Smooth Heavy-Duty Zipper Closure",
+      "Storage": "Quick-access front zipper pocket",
+      "Comfort": "Padded and adjustable shoulder straps"
     },
     "rating": 4.5,
     "reviewCount": 83,
@@ -1067,7 +1170,7 @@
     "id": "p13",
     "slug": "crescent-sling-bag",
     "name": "Crescent Sling Bag",
-    "description": "Crescent-shaped sling bag in vegan leather with an adjustable crossbody strap. Three colourways.",
+    "description": "Make a stunning impression with the Crescent Crossbody Sling Bag. Crafted from premium vegan leather, this chic bag features a luxe chain strap, decorative lock detail, and striped interior lining.",
     "price": 4299,
     "compareAtPrice": 5499,
     "image": "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image01.webp",
@@ -1087,6 +1190,8 @@
         "color": "#B8D4E0",
         "hex": "#B8D4E0",
         "slug": "milky-blue",
+        "productTitle": "Crescent Vegan Leather Crossbody Sling with Chain Strap - Milky Blue",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image02.webp",
@@ -1100,6 +1205,8 @@
         "color": "#40E0D0",
         "hex": "#40E0D0",
         "slug": "turquoise-blue",
+        "productTitle": "Crescent Vegan Leather Crossbody Sling with Chain Strap - Turquoise Blue",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Turquoise%20Blue/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Turquoise%20Blue/Image02.webp",
@@ -1113,6 +1220,8 @@
         "color": "#722F37",
         "hex": "#722F37",
         "slug": "wine",
+        "productTitle": "Crescent Vegan Leather Crossbody Sling with Chain Strap - Wine",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/wine/Image01.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/wine/Image02.webp",
@@ -1131,10 +1240,12 @@
       "Interior card slots"
     ],
     "specs": {
-      "Dimensions": "27.94 \u00d7 7.62 \u00d7 13.97 cm",
+      "Dimensions": "27.94 x 7.62 x 13.97 cm (L x W x H)",
       "Weight": "431g",
-      "Material": "Vegan Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% High-Quality PU Vegan Leather",
+      "Closure": "Flap and Lock detail with hidden Magnetic Snap",
+      "Strap Details": "Luxe gold chain strap for shoulder or crossbody carry",
+      "Interior": "Striped interior lining"
     },
     "rating": 4.5,
     "reviewCount": 64,
@@ -1144,7 +1255,7 @@
     "id": "p14",
     "slug": "business-laptop-briefcase",
     "name": "Business Laptop Briefcase",
-    "description": "Professional PU leather laptop briefcase with a dedicated laptop compartment and organizer pockets. Two classic colourways.",
+    "description": "Elevate your workday with this vegan leather business briefcase. Designed to hold up to a 15.6-inch laptop, it features organized storage, secure closure, and a padded adjustable strap for comfort.",
     "price": 5699,
     "compareAtPrice": 7499,
     "image": "/kibana_product_images/2%20collection/veyra%20briefcase/Black/1.webp",
@@ -1164,6 +1275,8 @@
         "color": "#1A1A1A",
         "hex": "#1A1A1A",
         "slug": "black",
+        "productTitle": "Business Vegan Leather Laptop Briefcase (15.6\" Laptop Fits) - Black",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/veyra%20briefcase/Black/1.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/veyra%20briefcase/Black/2.webp",
@@ -1177,6 +1290,8 @@
         "color": "#C9A77B",
         "hex": "#C9A77B",
         "slug": "tan",
+        "productTitle": "Business Vegan Leather Laptop Briefcase (15.6\" Laptop Fits) - Tan",
+        "stockQty": 10,
         "image": "/kibana_product_images/2%20collection/veyra%20briefcase/Ten/1.webp",
         "gallery": [
           "/kibana_product_images/2%20collection/veyra%20briefcase/Ten/2.webp",
@@ -1195,10 +1310,12 @@
       "Detachable shoulder strap"
     ],
     "specs": {
-      "Dimensions": "39.37 \u00d7 7.62 \u00d7 29.21 cm",
+      "Dimensions": "39.37 x 7.62 x 29.21 cm (L x W x H)",
       "Weight": "1283g",
-      "Material": "100% PU Leather",
-      "Closure": "Top Zipper"
+      "Material": "100% High-Quality PU Vegan Leather",
+      "Closure": "Secure closure with front magnetic snap support",
+      "Storage": "Front zipper pocket with organized interior",
+      "Commute": "Padded and adjustable shoulder strap"
     },
     "rating": 4.5,
     "reviewCount": 76,

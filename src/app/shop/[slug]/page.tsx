@@ -86,6 +86,8 @@ export default async function ProductDetailPage({
 
   const activeVariant =
     product.colorVariants?.find((v) => v.slug === color) ?? product.colorVariants?.[0];
+  const activeProductTitle = activeVariant?.productTitle || product.name;
+  const activeStockQty = activeVariant?.stockQty;
   const primaryImage = activeVariant?.image ?? product.image;
   const galleryImages = activeVariant?.gallery?.length
     ? activeVariant.gallery
@@ -117,7 +119,7 @@ export default async function ProductDetailPage({
           {/* Details */}
           <div className="w-full min-w-0 pt-1 sm:pt-2 md:pt-0">
             <h1 className="mt-1 break-words font-display text-lg leading-tight sm:text-2xl md:text-4xl">
-              {product.name}
+              {activeProductTitle}
             </h1>
 
             <div className="mt-1.5 flex items-center gap-2 text-xs sm:mt-2 sm:text-sm">
@@ -151,6 +153,18 @@ export default async function ProductDetailPage({
               {pct > 0 && (
                 <span className="bg-emerald-700 px-1 py-0.5 text-[10px] font-semibold text-white sm:px-1.5 sm:text-xs">
                   {pct}% OFF
+                </span>
+              )}
+              {typeof activeStockQty === "number" && (
+                <span
+                  className={cn(
+                    "px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs",
+                    activeStockQty > 5
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-amber-100 text-amber-800",
+                  )}
+                >
+                  Stock: {activeStockQty}
                 </span>
               )}
             </div>
