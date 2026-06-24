@@ -16,7 +16,7 @@ interface UPIPaymentProps {
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
   }
 }
 
@@ -130,8 +130,7 @@ export function UPIPayment({
             // Call success handler
             await onSuccess(response.razorpay_payment_id);
           } catch (err) {
-            const errorMsg =
-              err instanceof Error ? err.message : "Payment verification failed";
+            const errorMsg = err instanceof Error ? err.message : "Payment verification failed";
             setError(errorMsg);
             onError(errorMsg);
             setLoading(false);
@@ -161,8 +160,8 @@ export function UPIPayment({
 
   if (success) {
     return (
-      <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-        <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
+      <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+        <CheckCircle className="h-5 w-5 shrink-0 text-emerald-600" />
         <div>
           <p className="text-sm font-semibold text-emerald-900">✅ Payment Successful!</p>
           <p className="text-xs text-emerald-700">TXN ID: {transactionId}</p>
@@ -174,7 +173,7 @@ export function UPIPayment({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-destructive text-sm">
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>
@@ -187,14 +186,14 @@ export function UPIPayment({
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Processing...
           </>
         ) : (
           <>📱 Pay ₹{amount.toLocaleString("en-IN")} with UPI</>
         )}
       </Button>
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-center text-xs text-muted-foreground">
         🔒 Secured by Razorpay | Real-time money deduction
       </p>
     </div>
