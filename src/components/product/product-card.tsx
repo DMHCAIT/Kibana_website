@@ -17,6 +17,8 @@ type Props = {
   className?: string;
   imageClassName?: string;
   href?: string;
+  displayName?: string;
+  displayImage?: string;
   priority?: boolean;
 };
 
@@ -26,6 +28,8 @@ export function ProductCard({
   className,
   imageClassName,
   href,
+  displayName,
+  displayImage,
   priority = false,
 }: Props) {
   const add = useCart((s) => s.add);
@@ -39,6 +43,8 @@ export function ProductCard({
 
   const pct = discountPct(product.price, product.compareAtPrice);
   const productHref = href ?? `/shop/${product.slug}`;
+  const cardName = displayName ?? product.name;
+  const cardImage = displayImage ?? product.image;
   const visibleColorVariants = product.colorVariants?.length
     ? product.colorVariants
     : product.colors.map((color) => ({
@@ -73,8 +79,8 @@ export function ProductCard({
         )}
       >
         <Image
-          src={product.image}
-          alt={product.name}
+          src={cardImage}
+          alt={cardName}
           fill
           priority={priority}
           loading={priority ? "eager" : "lazy"}
@@ -109,7 +115,7 @@ export function ProductCard({
           href={productHref}
           className="line-clamp-1 text-xs leading-snug hover:underline sm:text-sm md:text-base"
         >
-          {product.name}
+          {cardName}
         </Link>
         {variant !== "minimal" && (
           <div className="flex flex-wrap items-center gap-1">

@@ -10,13 +10,13 @@ const heroSlides = [
     mobile: "/mv/hero1.jpg.jpeg",
     desktop: "/mv/women-hero-desktop.jpg.jpeg",
     alt: "Women collection",
-    href: "/shop?gender=women",
+    href: "/shop?title=Featured%20Collection",
   },
   {
     mobile: "/mv/hero2.jpg.jpeg",
     desktop: "/mv/men-hero-desktop.jpg.jpeg",
     alt: "Men collection",
-    href: "/shop?title=Men%20Collection&gender=men",
+    href: "/shop?title=New%20Arrivals",
   },
 ];
 
