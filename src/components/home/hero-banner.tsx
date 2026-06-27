@@ -10,7 +10,7 @@ const heroSlides = [
     mobile: "/mv/hero1.jpg.jpeg",
     desktop: "/mv/women-hero-desktop.jpg.jpeg",
     alt: "Women collection",
-    href: "/shop?title=Featured%20Collection",
+    href: "/shop?slugs=valera-dome&title=Valera%20Dome",
   },
   {
     mobile: "/mv/hero2.jpg.jpeg",

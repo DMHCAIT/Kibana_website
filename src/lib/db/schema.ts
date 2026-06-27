@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  integer,
-  boolean,
-  real,
-  timestamp,
-  jsonb,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, real, timestamp, jsonb } from "drizzle-orm/pg-core";
 
 // ── Products ─────────────────────────────────────────────────────────────────
 export const products = pgTable("products", {
@@ -49,7 +41,16 @@ export const orders = pgTable("orders", {
   id: text("id").primaryKey(),
   user: jsonb("user").$type<{ name: string; phone?: string; email?: string; id?: string } | null>(),
   items: jsonb("items")
-    .$type<{ productId: string; name: string; price: number; quantity: number; image: string; color?: string }[]>()
+    .$type<
+      {
+        productId: string;
+        name: string;
+        price: number;
+        quantity: number;
+        image: string;
+        color?: string;
+      }[]
+    >()
     .notNull()
     .default([]),
   total: integer("total").notNull().default(0),
@@ -68,8 +69,8 @@ export const orders = pgTable("orders", {
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull().default(""),
-  email: text("email"),           // nullable — legacy phone-only rows have no email
-  phone: text("phone"),           // nullable — kept for legacy/order data
+  email: text("email"), // nullable — legacy phone-only rows have no email
+  phone: text("phone"), // nullable — kept for legacy/order data
   loginAt: timestamp("login_at", { withTimezone: true }).defaultNow().notNull(),
   loginCount: integer("login_count").notNull().default(1),
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow().notNull(),
@@ -87,6 +88,8 @@ export const otpSessions = pgTable("otp_sessions", {
   phone: text("phone").primaryKey(),
   // session ID returned by 2Factor.in (used to verify OTP via their API)
   twoFactorSessionId: text("two_factor_session_id"),
+  // active OTP code (email login/signup)
+  otp: text("otp"),
   // fallback OTP stored locally when no API key is configured (dev/test mode)
   devOtp: text("dev_otp"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),

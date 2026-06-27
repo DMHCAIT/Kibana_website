@@ -6,10 +6,11 @@ import { useRef, useState, useEffect } from "react";
 import type { Product } from "@/types/product";
 
 const DEFAULT_VIDEO_POOL = [
+  "/videos/compressed/IMG_3139.mp4",
   "/videos/compressed/Guneet_Kaur_Draft.mp4",
   "/videos/compressed/IMG_0765.mp4",
   "/videos/compressed/IMG_2924.mp4",
-  "/videos/compressed/IMG_3139.mp4",
+
   "/videos/compressed/IMG_3237.mp4",
   "/videos/compressed/IMG_3547.mp4",
   "/videos/compressed/IMG_4378.mp4",

@@ -4,12 +4,14 @@ import { Suspense } from "react";
 import { Check, Star } from "lucide-react";
 import { getProductBySlug, getProducts } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
+import { pickDefaultProductImage } from "@/lib/product-images";
 import { ProductGrid } from "@/components/product/product-grid";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
 import { WhatsAppShare } from "./whatsapp-share";
 import { ShopHeader } from "@/components/shop/shop-header";
+import { TrackProductView } from "@/components/analytics/track-product-view";
 import type { Product } from "@/types/product";
 
 export async function generateMetadata({
@@ -88,11 +90,101 @@ export default async function ProductDetailPage({
     product.colorVariants?.find((v) => v.slug === color) ?? product.colorVariants?.[0];
   const activeProductTitle = activeVariant?.productTitle || product.name;
   const activeStockQty = activeVariant?.stockQty;
-  const primaryImage = activeVariant?.image ?? product.image;
   const galleryImages = activeVariant?.gallery?.length
     ? activeVariant.gallery
     : (product.gallery ?? []);
-  const allImages = [primaryImage, ...galleryImages].filter(Boolean);
+  const valeraImageByColor: Record<string, string> = {
+    black: "06",
+    "forest-green": "02",
+    "milky-blue": "01",
+    "royal-blue": "06",
+  };
+  const cordiaImageByColor: Record<string, string> = {
+    black: "01",
+    "light-purple": "06",
+    "lime-yellow": "06",
+  };
+  const crescentImageByColor: Record<string, string> = {
+    "milky-blue": "01",
+    "turquoise-blue": "06",
+    wine: "05",
+  };
+  const primaryImage =
+    product.slug === "valera-dome" && activeVariant?.slug
+      ? (activeVariant.image?.replace(
+          /Image\d+\.webp$/i,
+          `Image${valeraImageByColor[activeVariant.slug] ?? "01"}.webp`,
+        ) ??
+        activeVariant.image ??
+        product.image)
+      : product.slug === "cordia-bag" && activeVariant?.slug
+        ? (activeVariant.image?.replace(
+            /Image\d+\.webp$/i,
+            `Image${cordiaImageByColor[activeVariant.slug] ?? "01"}.webp`,
+          ) ??
+          activeVariant.image ??
+          product.image)
+        : product.slug === "halo-mini" && activeVariant?.slug === "turquoise-blue"
+          ? (activeVariant.image?.replace(/Image\d+\.webp$/i, "Image02.webp") ??
+            activeVariant.image ??
+            product.image)
+          : product.slug === "crescent-sling-bag" && activeVariant?.slug
+            ? (activeVariant.image?.replace(
+                /Image\d+\.webp$/i,
+                `Image${crescentImageByColor[activeVariant.slug] ?? "01"}.webp`,
+              ) ??
+              activeVariant.image ??
+              product.image)
+            : product.slug === "business-laptop-briefcase" && activeVariant?.slug
+              ? (activeVariant.image?.replace(
+                  /\/\d+\.webp$/i,
+                  `/${activeVariant.slug === "black" ? "7" : activeVariant.slug === "tan" ? "4" : "1"}.webp`,
+                ) ??
+                activeVariant.image ??
+                product.image)
+              : product.slug === "sandesh-laptop-bag" && activeVariant?.slug === "tan"
+                ? (activeVariant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
+                  galleryImages[5] ??
+                  activeVariant.image ??
+                  product.image)
+                : product.slug === "sandesh-laptop-bag" && activeVariant?.slug === "teal-blue"
+                  ? (activeVariant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
+                    galleryImages[5] ??
+                    activeVariant.image ??
+                    product.image)
+                  : product.slug === "vistapack"
+                    ? (activeVariant?.image?.replace(
+                        /\/\d+\.webp$/i,
+                        `/${activeVariant?.slug === "tan" ? "6" : activeVariant?.slug === "milky-blue" ? "4" : activeVariant?.slug === "mint-green" || activeVariant?.slug === "teal-blue" ? "2" : "5"}.webp`,
+                      ) ??
+                      galleryImages[3] ??
+                      activeVariant?.image ??
+                      product.image)
+                    : product.slug === "lekha-wallet"
+                      ? (activeVariant.image?.replace(
+                          /\/\d+\.webp$/i,
+                          activeVariant?.slug === "wine" ? "/5.webp" : "/2.webp",
+                        ) ??
+                        galleryImages[0] ??
+                        activeVariant.image ??
+                        product.image)
+                      : product.slug === "zippy-wallet"
+                        ? (activeVariant?.image?.replace(/\/\d+\.webp$/i, "/1.webp") ??
+                          activeVariant?.image ??
+                          product.image)
+                        : product.slug === "prizma-sling-bag"
+                          ? (galleryImages[0] ?? activeVariant?.image ?? product.image)
+                          : pickDefaultProductImage(
+                              activeVariant?.image ?? product.image,
+                              galleryImages,
+                            );
+  const allImages = Array.from(
+    new Set(
+      product.slug === "lekha-wallet"
+        ? [primaryImage, activeVariant?.image, ...galleryImages].filter(Boolean)
+        : [primaryImage, ...galleryImages].filter(Boolean),
+    ),
+  );
 
   // Per-color content overrides (fall back to product-level if not set per-color)
   const activeDescription = activeVariant?.description || product.description;
@@ -108,6 +200,7 @@ export default async function ProductDetailPage({
 
   return (
     <>
+      <TrackProductView product={product} />
       <section className="container py-1 pb-16 sm:py-4 sm:pb-20 md:py-8 md:pb-8">
         <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-8 sm:px-4 md:px-8 lg:grid-cols-[minmax(0,620px)_1fr] lg:gap-12">
           {/* Gallery Column with Header */}

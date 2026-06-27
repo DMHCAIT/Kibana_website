@@ -12,19 +12,21 @@ const TREND_CARD_IMAGES: Record<string, string> = {
   p1: "/mv/Trend1.webp",
   p2: "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/7.webp",
   p7: "/mv/Trend3.webp",
-  p9: "/mv/Trend4.webp",
-  p10: "/mv/Trend5.webp",
-  p11: "/mv/Trend6.webp",
+  p9: "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image02.webp",
+  p10: "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image06.webp",
 };
 
 const TREND_CARD_LINKS: Record<string, string> = {
   p2: "/shop/prizma-sling-bag?color=teal-blue",
+  p7: "/shop/orwyn-backpack?color=tan",
+  p9: "/shop/valera-dome?color=forest-green",
+  p10: "/shop/cordia-bag?color=lime-yellow",
 };
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const trendingProducts = (propProducts ?? staticProducts)
-    .filter((p) => p.isTrending)
+    .filter((p) => p.isTrending && p.id !== "p11")
     .sort((a, b) => {
       const n = (id: string) => parseInt(id.replace(/\D/g, ""), 10) || 0;
       return n(a.id) - n(b.id);
@@ -56,7 +58,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
                 key={p.id}
                 href={TREND_CARD_LINKS[p.id] ?? `/shop/${p.slug}`}
                 data-card
-                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
+                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden bg-[#eef4f0] shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
                 style={{ scrollSnapAlign: "start" }}
               >
                 <Image
@@ -66,7 +68,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
                   priority={index === 0}
                   quality={70}
                   sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover object-center transition-transform duration-300"
                 />
                 {/* Overlay at bottom with product name */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent px-3 pb-4 pt-12 sm:px-4">

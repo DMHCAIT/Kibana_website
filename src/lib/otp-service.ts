@@ -1,10 +1,18 @@
 import postgres from "postgres";
 
 // Use the same PostgreSQL connection as the main database
-const sql = postgres(process.env.DATABASE_URL!, { 
+const sql = postgres(process.env.DATABASE_URL!, {
   ssl: "require",
-  max: 1 // Use pooler connection
+  max: 1, // Use pooler connection
 });
+const isDev = process.env.NODE_ENV === "development";
+
+type InMemoryOtp = {
+  otp: string;
+  expiresAt: Date;
+};
+
+const inMemoryOtpStore = new Map<string, InMemoryOtp>();
 
 // Generate 6-digit OTP
 export function generateOtp(): string {
@@ -14,30 +22,37 @@ export function generateOtp(): string {
 // Store OTP in PostgreSQL database
 export async function storeOtp(email: string, otp: string, expiresInMinutes = 10) {
   const cleanEmail = email.toLowerCase().trim();
-  
+
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes);
 
   try {
     console.log(`📝 Storing OTP for ${cleanEmail}, expires at ${expiresAt.toISOString()}`);
-    
+
     // Delete any existing OTP for this email first
     const deleteResult = await sql`
-      DELETE FROM email_otp_sessions 
-      WHERE email = ${cleanEmail}
+      DELETE FROM otp_sessions 
+      WHERE phone = ${cleanEmail}
     `;
     console.log(`📝 Deleted ${deleteResult.count || 0} old OTP records for ${cleanEmail}`);
 
     // Store OTP in database
     const insertResult = await sql`
-      INSERT INTO email_otp_sessions (email, otp, expires_at, created_at)
-      VALUES (${cleanEmail}, ${otp}, ${expiresAt.toISOString()}, NOW())
+      INSERT INTO otp_sessions (phone, otp, dev_otp, expires_at, created_at)
+      VALUES (${cleanEmail}, ${otp}, ${otp}, ${expiresAt.toISOString()}, NOW())
     `;
-    console.log(`✓ OTP stored successfully in database for ${cleanEmail}. Rows inserted: ${insertResult.count || 1}`);
+    console.log(
+      `✓ OTP stored successfully in database for ${cleanEmail}. Rows inserted: ${insertResult.count || 1}`,
+    );
   } catch (error) {
     console.error("✗ Error storing OTP:", error);
     console.error(`   Email: ${cleanEmail}`);
     console.error(`   OTP: ${otp}`);
+    if (isDev) {
+      // Local fallback when database is unavailable in development
+      inMemoryOtpStore.set(cleanEmail, { otp, expiresAt });
+      console.log(`✓ OTP stored in memory fallback for ${cleanEmail}`);
+    }
   }
 }
 
@@ -47,47 +62,62 @@ export async function getOtp(email: string): Promise<string | null> {
 
   try {
     console.log(`🔍 Getting OTP for ${cleanEmail}...`);
-    
+
     // Query database for valid OTP
     const result = await sql`
-      SELECT otp, expires_at 
-      FROM email_otp_sessions 
-      WHERE email = ${cleanEmail}
+      SELECT otp, dev_otp, expires_at 
+      FROM otp_sessions 
+      WHERE phone = ${cleanEmail}
       LIMIT 1
     `;
 
     console.log(`🔍 Query returned ${result.length} rows for ${cleanEmail}`);
 
     if (result.length === 0) {
-      console.log(`ℹ No OTP found for ${cleanEmail} - table might be empty or email not in database`);
+      console.log(
+        `ℹ No OTP found for ${cleanEmail} - table might be empty or email not in database`,
+      );
       return null;
     }
 
     const data = result[0];
-    console.log(`🔍 Found OTP record: otp_length=${data.otp?.length}, expires_at=${data.expires_at}`);
+    const resolvedOtp = data.otp || data.dev_otp;
+    console.log(
+      `🔍 Found OTP record: otp_length=${resolvedOtp?.length}, expires_at=${data.expires_at}`,
+    );
 
     // Check if expired
     const expiresAt = new Date(data.expires_at);
     const now = new Date();
     const isExpired = now > expiresAt;
-    console.log(`🔍 Expiry check: now=${now.toISOString()}, expires_at=${expiresAt.toISOString()}, expired=${isExpired}`);
-    
+    console.log(
+      `🔍 Expiry check: now=${now.toISOString()}, expires_at=${expiresAt.toISOString()}, expired=${isExpired}`,
+    );
+
     if (isExpired) {
       console.log(`ℹ OTP expired for ${cleanEmail}`);
       // Delete expired OTP
       await sql`
-        DELETE FROM email_otp_sessions 
-        WHERE email = ${cleanEmail}
+        DELETE FROM otp_sessions 
+        WHERE phone = ${cleanEmail}
       `;
       return null;
     }
 
     console.log(`✓ Returning valid OTP for ${cleanEmail}`);
-    return data.otp;
+    return resolvedOtp;
   } catch (error) {
     console.error("✗ Error getting OTP:", error);
     console.error(`   Email: ${cleanEmail}`);
-    return null;
+    if (!isDev) return null;
+    const inMemoryOtp = inMemoryOtpStore.get(cleanEmail);
+    if (!inMemoryOtp) return null;
+    if (new Date() > inMemoryOtp.expiresAt) {
+      inMemoryOtpStore.delete(cleanEmail);
+      return null;
+    }
+    console.log(`✓ Using in-memory OTP fallback for ${cleanEmail}`);
+    return inMemoryOtp.otp;
   }
 }
 
@@ -107,12 +137,13 @@ export async function verifyOtp(email: string, otp: string): Promise<boolean> {
   if (stored === cleanOtp) {
     try {
       await sql`
-        DELETE FROM email_otp_sessions 
-        WHERE email = ${cleanEmail}
+        DELETE FROM otp_sessions 
+        WHERE phone = ${cleanEmail}
       `;
       console.log(`✓ OTP verified and deleted for ${cleanEmail}`);
     } catch (error) {
       console.error("✗ Error deleting OTP:", error);
+      if (isDev) inMemoryOtpStore.delete(cleanEmail);
     }
     return true;
   }
@@ -127,11 +158,12 @@ export async function clearOtp(email: string) {
 
   try {
     await sql`
-      DELETE FROM email_otp_sessions 
-      WHERE email = ${cleanEmail}
+      DELETE FROM otp_sessions 
+      WHERE phone = ${cleanEmail}
     `;
     console.log(`✓ OTP cleared for ${cleanEmail}`);
   } catch (error) {
     console.error("✗ Error clearing OTP:", error);
+    if (isDev) inMemoryOtpStore.delete(cleanEmail);
   }
 }

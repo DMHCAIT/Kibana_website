@@ -40,6 +40,7 @@ export function NewArrivals({ products }: { products: Product[] }) {
               product={p}
               variant="minimal"
               href={NEW_ARRIVALS_REDIRECTS[p.id] ?? `/shop/${p.slug}`}
+              displayImage={NEW_ARRIVALS_OLD_IMAGES[p.id] ?? p.image}
             />
           ))}
         </div>

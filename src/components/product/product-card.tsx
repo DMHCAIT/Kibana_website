@@ -7,6 +7,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { cn, discountPct, formatINR } from "@/lib/utils";
+import { pickDefaultProductImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { useAuth } from "@/store/auth-store";
@@ -44,7 +45,7 @@ export function ProductCard({
   const pct = discountPct(product.price, product.compareAtPrice);
   const productHref = href ?? `/shop/${product.slug}`;
   const cardName = displayName ?? product.name;
-  const cardImage = displayImage ?? product.image;
+  const cardImage = displayImage ?? pickDefaultProductImage(product.image, product.gallery ?? []);
   const visibleColorVariants = product.colorVariants?.length
     ? product.colorVariants
     : product.colors.map((color) => ({

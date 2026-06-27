@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { useWishlist } from "@/store/wishlist-store";
 import { useCart } from "@/store/cart-store";
 import { useProductCache } from "@/store/product-cache";
+import { trackLogin, trackSignUp } from "@/lib/analytics";
 
 export type AuthUser = {
   id: string;
@@ -34,14 +35,14 @@ type AuthState = {
     email: string,
     mode: "login" | "signup",
     phone?: string,
-    name?: string
+    name?: string,
   ) => Promise<{ error?: string; isNewUser?: boolean }>;
 
   /** Verify OTP from email. For new users also saves name and phone. */
   verifyOtp: (
     email: string,
     otp: string,
-    signupData?: { name: string; phone: string }
+    signupData?: { name: string; phone: string },
   ) => Promise<{ error?: string }>;
 
   logout: () => Promise<void>;
@@ -55,8 +56,7 @@ export const useAuth = create<AuthState>()((set) => ({
 
   setHasHydrated: (v) => set({ _hasHydrated: v }),
 
-  openAuthModal: (message = "") =>
-    set({ showAuthModal: true, authModalMessage: message }),
+  openAuthModal: (message = "") => set({ showAuthModal: true, authModalMessage: message }),
 
   closeAuthModal: () => {
     if (typeof window !== "undefined") {
@@ -101,7 +101,7 @@ export const useAuth = create<AuthState>()((set) => ({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: cleanEmail }),
           });
-          const data = await res.json() as { exists?: boolean };
+          const data = (await res.json()) as { exists?: boolean };
           if (data.exists) {
             return { error: "already_exists" };
           }
@@ -116,7 +116,7 @@ export const useAuth = create<AuthState>()((set) => ({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: cleanEmail }),
           });
-          const data = await res.json() as { exists?: boolean };
+          const data = (await res.json()) as { exists?: boolean };
           if (!data.exists) {
             return { error: "not_found" };
           }
@@ -136,7 +136,7 @@ export const useAuth = create<AuthState>()((set) => ({
         }),
       });
 
-      const data = await res.json() as { error?: string };
+      const data = (await res.json()) as { error?: string };
       if (!res.ok || data.error) {
         return { error: data.error || "Failed to send verification code" };
       }
@@ -159,14 +159,16 @@ export const useAuth = create<AuthState>()((set) => ({
         body: JSON.stringify({
           email: cleanEmail,
           otp: otp.trim(),
-          signupData: signupData ? {
-            name: signupData.name.trim(),
-            phone: signupData.phone.trim()
-          } : undefined
+          signupData: signupData
+            ? {
+                name: signupData.name.trim(),
+                phone: signupData.phone.trim(),
+              }
+            : undefined,
         }),
       });
 
-      const data = await response.json() as { error?: string; user?: AuthUser };
+      const data = (await response.json()) as { error?: string; user?: AuthUser };
       if (!response.ok || data.error) {
         return { error: data.error || "Verification failed" };
       }
@@ -179,6 +181,12 @@ export const useAuth = create<AuthState>()((set) => ({
           useWishlist.getState().loadForUser(data.user.id),
           useCart.getState().loadForUser(data.user.id),
         ]);
+
+        if (signupData) {
+          trackSignUp(data.user.id);
+        } else {
+          trackLogin(data.user.id);
+        }
 
         // Record login in admin users panel (fire-and-forget)
         fetch("/api/admin/users", {
@@ -201,12 +209,10 @@ export const useAuth = create<AuthState>()((set) => ({
     } catch {
       // Ignore errors
     }
-    
+
     // Clear user-scoped wishlist and cart so guest sees empty state
     useWishlist.getState().clearForUser();
     useCart.getState().clearForUser();
     set({ user: null });
   },
 }));
-
-

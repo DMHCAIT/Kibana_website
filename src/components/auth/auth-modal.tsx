@@ -55,6 +55,7 @@ export function AuthModal() {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setError("");
 
     const cleaned = email.trim().toLowerCase();
@@ -70,7 +71,7 @@ export function AuthModal() {
       setError("Please enter your phone number.");
       return;
     }
-    if (tab === "signup" && !acceptedPolicy) {
+    if (!acceptedPolicy) {
       setError("Please accept Privacy Policy and T&Cs to continue.");
       return;
     }
@@ -117,6 +118,7 @@ export function AuthModal() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setError("");
 
     const otpString = otp.join("");
@@ -179,6 +181,7 @@ export function AuthModal() {
 
   const handleResend = async () => {
     if (resendCooldown > 0) return;
+    if (loading) return;
     setError("");
     setOtp(["", "", "", "", "", ""]);
     setLoading(true);
@@ -241,7 +244,6 @@ export function AuthModal() {
                     onClick={() => {
                       setTab(t);
                       setError("");
-                      if (t === "login") setAcceptedPolicy(false);
                     }}
                     className={cn(
                       "flex-1 pb-2 text-sm font-medium tracking-wide transition-colors",
@@ -302,19 +304,17 @@ export function AuthModal() {
                   />
                 </div>
 
-                {tab === "signup" && (
-                  <label className="flex items-start gap-2 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={acceptedPolicy}
-                      onChange={(e) => setAcceptedPolicy(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 accent-gray-900"
-                    />
-                    <span>
-                      I accept that I have read &amp; understood your Privacy Policy and T&amp;Cs.
-                    </span>
-                  </label>
-                )}
+                <label className="flex items-start gap-2 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={acceptedPolicy}
+                    onChange={(e) => setAcceptedPolicy(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-gray-900"
+                  />
+                  <span>
+                    I accept that I have read &amp; understood your Privacy Policy and T&amp;Cs.
+                  </span>
+                </label>
 
                 {error && (
                   <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">

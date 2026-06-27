@@ -88,9 +88,9 @@ export async function getProducts(): Promise<Product[]> {
   }
 
   const rows = await withTimeout(
-    db.select().from(productsTable).orderBy(asc(productsTable.sortOrder))
+    db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
-  const result = rows ? rows.map(rowToProduct) : localProducts;
+  const result = rows && rows.length > 0 ? rows.map(rowToProduct) : localProducts;
   setCached("products", result, 60000); // Cache for 1 minute
   return result;
 }
@@ -98,10 +98,7 @@ export async function getProducts(): Promise<Product[]> {
 export async function getProduct(id: string): Promise<Product | undefined> {
   if (!hasDatabase) return localProducts.find((p) => p.id === id);
   try {
-    const [row] = await db
-      .select()
-      .from(productsTable)
-      .where(eq(productsTable.id, id));
+    const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
     if (row) return rowToProduct(row);
     return localProducts.find((p) => p.id === id);
   } catch {
@@ -112,10 +109,7 @@ export async function getProduct(id: string): Promise<Product | undefined> {
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   if (!hasDatabase) return localProducts.find((p) => p.slug === slug);
   try {
-    const [row] = await db
-      .select()
-      .from(productsTable)
-      .where(eq(productsTable.slug, slug));
+    const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
     if (row) return rowToProduct(row);
     return localProducts.find((p) => p.slug === slug);
   } catch {
@@ -123,7 +117,9 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   }
 }
 
-export async function saveProduct(product: Product & { order?: number; video?: string; inStock?: boolean }): Promise<void> {
+export async function saveProduct(
+  product: Product & { order?: number; video?: string; inStock?: boolean },
+): Promise<void> {
   const row = {
     id: product.id,
     slug: product.slug,
@@ -165,8 +161,8 @@ export async function reorderProducts(orderedIds: string[]): Promise<void> {
       db
         .update(productsTable)
         .set({ sortOrder: i + 1 })
-        .where(eq(productsTable.id, id))
-    )
+        .where(eq(productsTable.id, id)),
+    ),
   );
 }
 
@@ -186,7 +182,7 @@ function rowToCategory(row: typeof categoriesTable.$inferSelect): AdminCategory 
 export async function getCategories(): Promise<AdminCategory[]> {
   if (!hasDatabase) return localCategories as AdminCategory[];
   const rows = await withTimeout(
-    db.select().from(categoriesTable).orderBy(asc(categoriesTable.sortOrder))
+    db.select().from(categoriesTable).orderBy(asc(categoriesTable.sortOrder)),
   );
   return rows && rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
 }
@@ -209,8 +205,8 @@ export async function reorderCategories(orderedSlugs: string[]): Promise<void> {
       db
         .update(categoriesTable)
         .set({ sortOrder: i + 1 })
-        .where(eq(categoriesTable.slug, slug))
-    )
+        .where(eq(categoriesTable.slug, slug)),
+    ),
   );
 }
 
@@ -321,14 +317,18 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   if (!hasDatabase) return fallback;
   try {
     const result = await withTimeout(
-      db.select().from(siteConfigTable).where(eq(siteConfigTable.key, "config"))
+      db.select().from(siteConfigTable).where(eq(siteConfigTable.key, "config")),
     );
     if (!result) return fallback;
     const [row] = result;
     if (!row) return fallback;
     const cfg = row.value as unknown as SiteConfig & {
       pages?: {
-        contact?: { instagram?: string; twitter?: string; socialLinks?: SiteConfig["pages"]["contact"]["socialLinks"] };
+        contact?: {
+          instagram?: string;
+          twitter?: string;
+          socialLinks?: SiteConfig["pages"]["contact"]["socialLinks"];
+        };
       };
     };
     // Migrate legacy instagram/twitter fields to socialLinks
@@ -337,10 +337,20 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       if (!c.socialLinks) {
         c.socialLinks = [];
         if ((c as { instagram?: string }).instagram) {
-          c.socialLinks.push({ id: "sl_ig", platform: "Instagram", url: (c as { instagram?: string }).instagram!, label: "Follow us on Instagram" });
+          c.socialLinks.push({
+            id: "sl_ig",
+            platform: "Instagram",
+            url: (c as { instagram?: string }).instagram!,
+            label: "Follow us on Instagram",
+          });
         }
         if ((c as { twitter?: string }).twitter) {
-          c.socialLinks.push({ id: "sl_tw", platform: "Twitter / X", url: (c as { twitter?: string }).twitter!, label: "Follow us on Twitter" });
+          c.socialLinks.push({
+            id: "sl_tw",
+            platform: "Twitter / X",
+            url: (c as { twitter?: string }).twitter!,
+            label: "Follow us on Twitter",
+          });
         }
       }
     }
@@ -474,7 +484,7 @@ export async function recordUserLogin(user: {
       registeredAt: now,
     });
   }
-  
+
   // Invalidate cache
   dataCache.delete("users");
 }
@@ -554,28 +564,22 @@ export async function saveOrder(order: AdminOrder): Promise<void> {
     trackingId: order.trackingId ?? null,
     placedAt: new Date(order.placedAt),
   };
-  await db
-    .insert(ordersTable)
-    .values(row)
-    .onConflictDoUpdate({ target: ordersTable.id, set: row });
-  
+  await db.insert(ordersTable).values(row).onConflictDoUpdate({ target: ordersTable.id, set: row });
+
   // Invalidate cache
   dataCache.delete("orders");
 }
 
-export async function updateOrderStatus(
-  id: string,
-  status: AdminOrder["status"]
-): Promise<void> {
+export async function updateOrderStatus(id: string, status: AdminOrder["status"]): Promise<void> {
   await db.update(ordersTable).set({ status }).where(eq(ordersTable.id, id));
-  
+
   // Invalidate cache
   dataCache.delete("orders");
 }
 
 export async function deleteOrder(id: string): Promise<void> {
   await db.delete(ordersTable).where(eq(ordersTable.id, id));
-  
+
   // Invalidate cache
   dataCache.delete("orders");
 }
@@ -627,7 +631,7 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
         .from(userCartTable)
         .innerJoin(usersTable, eq(userCartTable.userId, usersTable.id))
         .innerJoin(productsTable, eq(userCartTable.productId, productsTable.id))
-        .orderBy(desc(userCartTable.addedAt))
+        .orderBy(desc(userCartTable.addedAt)),
     );
 
     if (!rows) {

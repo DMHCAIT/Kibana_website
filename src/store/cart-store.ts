@@ -4,6 +4,7 @@ import { create } from "zustand";
 import type { Product } from "@/types/product";
 import { useAuth } from "@/store/auth-store";
 import { useProductCache } from "@/store/product-cache";
+import { trackAddToCart } from "@/lib/analytics";
 
 export type CartItem = {
   product: Product;
@@ -33,16 +34,17 @@ export const useCart = create<CartState>()((set, get) => ({
     // Get the current user from auth store
     const user = useAuth.getState().user;
     if (!user) return;
-    
+
     // OPTIMISTIC UPDATE: Update UI immediately
     const state = get();
     const existing = state.items.find((i) => i.product.id === product.id);
     const next = existing
       ? state.items.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i
+          i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
         )
       : [...state.items, { product, quantity }];
     set({ items: next });
+    trackAddToCart(product, quantity);
 
     // SYNC WITH SERVER in background (fire and forget)
     fetch("/api/cart", {
@@ -63,11 +65,9 @@ export const useCart = create<CartState>()((set, get) => ({
     set({ items: next });
 
     // SYNC WITH SERVER in background
-    fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch(
-      (error) => {
-        console.error("Failed to sync cart to server:", error);
-      }
-    );
+    fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch((error) => {
+      console.error("Failed to sync cart to server:", error);
+    });
   },
 
   setQuantity: async (productId, quantity) => {
@@ -76,18 +76,15 @@ export const useCart = create<CartState>()((set, get) => ({
 
     // OPTIMISTIC UPDATE: Update quantity immediately
     const next = get()
-      .items
-      .map((i) => (i.product.id === productId ? { ...i, quantity } : i))
+      .items.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
       .filter((i) => i.quantity > 0);
     set({ items: next });
 
     // SYNC WITH SERVER in background
     if (quantity === 0) {
-      fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch(
-        (error) => {
-          console.error("Failed to sync cart to server:", error);
-        }
-      );
+      fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch((error) => {
+        console.error("Failed to sync cart to server:", error);
+      });
     } else {
       fetch("/api/cart", {
         method: "PUT",
