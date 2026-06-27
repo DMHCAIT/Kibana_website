@@ -16,7 +16,7 @@ const heroSlides = [
     mobile: "/mv/hero2.jpg.jpeg",
     desktop: "/mv/men-hero-desktop.jpg.jpeg",
     alt: "Men collection",
-    href: "/shop?title=New%20Arrivals",
+    href: "/shop?cat=laptop-bag&slugs=business-laptop-briefcase&title=Laptop%20Bag%20Collection",
   },
 ];
 

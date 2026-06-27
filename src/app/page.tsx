@@ -59,7 +59,7 @@ function sectionProducts(
     case "most-trending":
       return allProducts.filter((p) => p.isTrending).slice(0, 8);
     case "style-in-motion":
-      return allProducts.slice(0, 6);
+      return allProducts;
     default:
       return [];
   }
@@ -94,14 +94,9 @@ export default async function HomePage() {
         if (!render) return null;
         const sectionProds = sectionProducts(products, s.id, pinned);
         const bg = i % 2 === 0 ? "bg-white" : "bg-[#fdf8f3]";
-        const spacing = s.id === "new-arrivals" ? "py-4 md:py-8" : "";
-        const borderClass =
-          s.id === "best-sellers"
-            ? "border-b border-stone-100"
-            : "border-t border-b border-stone-100";
-        const marginClass = s.id === "best-sellers" ? "-mt-px" : "";
+        const wrapperClass = s.id === "new-arrivals" ? "" : bg;
         return (
-          <div key={s.id} className={`${bg} ${borderClass} ${spacing} ${marginClass}`}>
+          <div key={s.id} className={wrapperClass}>
             {render(sectionProds)}
           </div>
         );

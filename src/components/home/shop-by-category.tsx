@@ -4,6 +4,8 @@ import { categories as staticCategories } from "@/lib/data";
 import { SectionHeading } from "./section-heading";
 
 type Cat = { slug: string; name: string; image: string };
+const LEKHA_WALLET_IMAGE =
+  "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/1.webp";
 
 export function ShopByCategory({ categories }: { categories?: Cat[] }) {
   const cats = categories ?? staticCategories;
@@ -35,24 +37,34 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
                 </span>
               </Link>
             ) : (
-              <Link
-                key={c.slug}
-                href={`/shop?cat=${c.slug}`}
-                className="group flex flex-col items-center gap-1 text-center"
-              >
-                <span className="relative aspect-square w-full overflow-hidden rounded-lg bg-kibana-cream">
-                  <Image
-                    src={c.image}
-                    alt={c.name}
-                    fill
-                    sizes="(max-width: 640px) 40vw, 28vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </span>
-                <span className="text-center text-xs leading-tight sm:text-sm md:text-base">
-                  {c.name}
-                </span>
-              </Link>
+              (() => {
+                const isClutch = c.slug === "clutch";
+                const href = isClutch
+                  ? "/shop?slugs=lekha-wallet&title=Lekha%20Wallet"
+                  : `/shop?cat=${c.slug}`;
+                const image = isClutch ? LEKHA_WALLET_IMAGE : c.image;
+                const name = isClutch ? "Lekha Wallet" : c.name;
+                return (
+                  <Link
+                    key={c.slug}
+                    href={href}
+                    className="group flex flex-col items-center gap-1 text-center"
+                  >
+                    <span className="relative aspect-square w-full overflow-hidden rounded-lg bg-kibana-cream">
+                      <Image
+                        src={image}
+                        alt={name}
+                        fill
+                        sizes="(max-width: 640px) 40vw, 28vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </span>
+                    <span className="text-center text-xs leading-tight sm:text-sm md:text-base">
+                      {name}
+                    </span>
+                  </Link>
+                );
+              })()
             ),
           )}
         </div>

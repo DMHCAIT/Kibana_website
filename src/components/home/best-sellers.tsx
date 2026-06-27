@@ -21,9 +21,9 @@ export function BestSellers({
   const bannerImage = config?.leftImage || "/mv/best-seller-B.jpg.jpeg";
 
   return (
-    <section className="w-full bg-[#eef4f0] py-2 md:py-6">
+    <section className="w-full bg-[#f5f0e8] py-2 md:py-6">
       <div className="container">
-        <SectionHeading title="Best Sellers" className="font-bold uppercase tracking-[0.15em]" />
+        <SectionHeading title="Best Sellers" />
 
         {/* Full-width banner — aspect matches image's natural 1816×866 ratio on mobile */}
         <Link

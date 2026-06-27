@@ -40,6 +40,22 @@ type ProductListItem = {
 
 function getShopDisplayImage(product: Product, variant: Product["colorVariants"][number]) {
   if (product.slug === "prizma-sling-bag") {
+    if (variant.slug === "teal-blue") {
+      return (
+        variant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
+        variant.gallery?.[5] ??
+        variant.image ??
+        product.image
+      );
+    }
+    if (variant.slug === "tan") {
+      return (
+        variant.image?.replace(/\/\d+\.webp$/i, "/4.webp") ??
+        variant.gallery?.[2] ??
+        variant.image ??
+        product.image
+      );
+    }
     return variant.gallery?.[0] ?? product.gallery?.[0] ?? variant.image ?? product.image;
   }
 
@@ -121,6 +137,30 @@ function getShopDisplayImage(product: Product, variant: Product["colorVariants"]
     return variant.image?.replace(/\/\d+\.webp$/i, "/1.webp") ?? variant.image ?? product.image;
   }
 
+  if (product.slug === "vistara-tote-bag") {
+    if (["milky-blue", "mint-green", "teal-blue", "tan"].includes(variant.slug)) {
+      return (
+        variant.image?.replace(/[^/]+$/i, "Artboard%201_result.webp") ??
+        variant.gallery?.find((img) => img.includes("Artboard%201_result.webp")) ??
+        variant.image ??
+        product.image
+      );
+    }
+  }
+
+  if (product.slug === "large-aurelia-fan-tote") {
+    if (variant.slug === "mocha") {
+      return "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp";
+    }
+    if (variant.slug === "wine") {
+      return "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/02-04-2026--paulina06342_result.webp";
+    }
+  }
+
+  if (product.slug === "mini-aurelia-fan-tote" && variant.slug === "mocha") {
+    return "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/1.webp";
+  }
+
   if (product.slug === "sandesh-laptop-bag" && variant.slug === "tan") {
     return (
       variant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ?? variant.gallery?.[5] ?? variant.image
@@ -138,10 +178,12 @@ function getShopDisplayImage(product: Product, variant: Product["colorVariants"]
       variant.slug === "tan"
         ? "6"
         : variant.slug === "milky-blue"
-          ? "4"
-          : variant.slug === "mint-green" || variant.slug === "teal-blue"
-            ? "2"
-            : "5";
+          ? "1"
+          : variant.slug === "mint-green"
+            ? "6"
+            : variant.slug === "teal-blue"
+              ? "2"
+              : "5";
     const colorImage = variant.image?.replace(/\/\d+\.webp$/i, `/${targetImageNumber}.webp`);
     return (
       colorImage ??
@@ -170,7 +212,11 @@ function toVariantListingItems(product: Product): ProductListItem[] {
       key: `${product.id}-${variant.slug}`,
       product,
       href: `/shop/${product.slug}?color=${variant.slug}`,
-      displayName: variant.productTitle || `${product.name} - ${variant.color}`,
+      displayName:
+        (product.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
+        product.slug === "mini-aurelia-fan-tote"
+          ? "Mini Aurelia Fan Tote"
+          : variant.productTitle || `${product.name} - ${variant.color}`,
       displayImage: getShopDisplayImage(product, variant),
     }));
 }

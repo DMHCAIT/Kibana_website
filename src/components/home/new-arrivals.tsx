@@ -31,8 +31,8 @@ export function NewArrivals({ products }: { products: Product[] }) {
     .map((p) => ({ ...p, image: NEW_ARRIVALS_OLD_IMAGES[p.id] ?? p.image }));
   return (
     <section className="w-full bg-[#f5f0e8]">
-      <div className="container py-2 md:py-6">
-        <SectionHeading title="Shop by New Arrivals" className="pt-2 sm:pt-4" />
+      <div className="container py-3 md:py-7">
+        <SectionHeading title="Shop by New Arrivals" className="pt-2 md:pt-3" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {items.map((p) => (
             <ProductCard

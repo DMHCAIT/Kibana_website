@@ -3,117 +3,33 @@
 import { SectionHeading } from "./section-heading";
 import { Truck, Zap, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import type { Product } from "@/types/product";
-
-const DEFAULT_VIDEO_POOL = [
-  "/videos/compressed/IMG_3139.mp4",
-  "/videos/compressed/Guneet_Kaur_Draft.mp4",
-  "/videos/compressed/IMG_0765.mp4",
-  "/videos/compressed/IMG_2924.mp4",
-
-  "/videos/compressed/IMG_3237.mp4",
-  "/videos/compressed/IMG_3547.mp4",
-  "/videos/compressed/IMG_4378.mp4",
-  "/videos/compressed/IMG_4481.mp4",
-  "/videos/compressed/IMG_4484.mp4",
-  "/videos/compressed/IMG_4513.mp4",
-  "/videos/compressed/IMG_5514.mp4",
-  "/videos/compressed/IMG_5878.mp4",
-  "/videos/compressed/01_KIBANA_BAG_4K_F.mp4",
-  "/videos/compressed/Sony_Kibana_Compressed.mp4",
-  "/videos/compressed/IMG_8582.mp4",
-];
 
 const FALLBACK_TILES: { alt: string; label: string; href: string; video?: string }[] = [
   {
-    alt: "Kibana style in motion 4",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/Guneet_Kaur_Draft.mp4",
+    alt: "Sandesh Laptop Bag",
+    label: "Sandesh Laptop Bag",
+    href: "/shop/sandesh-laptop-bag",
+    video: "/videos/compressed/Sandesh%20Laptop%20bag.mp4",
   },
   {
-    alt: "Kibana style in motion 5",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_0765.mp4",
+    alt: "Vistara Tote Bag",
+    label: "Vistara Tote Bag",
+    href: "/shop/vistara-tote-bag",
+    video: "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
   },
   {
-    alt: "Kibana style in motion 6",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_2924.mp4",
+    alt: "Prizma Sling Bag",
+    label: "Prizma Sling Bag",
+    href: "/shop/prizma-sling-bag",
+    video: "/videos/compressed/PRIZMA%20SLING.mp4",
   },
   {
-    alt: "Kibana style in motion 7",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_3139.mp4",
-  },
-  {
-    alt: "Kibana style in motion 8",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_3237.mp4",
-  },
-  {
-    alt: "Kibana style in motion 9",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_3547.mp4",
-  },
-  {
-    alt: "Kibana style in motion 10",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_4378.mp4",
-  },
-  {
-    alt: "Kibana style in motion 11",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_4481.mp4",
-  },
-  {
-    alt: "Kibana style in motion 12",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_4484.mp4",
-  },
-  {
-    alt: "Kibana style in motion 13",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_4513.mp4",
-  },
-  {
-    alt: "Kibana style in motion 14",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_5514.mp4",
-  },
-  {
-    alt: "Kibana style in motion 15",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_5878.mp4",
-  },
-  {
-    alt: "Kibana style in motion 1",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/01_KIBANA_BAG_4K_F.mp4",
-  },
-  {
-    alt: "Kibana style in motion 2",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/Sony_Kibana_Compressed.mp4",
-  },
-  {
-    alt: "Kibana style in motion 3",
-    label: "KIBANA",
-    href: "/shop",
-    video: "/videos/compressed/IMG_8582.mp4",
+    alt: "Halo Mini",
+    label: "Halo Mini",
+    href: "/shop/halo-mini",
+    video: "/videos/compressed/HALO%20MINI%20Optimized.mp4",
   },
 ];
 
@@ -124,10 +40,23 @@ const badges = [
 ];
 
 type Tile = { alt: string; label: string; href: string; video?: string };
+const PRIORITY_SLUGS = [
+  "sandesh-laptop-bag",
+  "vistara-tote-bag",
+  "prizma-sling-bag",
+  "halo-mini",
+] as const;
+
+const VIDEO_BY_SLUG: Record<(typeof PRIORITY_SLUGS)[number], string> = {
+  "sandesh-laptop-bag": "/videos/compressed/Sandesh%20Laptop%20bag.mp4",
+  "vistara-tote-bag": "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
+  "prizma-sling-bag": "/videos/compressed/PRIZMA%20SLING.mp4",
+  "halo-mini": "/videos/compressed/HALO%20MINI%20Optimized.mp4",
+};
 
 /** Individual card: autoplays while visible and keeps original tile size/layout */
 function TileCard({ tile }: { tile: Tile }) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLAnchorElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInView, setIsInView] = useState(false);
 
@@ -159,17 +88,17 @@ function TileCard({ tile }: { tile: Tile }) {
   }, [isInView, tile.video]);
 
   return (
-    <div
+    <Link
+      href={tile.href}
       ref={cardRef}
       data-card
-      className="group relative block h-[330px] w-[180px] flex-shrink-0 snap-start overflow-hidden rounded-xl bg-kibana-cream shadow-lg transition-all duration-300 hover:shadow-2xl sm:h-[420px] sm:w-[230px]"
+      className="group relative block aspect-[9/16] w-[180px] shrink-0 snap-start overflow-hidden rounded-xl bg-kibana-cream shadow-lg transition-all duration-300 hover:shadow-2xl sm:w-[230px] lg:w-auto lg:flex-1"
     >
       {tile.video && (
         <video
           ref={videoRef}
           src={tile.video}
           muted
-          autoPlay
           loop
           playsInline
           preload="none"
@@ -184,7 +113,7 @@ function TileCard({ tile }: { tile: Tile }) {
           {tile.label}
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -203,12 +132,18 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
 
   const tiles: Tile[] =
     products.length > 0
-      ? products.map((p, index) => ({
-          alt: p.name,
-          label: p.name,
-          href: `/shop/${p.slug}`,
-          video: p.video || DEFAULT_VIDEO_POOL[index % DEFAULT_VIDEO_POOL.length],
-        }))
+      ? PRIORITY_SLUGS.flatMap((slug) => {
+          const product = products.find((p) => p.slug === slug);
+          if (!product) return [];
+          return [
+            {
+              alt: product.name,
+              label: product.name,
+              href: `/shop/${product.slug}`,
+              video: VIDEO_BY_SLUG[slug],
+            },
+          ];
+        })
       : FALLBACK_TILES;
 
   return (

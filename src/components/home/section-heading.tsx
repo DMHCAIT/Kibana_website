@@ -12,7 +12,7 @@ export function SectionHeading({
   return (
     <h2
       className={cn(
-        "font-bold uppercase tracking-[0.15em] text-base sm:text-lg pt-3 sm:pt-4 mb-4 sm:mb-6 text-foreground",
+        "mb-5 text-lg font-bold uppercase leading-tight tracking-[0.15em] text-foreground sm:mb-6 sm:text-xl md:text-[22px]",
         align === "center" && "text-center",
         className,
       )}

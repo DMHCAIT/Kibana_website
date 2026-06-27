@@ -88,7 +88,12 @@ export function ProductCard({
           fetchPriority={priority ? "high" : "auto"}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           quality={70}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className={cn(
+            "transition-transform duration-500",
+            variant === "full"
+              ? "scale-[1.08] object-contain group-hover:scale-[1.11]"
+              : "object-cover group-hover:scale-105",
+          )}
         />
         {/* Discount badge — top left on image */}
         {pct > 0 && variant !== "minimal" && (
