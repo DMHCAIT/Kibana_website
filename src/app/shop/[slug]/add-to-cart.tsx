@@ -37,41 +37,53 @@ export function AddToCartButton({ product }: { product: Product }) {
     }
   }
 
-  function handleAddToCart() {
-    add(product, qty);
+  async function handleAddToCart() {
+    if (!user) {
+      openAuthModal("Please log in to add items to your cart.");
+      return;
+    }
+    await add(product, qty);
     setAddedNotification(true);
     setTimeout(() => setAddedNotification(false), 4000);
   }
 
   return (
-    <div className="space-y-4 w-full min-w-0">
+    <div className="w-full min-w-0 space-y-4">
       {/* Added to cart notification */}
       {addedNotification && (
-        <div className="fixed bottom-6 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-white border border-border shadow-xl rounded-xl p-4 flex gap-3 items-start animate-in slide-in-from-bottom-4 duration-300">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mt-0.5">
+        <div className="fixed bottom-24 right-4 z-50 flex w-[calc(100vw-2rem)] max-w-sm items-start gap-3 rounded-xl border border-border bg-white p-4 shadow-xl duration-300 animate-in slide-in-from-bottom-4 sm:bottom-6">
+          <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
             <Check className="h-4 w-4 text-emerald-700" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground">Added to cart!</p>
             <div className="mt-1.5 flex items-center gap-2.5">
               <div className="relative h-10 w-9 shrink-0 overflow-hidden rounded bg-muted">
-                <Image src={product.image} alt={product.name} fill sizes="36px" className="object-cover" />
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium truncate">{product.name}</p>
-                <p className="text-xs text-muted-foreground">Qty: {qty} · {formatINR(product.price * qty)}</p>
+                <p className="truncate text-xs font-medium">{product.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  Qty: {qty} · {formatINR(product.price * qty)}
+                </p>
               </div>
             </div>
             <div className="mt-3 flex gap-2">
               <Link
                 href="/cart"
-                className="flex-1 text-center text-xs font-semibold bg-foreground text-background px-3 py-2 rounded hover:bg-foreground/90 transition-colors"
+                className="flex-1 rounded bg-foreground px-3 py-2 text-center text-xs font-semibold text-background transition-colors hover:bg-foreground/90"
               >
                 View Cart
               </Link>
               <Link
                 href="/checkout"
-                className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold bg-kibana-tan text-white px-3 py-2 rounded hover:bg-kibana-tan/90 transition-colors"
+                className="flex flex-1 items-center justify-center gap-1 rounded bg-kibana-tan px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-kibana-tan/90"
               >
                 Checkout <ArrowRight className="h-3 w-3" />
               </Link>
@@ -80,7 +92,7 @@ export function AddToCartButton({ product }: { product: Product }) {
           <button
             type="button"
             onClick={() => setAddedNotification(false)}
-            className="text-muted-foreground hover:text-foreground flex-shrink-0"
+            className="flex-shrink-0 text-muted-foreground hover:text-foreground"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
@@ -97,18 +109,16 @@ export function AddToCartButton({ product }: { product: Product }) {
           <button
             type="button"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="px-3 py-2 hover:bg-muted transition-colors"
+            className="px-3 py-2 transition-colors hover:bg-muted"
             aria-label="Decrease quantity"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <span className="px-5 py-2 text-sm font-medium min-w-[3rem] text-center">
-            {qty}
-          </span>
+          <span className="min-w-[3rem] px-5 py-2 text-center text-sm font-medium">{qty}</span>
           <button
             type="button"
             onClick={() => setQty((q) => q + 1)}
-            className="px-3 py-2 hover:bg-muted transition-colors"
+            className="px-3 py-2 transition-colors hover:bg-muted"
             aria-label="Increase quantity"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -129,16 +139,11 @@ export function AddToCartButton({ product }: { product: Product }) {
         <Button
           size="lg"
           variant="outline"
-          className="rounded-none px-3 sm:px-4 shrink-0"
+          className="shrink-0 rounded-none px-3 sm:px-4"
           onClick={handleWishlist}
           aria-label={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
         >
-          <Heart
-            className={cn(
-              "h-4 w-4",
-              inWishlist ? "fill-red-500 text-red-500" : "",
-            )}
-          />
+          <Heart className={cn("h-4 w-4", inWishlist ? "fill-red-500 text-red-500" : "")} />
         </Button>
       </div>
     </div>

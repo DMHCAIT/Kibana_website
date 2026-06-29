@@ -126,13 +126,14 @@ export function CheckoutView() {
   }, []);
 
   const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+  const hasItems = items.length > 0;
   const shipping = subtotal === 0 ? 0 : subtotal >= 1499 ? 0 : 99;
   const subtotalWithShipping = subtotal + shipping;
 
   // Cashback/Discount or Extra charges based on payment method
-  const discount = payment === "card" ? 50 : payment === "upi" ? 50 : 0;
+  const discount = hasItems ? (payment === "card" ? 50 : payment === "upi" ? 50 : 0) : 0;
   const discountLabel = payment === "card" ? "💳 Cashback" : payment === "upi" ? "📱 Cashback" : "";
-  const codExtraCharge = payment === "cod" ? 50 : 0;
+  const codExtraCharge = hasItems && payment === "cod" ? 50 : 0;
   const total = Math.max(0, subtotalWithShipping - discount + codExtraCharge);
 
   // ── Order confirmed screen ────────────────────────────────────────────────
@@ -182,6 +183,25 @@ export function CheckoutView() {
               <Link href="/shop">Continue Shopping</Link>
             </Button>
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!hasItems) {
+    return (
+      <section className="container py-16 md:py-24">
+        <div className="mx-auto flex max-w-md flex-col items-center text-center">
+          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+          </span>
+          <h1 className="mt-5 font-display text-3xl">Your cart is empty</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add at least one product to continue checkout.
+          </p>
+          <Button asChild className="mt-6">
+            <Link href="/shop">Browse Products</Link>
+          </Button>
         </div>
       </section>
     );
