@@ -1,123 +1,109 @@
 import Link from "next/link";
-import { ResponsiveImage } from "@/components/ui/responsive-image";
 import { Facebook, Instagram, Youtube } from "lucide-react";
 import { NewsletterForm } from "./newsletter-form";
 
 const columns = [
   {
-    title: "SHOP",
+    title: "Shop",
     links: [
-      { label: "Laptop", href: "/shop?cat=laptop-bag" },
-      { label: "Wallet", href: "/shop?cat=wallet" },
-      { label: "Tote bag", href: "/shop?cat=tote-bag" },
-      { label: "Sling bag", href: "/shop?cat=sling-bag" },
-      { label: "Backpack", href: "/shop?cat=backpack" },
-      { label: "All category", href: "/shop" },
+      { label: "Tote Bags", href: "/shop?cat=tote-bag" },
+      { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
+      { label: "Sling Bags", href: "/shop?cat=sling-bag" },
+      { label: "Shoulder Bags", href: "/shop?cat=shoulder-bag" },
+      { label: "Backpacks", href: "/shop?cat=backpack" },
+      { label: "Wallets", href: "/shop?cat=wallet" },
+      { label: "All Products", href: "/shop" },
     ],
   },
   {
-    title: "ABOUT",
-    links: [{ label: "our story", href: "/about" }],
+    title: "About",
+    links: [{ label: "Our Story", href: "/about" }],
   },
   {
-    title: "SUPPORT",
+    title: "Support",
     links: [
       { label: "FAQs", href: "/faqs" },
-      { label: "contact us", href: "/contact" },
-      { label: "returns & exchange", href: "/returns" },
+      { label: "Contact Us", href: "/contact" },
+      { label: "Returns", href: "/returns" },
     ],
   },
+];
+
+const socialLinks = [
+  { label: "Facebook", href: "https://www.facebook.com/kibanalife", icon: Facebook },
+  { label: "YouTube", href: "https://www.youtube.com/@KibanaLife", icon: Youtube },
+  { label: "Instagram", href: "https://www.instagram.com/kibanalifeofficial/", icon: Instagram },
 ];
 
 export function Footer() {
   return (
     <footer className="bg-kibana-ink pb-16 text-kibana-cream md:pb-0">
-      <div className="px-4 py-6 md:container sm:px-8 md:py-7">
-        {/* Newsletter section */}
-        <div className="mb-6 border-b border-kibana-cream/10 pb-6">
-          <h3 className="mb-4 text-lg font-bold uppercase tracking-[0.15em] sm:text-xl">
-            Get In Touch
-          </h3>
-          <NewsletterForm />
-        </div>
+      <div className="container py-6 md:py-8">
+        {/* Main content — single compact block */}
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10 lg:grid-cols-[200px_1fr_280px] lg:items-start">
+          {/* Logo */}
+          <div className="flex flex-col items-center md:items-start">
+            <Link href="/" aria-label="Kibana home" className="transition-opacity hover:opacity-90">
+              <span className="font-logo text-2xl font-normal tracking-[0.25em] text-kibana-cream md:text-[1.65rem]">
+                KIBANA
+              </span>
+            </Link>
+            <p className="mt-1.5 text-[11px] tracking-[0.14em] text-kibana-cream/50">
+              Pure. Minimal. Luxe.
+            </p>
+          </div>
 
-        {/* Logo + Nav columns */}
-        <div className="mb-6">
-          <div className="flex flex-col gap-6 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-10 md:pt-2">
-            {/* Logo */}
-            <div className="hidden md:flex md:flex-shrink-0">
-              <Link href="/" className="inline-flex items-center justify-start">
-                <ResponsiveImage
-                  src="/extracted/kibana logo_white.webp"
-                  alt="Kibana"
-                  width={160}
-                  height={64}
-                  className="h-24 w-auto object-contain lg:h-28"
-                />
-              </Link>
-            </div>
+          {/* Nav columns */}
+          <div className="grid grid-cols-3 gap-4 sm:gap-8">
+            {columns.map((col) => (
+              <div key={col.title}>
+                <h4 className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-kibana-tan">
+                  {col.title}
+                </h4>
+                <ul className="space-y-1.5">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-xs text-kibana-cream/65 transition-colors hover:text-kibana-cream sm:text-sm"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
-            {/* Nav columns */}
-            <div className="grid flex-1 grid-cols-3 gap-5 sm:gap-8 md:grid-cols-3 md:gap-10">
-              {columns.map((col) => (
-                <div key={col.title}>
-                  <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-kibana-cream">
-                    {col.title}
-                  </h4>
-                  <ul className="space-y-2.5 text-sm text-kibana-cream/75">
-                    {col.links.map((l) => (
-                      <li key={l.href}>
-                        <Link
-                          href={l.href}
-                          className="block leading-snug transition-colors hover:text-kibana-cream"
-                        >
-                          {l.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+          {/* Newsletter */}
+          <div className="md:col-span-2 lg:col-span-1">
+            <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-kibana-tan">
+              Newsletter
+            </h4>
+            <NewsletterForm />
           </div>
         </div>
 
-        {/* Social row */}
-        <div className="border-t border-kibana-cream/10 pt-5">
-          <div className="flex flex-col items-center gap-4">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-kibana-cream/75">
-              Follow us
-            </h3>
-            <div className="flex items-center gap-8">
+        {/* Bottom bar */}
+        <div className="mt-6 flex flex-col items-center gap-3 border-t border-kibana-cream/10 pt-5 sm:flex-row sm:justify-between">
+          <div className="flex items-center gap-3">
+            {socialLinks.map(({ label, href, icon: Icon }) => (
               <Link
-                href="https://www.facebook.com/kibanalife"
+                key={label}
+                href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
+                aria-label={label}
+                className="text-kibana-cream/50 transition-colors hover:text-kibana-tan"
               >
-                <Facebook className="h-6 w-6" />
+                <Icon className="h-4 w-4" />
               </Link>
-              <Link
-                href="https://www.youtube.com/@KibanaLife"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
-              >
-                <Youtube className="h-6 w-6" />
-              </Link>
-              <Link
-                href="https://www.instagram.com/kibanalifeofficial/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="text-kibana-cream/70 transition-colors hover:text-kibana-cream"
-              >
-                <Instagram className="h-6 w-6" />
-              </Link>
-            </div>
+            ))}
           </div>
+          <p className="text-[10px] tracking-wide text-kibana-cream/35">
+            © {new Date().getFullYear()} Kibana. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

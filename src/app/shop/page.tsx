@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { getProducts, getCategories } from "@/lib/server-data";
+import { productHasShoulderKeyword } from "@/lib/product-filters";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { pickDefaultProductImage } from "@/lib/product-images";
@@ -243,7 +244,12 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     filtered = filtered.filter((p) => selectedSlugs.includes(p.slug));
   }
   if (selectedCategories.length > 0) {
-    filtered = filtered.filter((p) => selectedCategories.includes(p.category));
+    filtered = filtered.filter((p) => {
+      const matchesSelectedCategory = selectedCategories.some((slug) =>
+        slug === "shoulder-bag" ? productHasShoulderKeyword(p) : p.category === slug,
+      );
+      return matchesSelectedCategory;
+    });
   }
   if (q) {
     const query = q.toLowerCase();

@@ -33,7 +33,7 @@ export function AboutUs() {
           {/* Image */}
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded">
             <Image
-              src="/image_born_our_story.webp"
+              src="/our_story.webp"
               alt="About Kibana"
               fill
               sizes="100vw"
@@ -49,7 +49,7 @@ export function AboutUs() {
         {/* LEFT — large image */}
         <div className="relative aspect-auto min-h-[480px] w-full">
           <Image
-            src="/image_born_our_story.webp"
+            src="/our_story.webp"
             alt="About Kibana"
             fill
             sizes="50vw"

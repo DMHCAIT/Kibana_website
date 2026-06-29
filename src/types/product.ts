@@ -53,7 +53,16 @@ export const ProductSchema = z.object({
 export type Product = z.infer<typeof ProductSchema>;
 
 export const CategorySchema = z.object({
-  slug: z.enum(["tote-bag", "handbag", "laptop-bag", "sling-bag", "clutch", "backpack", "wallet"]),
+  slug: z.enum([
+    "tote-bag",
+    "handbag",
+    "laptop-bag",
+    "sling-bag",
+    "shoulder-bag",
+    "clutch",
+    "backpack",
+    "wallet",
+  ]),
   name: z.string(),
   image: z.string(),
 });

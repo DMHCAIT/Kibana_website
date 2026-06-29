@@ -306,7 +306,11 @@ export default async function ProductDetailPage({
                 <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
                   Share Product
                 </h3>
-                <WhatsAppShare product={product} price={product.price} />
+                <WhatsAppShare
+                  product={product}
+                  price={product.price}
+                  colorSlug={activeVariant?.slug}
+                />
               </div>
             </div>
 
