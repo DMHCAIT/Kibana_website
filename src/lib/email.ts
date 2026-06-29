@@ -71,6 +71,18 @@ function getEmailTemplate(type: EmailType, otp: string, name?: string) {
 
 export async function sendOtpEmail(options: OtpEmailOptions): Promise<boolean> {
   try {
+    const smtpEmail = process.env.SMTP_EMAIL?.trim();
+    const smtpPassword = process.env.SMTP_PASSWORD?.trim();
+    const configuredFromEmail = process.env.SMTP_FROM_EMAIL?.trim();
+
+    if (!smtpEmail || !smtpPassword) {
+      console.error("❌ Missing SMTP credentials for OTP email", {
+        hasSmtpEmail: !!smtpEmail,
+        hasSmtpPassword: !!smtpPassword,
+      });
+      return false;
+    }
+
     const transporter = getTransporter();
 
     const subjectText =
@@ -78,16 +90,19 @@ export async function sendOtpEmail(options: OtpEmailOptions): Promise<boolean> {
         ? "Your Kibana Signup Verification Code"
         : "Your Kibana Login Verification Code";
 
-    const fromEmail = process.env.SMTP_FROM_EMAIL || "info@kibanalife.com";
+    // Gmail SMTP usually rejects arbitrary "from" addresses unless configured as aliases.
+    // Always default to the authenticated mailbox to maximize delivery reliability.
+    const effectiveFromEmail = smtpEmail || configuredFromEmail || "info@kibanalife.com";
     const mailOptions = {
-      from: `"Kibana" <${fromEmail}>`,
+      from: `"Kibana" <${effectiveFromEmail}>`,
       to: options.email,
       subject: subjectText,
       html: getEmailTemplate(options.type, options.otp, options.name),
+      ...(configuredFromEmail ? { replyTo: configuredFromEmail } : {}),
     };
 
     console.log(`📧 sendOtpEmail: Preparing to send to ${options.email}`);
-    console.log(`📧 From: ${process.env.SMTP_EMAIL}, Type: ${options.type}`);
+    console.log(`📧 Sender: ${effectiveFromEmail}, Type: ${options.type}`);
 
     // Create a promise with timeout (30 seconds for slower connections)
     const sendPromise = transporter.sendMail(mailOptions);

@@ -29,7 +29,7 @@ const FALLBACK_TILES: { alt: string; label: string; href: string; video?: string
     alt: "Vistara Bag Pack",
     label: "Vistara Bag Pack",
     href: "/shop/vistapack",
-    video: "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
+    video: "/videos/compressed/HALO%20MINI%20Optimized.mp4",
   },
 ];
 
@@ -51,7 +51,7 @@ const VIDEO_BY_SLUG: Record<(typeof PRIORITY_SLUGS)[number], string> = {
   "sandesh-laptop-bag": "/videos/compressed/Sandesh%20Laptop%20bag.mp4",
   "vistara-tote-bag": "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
   "prizma-sling-bag": "/videos/compressed/PRIZMA%20SLING.mp4",
-  vistapack: "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
+  vistapack: "/videos/compressed/HALO%20MINI%20Optimized.mp4",
 };
 
 /** Individual card: autoplays while visible and keeps original tile size/layout */
