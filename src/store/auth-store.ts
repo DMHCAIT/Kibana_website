@@ -42,7 +42,7 @@ type AuthState = {
   verifyOtp: (
     email: string,
     otp: string,
-    signupData?: { name: string; phone: string },
+    signupData?: { name: string; phone?: string },
   ) => Promise<{ error?: string }>;
 
   logout: () => Promise<void>;
@@ -162,7 +162,7 @@ export const useAuth = create<AuthState>()((set) => ({
           signupData: signupData
             ? {
                 name: signupData.name.trim(),
-                phone: signupData.phone.trim(),
+                ...(signupData.phone?.trim() && { phone: signupData.phone.trim() }),
               }
             : undefined,
         }),

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const { email, otp, signupData } = (await request.json()) as {
       email?: string;
       otp?: string;
-      signupData?: { name: string; phone: string };
+      signupData?: { name: string; phone?: string };
     };
 
     // Validate input

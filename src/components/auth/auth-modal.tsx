@@ -13,7 +13,7 @@ export function AuthModal() {
   const { showAuthModal, authModalMessage, closeAuthModal, sendOtp, verifyOtp } = useAuth();
 
   const [step, setStep] = useState<Step>("email");
-  const [tab, setTab] = useState<"login" | "signup">("login");
+  const [tab, setTab] = useState<"login" | "signup">("signup");
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -30,8 +30,10 @@ export function AuthModal() {
 
   useEffect(() => {
     if (showAuthModal) {
-      const shouldOpenSignup = authModalMessage.toLowerCase().includes("sign up");
-      setTab(shouldOpenSignup ? "signup" : "login");
+      const shouldOpenLogin =
+        authModalMessage.toLowerCase().includes("log in") ||
+        authModalMessage.toLowerCase().includes("login");
+      setTab(shouldOpenLogin ? "login" : "signup");
       setStep("email");
       setEmail("");
       setName("");
@@ -64,11 +66,7 @@ export function AuthModal() {
       return;
     }
     if (tab === "signup" && !name.trim()) {
-      setError("Please enter your full name.");
-      return;
-    }
-    if (tab === "signup" && !phone.trim()) {
-      setError("Please enter your phone number.");
+      setError("Please enter your name.");
       return;
     }
     if (!acceptedPolicy) {
@@ -88,7 +86,7 @@ export function AuthModal() {
     const result = await sendOtp(
       cleaned,
       tab,
-      tab === "signup" ? phone.trim() : undefined,
+      tab === "signup" && phone.trim() ? phone.trim() : undefined,
       tab === "signup" ? name.trim() : undefined,
     );
 
@@ -134,7 +132,7 @@ export function AuthModal() {
     const result = await verifyOtp(
       email,
       otpString,
-      isNewUser ? { name: name.trim(), phone: phone.trim() } : undefined,
+      isNewUser ? { name: name.trim(), ...(phone.trim() && { phone: phone.trim() }) } : undefined,
     );
     setLoading(false);
 
@@ -188,7 +186,7 @@ export function AuthModal() {
     const result = await sendOtp(
       email,
       tab,
-      tab === "signup" ? phone.trim() : undefined,
+      tab === "signup" && phone.trim() ? phone.trim() : undefined,
       tab === "signup" ? name.trim() : undefined,
     );
     setLoading(false);
@@ -217,12 +215,12 @@ export function AuthModal() {
           </p>
           <h2 className="mb-1 text-center font-display text-xl tracking-wide sm:text-2xl">
             {step === "email" ? (
-              tab === "login" ? (
+              tab === "signup" ? (
                 <span className="inline-block px-1 text-base font-semibold tracking-[0.06em] text-amber-900 sm:text-lg">
                   SIGN UP &amp; GET UPTO 10% OFF
                 </span>
               ) : (
-                "Create Account"
+                "Welcome Back"
               )
             ) : (
               "Check Your Email"
@@ -266,7 +264,7 @@ export function AuthModal() {
                       </label>
                       <Input
                         type="text"
-                        placeholder="Jane Doe"
+                        placeholder="Enter your name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
@@ -275,14 +273,16 @@ export function AuthModal() {
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium uppercase tracking-widest text-gray-500">
-                        Phone Number
+                        Mobile Number{" "}
+                        <span className="normal-case tracking-normal text-gray-400">
+                          (Optional)
+                        </span>
                       </label>
                       <Input
                         type="tel"
-                        placeholder="+91 98765 43210"
+                        placeholder="Enter your mobile number"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        required
                         className="h-10 sm:h-11"
                       />
                     </div>
@@ -324,7 +324,7 @@ export function AuthModal() {
 
                 <Button
                   type="submit"
-                  disabled={loading || (tab === "signup" && !acceptedPolicy)}
+                  disabled={loading || !acceptedPolicy}
                   className="mt-1 flex h-10 w-full items-center justify-center gap-2 bg-gray-900 text-xs font-medium uppercase tracking-widest text-white hover:bg-gray-700 sm:h-11"
                 >
                   <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
