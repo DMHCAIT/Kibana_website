@@ -43,8 +43,8 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
   };
 
   return (
-    <section className="w-full bg-[#eef4f0] py-2 md:py-8">
-      <div className="md:container">
+    <section className="w-full bg-[#f5f0e8]">
+      <div className="py-2 md:container md:py-8">
         <SectionHeading title="Most Trending" className="px-4 md:px-0" />
         <div className="relative">
           {/* Scrollable carousel — 1.5 cards on mobile (peek), 2 on tablet, 3 on desktop */}
@@ -58,7 +58,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
                 key={p.id}
                 href={TREND_CARD_LINKS[p.id] ?? `/shop/${p.slug}`}
                 data-card
-                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden bg-[#eef4f0] shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
+                className="group relative h-[450px] w-[calc(85vw-1rem)] flex-shrink-0 overflow-hidden bg-[#f5f0e8] shadow-sm sm:h-[520px] sm:w-[calc(50vw-1rem)] md:h-[560px] md:w-[calc(33.333%-8px)] lg:w-[calc(33.333%-8px)]"
                 style={{ scrollSnapAlign: "start" }}
               >
                 <Image
@@ -99,6 +99,12 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
           </button>
         </div>
       </div>
+
+      {/* Background fade below cards — blends into Style in Motion, never overlaps carousel */}
+      <div
+        aria-hidden
+        className="h-8 bg-gradient-to-b from-[#f5f0e8] via-[#faf7f2] to-[#fdf8f3] sm:h-12 md:h-16"
+      />
     </section>
   );
 }

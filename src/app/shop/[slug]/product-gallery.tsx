@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
@@ -10,12 +10,88 @@ type Props = {
   discountPct: number;
 };
 
+const SWIPE_THRESHOLD = 48;
+
 export function ProductGallery({ images, productName, discountPct: pct }: Props) {
   const [active, setActive] = useState(0);
   const allImages = images.length > 0 ? images : ["/extracted/img-060.jpg"];
 
   const hScrollRef = useRef<HTMLDivElement>(null);
   const vScrollRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isSwiping = useRef(false);
+
+  const imageKey = allImages.join("|");
+
+  useEffect(() => {
+    setActive(0);
+  }, [imageKey]);
+
+  useEffect(() => {
+    const hThumb = hScrollRef.current?.children[active] as HTMLElement | undefined;
+    hThumb?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+
+    const vThumb = vScrollRef.current?.children[active] as HTMLElement | undefined;
+    vThumb?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "center" });
+  }, [active]);
+
+  const goNext = useCallback(() => {
+    if (allImages.length <= 1) return;
+    setActive((prev) => (prev + 1) % allImages.length);
+  }, [allImages.length]);
+
+  const goPrev = useCallback(() => {
+    if (allImages.length <= 1) return;
+    setActive((prev) => (prev - 1 + allImages.length) % allImages.length);
+  }, [allImages.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isSwiping.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+    if (dx > dy && dx > 10) isSwiping.current = true;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isSwiping.current || allImages.length <= 1) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) < SWIPE_THRESHOLD) return;
+    if (delta > 0) goNext();
+    else goPrev();
+  };
+
+  const swipeProps =
+    allImages.length > 1
+      ? {
+          onTouchStart: handleTouchStart,
+          onTouchMove: handleTouchMove,
+          onTouchEnd: handleTouchEnd,
+          className:
+            "relative aspect-[3/4] w-full touch-pan-y overflow-hidden rounded-lg bg-white select-none",
+        }
+      : {
+          className: "relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-white",
+        };
+
+  const desktopSwipeProps =
+    allImages.length > 1
+      ? {
+          onTouchStart: handleTouchStart,
+          onTouchMove: handleTouchMove,
+          onTouchEnd: handleTouchEnd,
+          className:
+            "relative mx-auto aspect-[8/11] w-full max-w-[512px] touch-pan-y overflow-hidden rounded-lg bg-white select-none",
+        }
+      : {
+          className:
+            "relative mx-auto aspect-[8/11] w-full max-w-[512px] overflow-hidden rounded-lg bg-white",
+        };
 
   return (
     <>
@@ -23,7 +99,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
       <div className="flex w-full min-w-0 flex-col gap-2 sm:gap-3 md:hidden">
         {/* Main image */}
         <div className="rounded-lg bg-[#f5f1ed] p-3 sm:p-4">
-          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-white">
+          <div {...swipeProps}>
             <Image
               src={allImages[active]}
               alt={productName}
@@ -31,6 +107,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
               priority
               sizes="(max-width: 640px) calc(100vw - 1.5rem), 100vw"
               className="object-cover transition-opacity duration-200"
+              draggable={false}
             />
             {pct > 0 && (
               <Badge variant="discount" className="absolute left-2 top-2 sm:left-3 sm:top-3">
@@ -97,7 +174,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
 
         {/* Main image — fluid up to 512px wide so it never overflows on tablets */}
         <div className="min-w-0 flex-1 rounded-lg bg-[#f5f1ed] p-6">
-          <div className="relative mx-auto aspect-[8/11] w-full max-w-[512px] overflow-hidden rounded-lg bg-white">
+          <div {...desktopSwipeProps}>
             <Image
               src={allImages[active]}
               alt={productName}
@@ -105,6 +182,7 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
               priority
               sizes="(max-width: 1024px) 80vw, 512px"
               className="object-cover transition-opacity duration-200"
+              draggable={false}
             />
             {pct > 0 && (
               <Badge variant="discount" className="absolute left-3 top-3">
