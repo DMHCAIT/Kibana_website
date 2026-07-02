@@ -43,7 +43,11 @@ export function ShopByCategory({ categories }: { categories?: Cat[] }) {
                   ? "/shop?slugs=lekha-wallet&title=Lekha%20Wallet"
                   : `/shop?cat=${c.slug}`;
                 const image = isClutch ? LEKHA_WALLET_IMAGE : c.image;
-                const name = isClutch ? "Lekha Wallet" : c.name;
+                const name = isClutch
+                  ? "Lekha Wallet"
+                  : c.slug === "tote-bag"
+                    ? "Shoulder Bag"
+                    : c.name;
                 return (
                   <Link
                     key={c.slug}

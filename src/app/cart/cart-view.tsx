@@ -15,7 +15,7 @@ export function CartView() {
   const remove = useCart((s) => s.remove);
   const { user, openAuthModal } = useAuth();
   const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
-  const shipping = subtotal === 0 ? 0 : subtotal >= 1499 ? 0 : 99;
+  const shipping = 0;
   const total = subtotal + shipping;
 
   if (items.length === 0) {
@@ -45,12 +45,12 @@ export function CartView() {
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px]">
-        <ul className="divide-y divide-border rounded-xl border border-border bg-card">
+        <ul className="bg-card divide-y divide-border rounded-xl border border-border">
           {items.map(({ product, quantity }) => (
             <li key={product.id} className="flex gap-3 p-3 sm:gap-4 sm:p-4">
               <Link
                 href={`/shop/${product.slug}`}
-                className="relative h-24 w-20 sm:h-28 sm:w-24 shrink-0 overflow-hidden rounded-lg bg-muted"
+                className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-24"
               >
                 <Image
                   src={product.image}
@@ -65,7 +65,7 @@ export function CartView() {
                 <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/shop/${product.slug}`}
-                    className="text-sm font-medium hover:underline line-clamp-2"
+                    className="line-clamp-2 text-sm font-medium hover:underline"
                   >
                     {product.name}
                   </Link>
@@ -78,7 +78,7 @@ export function CartView() {
                   </button>
                 </div>
 
-                <p className="mt-1 text-xs text-muted-foreground capitalize">
+                <p className="mt-1 text-xs capitalize text-muted-foreground">
                   {product.category.replace("-", " ")}
                 </p>
 
@@ -102,9 +102,7 @@ export function CartView() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-sm font-semibold">
-                      {formatINR(product.price * quantity)}
-                    </p>
+                    <p className="text-sm font-semibold">{formatINR(product.price * quantity)}</p>
                     {product.compareAtPrice && (
                       <p className="text-xs text-muted-foreground line-through">
                         {formatINR(product.compareAtPrice * quantity)}
@@ -117,7 +115,7 @@ export function CartView() {
           ))}
         </ul>
 
-        <aside className="rounded-xl border border-border bg-card p-5 h-fit lg:sticky lg:top-24">
+        <aside className="bg-card h-fit rounded-xl border border-border p-5 lg:sticky lg:top-24">
           <h2 className="text-sm font-semibold uppercase tracking-[0.18em]">Order summary</h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
@@ -134,12 +132,6 @@ export function CartView() {
               <dd>{formatINR(total)}</dd>
             </div>
           </dl>
-
-          {subtotal < 1499 && (
-            <p className="mt-3 rounded-md bg-kibana-stone p-3 text-xs text-foreground/80">
-              Add <strong>{formatINR(1499 - subtotal)}</strong> more for free shipping.
-            </p>
-          )}
 
           <Button
             size="lg"

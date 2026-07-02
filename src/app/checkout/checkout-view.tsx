@@ -127,7 +127,7 @@ export function CheckoutView() {
 
   const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
   const hasItems = items.length > 0;
-  const shipping = subtotal === 0 ? 0 : subtotal >= 1499 ? 0 : 99;
+  const shipping = 0;
   const subtotalWithShipping = subtotal + shipping;
 
   // Cashback/Discount or Extra charges based on payment method
