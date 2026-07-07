@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// Rebuild trigger: Image cache update
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   compress: true,
