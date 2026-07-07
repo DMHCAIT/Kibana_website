@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" fill="none">
+  <!-- Stem: tall vertical blade -->
+  <path d="M36 6 C40 6 50 6 52 10 C53 28 58 55 58 76 C56 80 44 80 40 76 C38 58 34 28 36 6 Z" fill="#1A1A1A"/>
+  <!-- Upper arm: leaf pointing upper-right -->
+  <path d="M50 28 C60 14 78 6 92 10 C88 22 74 36 56 46 Z" fill="#1A1A1A"/>
+  <!-- Lower arm: wider leaf pointing lower-right -->
+  <path d="M54 54 C70 50 88 56 98 68 C84 76 66 72 48 64 Z" fill="#1A1A1A"/>
+  <!-- KIBANA text in serif -->
+  <text x="110" y="128" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="7" text-anchor="middle" fill="#1A1A1A" font-weight="400">KIBANA</text>
+</svg>

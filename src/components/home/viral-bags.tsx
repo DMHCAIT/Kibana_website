@@ -1,0 +1,17 @@
+import { ProductCard } from "@/components/product/product-card";
+import { SectionHeading } from "./section-heading";
+import type { Product } from "@/types/product";
+
+export function ViralBags({ products }: { products: Product[] }) {
+  const items = products.filter((p) => p.isTrending).slice(0, 3);
+  return (
+    <section className="container py-2 md:py-6">
+      <SectionHeading title="Viral Bag" />
+      <div className="grid grid-cols-3 gap-2">
+        {items.map((p) => (
+          <ProductCard key={p.id} product={p} variant="full" />
+        ))}
+      </div>
+    </section>
+  );
+}
