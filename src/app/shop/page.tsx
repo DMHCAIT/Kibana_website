@@ -139,14 +139,8 @@ function getShopDisplayImage(product: Product, variant: Product["colorVariants"]
   }
 
   if (product.slug === "vistara-tote-bag") {
-    if (["milky-blue", "mint-green", "teal-blue", "tan"].includes(variant.slug)) {
-      return (
-        variant.image?.replace(/[^/]+$/i, "Artboard%201_result.webp") ??
-        variant.gallery?.find((img) => img.includes("Artboard%201_result.webp")) ??
-        variant.image ??
-        product.image
-      );
-    }
+    // Use the first gallery image for better display
+    return variant.gallery?.[0] ?? variant.image ?? product.image;
   }
 
   if (product.slug === "large-aurelia-fan-tote") {

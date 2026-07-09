@@ -20,6 +20,7 @@ type Props = {
   href?: string;
   displayName?: string;
   displayImage?: string;
+  variantInStock?: boolean; // New: indicates if color variant is out of stock
   priority?: boolean;
 };
 
@@ -31,6 +32,7 @@ export function ProductCard({
   href,
   displayName,
   displayImage,
+  variantInStock = true, // Default to in stock
   priority = false,
 }: Props) {
   const add = useCart((s) => s.add);
@@ -45,7 +47,7 @@ export function ProductCard({
   const pct = discountPct(product.price, product.compareAtPrice);
   const productHref = href ?? `/shop/${product.slug}`;
   const cardName = displayName ?? product.name;
-  const cardImage = displayImage ?? pickDefaultProductImage(product.image, product.gallery ?? []);
+  const cardImage = displayImage ?? product.displayImage ?? pickDefaultProductImage(product.image, product.gallery ?? []);
   const visibleColorVariants = product.colorVariants?.length
     ? product.colorVariants
     : product.colors.map((color) => ({
@@ -99,6 +101,12 @@ export function ProductCard({
         {pct > 0 && variant !== "minimal" && (
           <span className="absolute left-2 top-2 bg-gray-900 px-1.5 py-0.5 text-[9px] tracking-wide text-white sm:text-[10px]">
             {pct}% OFF
+          </span>
+        )}
+        {/* Out of Stock badge */}
+        {!variantInStock && (
+          <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">OUT OF STOCK</span>
           </span>
         )}
         <button

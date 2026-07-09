@@ -71,14 +71,14 @@ export default async function HomePage() {
     getSiteConfig(),
     getCategories(),
   ]);
-  const pinned = config.sectionProducts ?? {};
+  const pinned = config?.sectionProducts ?? {};
   const sections = config.sections.filter((s) => s.visible).sort((a, b) => a.order - b.order);
 
   const SECTION_COMPONENTS: Record<string, (products: Product[]) => React.ReactNode> = {
-    "new-arrivals": (p) => <NewArrivals products={p} />,
+    "new-arrivals": (p) => <NewArrivals products={products} />,
     "best-sellers": (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
     "shop-by-category": (_) => <ShopByCategory categories={categories} />,
-    "most-trending": (p) => <MostTrending products={p} />,
+    "most-trending": (p) => <MostTrending products={products} />,
     "about-us": (_) => <AboutUs />,
     "style-in-motion": (p) => <StyleInMotion products={p} />,
     "customer-review": (_) => <CustomerReview />,
@@ -92,7 +92,11 @@ export default async function HomePage() {
         if (s.id === "customer-review") return null;
         const render = SECTION_COMPONENTS[s.id];
         if (!render) return null;
-        const sectionProds = sectionProducts(products, s.id, pinned);
+        // For new-arrivals and most-trending, components manage their own products
+        const sectionProds = 
+          s.id === "new-arrivals" || s.id === "most-trending" 
+            ? products 
+            : sectionProducts(products, s.id, pinned);
         const bg = i % 2 === 0 ? "bg-white" : "bg-[#fdf8f3]";
         const wrapperClass = s.id === "new-arrivals" ? "" : bg;
         return (

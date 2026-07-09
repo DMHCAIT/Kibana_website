@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getProduct, getCategories } from "@/lib/server-data";
-import { ProductForm } from "@/components/admin/product-form";
+import { EnhancedProductForm } from "@/components/admin/enhanced-product-form";
 
 export const dynamic = "force-dynamic";
 
@@ -21,5 +21,5 @@ export default async function EditProductPage({
 
   if (!product) notFound();
 
-  return <ProductForm product={product} categories={categories} />;
+  return <EnhancedProductForm product={product} categories={categories} />;
 }

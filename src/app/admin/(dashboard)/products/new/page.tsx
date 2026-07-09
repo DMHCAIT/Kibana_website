@@ -1,5 +1,5 @@
 import { getCategories } from "@/lib/server-data";
-import { ProductForm } from "@/components/admin/product-form";
+import { EnhancedProductForm } from "@/components/admin/enhanced-product-form";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,6 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 
 export default async function NewProductPage() {
   const categories = await withTimeout(getCategories(), 2500, []);
-  return <ProductForm isNew categories={categories} />;
+  return <EnhancedProductForm isNew categories={categories} />;
 }
 

@@ -14,17 +14,3 @@ export default async function AdminMembersPage() {
   );
   return <UsersClient initialUsers={sorted} />;
 }
-    blue: "bg-blue-100 text-blue-600",
-    purple: "bg-purple-100 text-purple-600",
-  };
-  return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${colors[color]}`}>
-        <Icon size={20} />
-      </div>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
-      <p className="text-sm text-gray-500 mt-0.5">{label}</p>
-    </div>
-  );
-}
-

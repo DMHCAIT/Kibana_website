@@ -69,13 +69,6 @@
     "fontBody": "inter"
   },
   "announcementBar": "FREE RETURNS ON ALL ORDERS · 100% PREMIUM VEGAN LEATHER · FREE SHIPPING ABOVE ₹999",
-  "sectionProducts": {
-    "new-arrivals": [],
-    "best-sellers": [],
-    "viral-bags": [],
-    "most-trending": [],
-    "style-in-motion": []
-  },
   "sectionContent": {
     "bestSellers": {
       "leftImage": "/mv/best-seller-B.jpg.jpeg",

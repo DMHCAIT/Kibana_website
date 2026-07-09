@@ -75,7 +75,6 @@ export async function getOtp(email: string): Promise<string | null> {
 
   try {
     const db = getSqlClient();
-    console.log(`🔍 Getting OTP for ${cleanEmail}...`);
 
     // Query database for valid OTP
     const result = await db`
@@ -85,44 +84,27 @@ export async function getOtp(email: string): Promise<string | null> {
       LIMIT 1
     `;
 
-    console.log(`🔍 Query returned ${result.length} rows for ${cleanEmail}`);
-
     if (result.length === 0) {
-      console.log(
-        `ℹ No OTP found for ${cleanEmail} - table might be empty or email not in database`,
-      );
       return null;
     }
 
     const data = result[0];
     const resolvedOtp = data.otp || data.dev_otp;
-    console.log(
-      `🔍 Found OTP record: otp_length=${resolvedOtp?.length}, expires_at=${data.expires_at}`,
-    );
 
     // Check if expired
     const expiresAt = new Date(data.expires_at);
     const now = new Date();
-    const isExpired = now > expiresAt;
-    console.log(
-      `🔍 Expiry check: now=${now.toISOString()}, expires_at=${expiresAt.toISOString()}, expired=${isExpired}`,
-    );
-
-    if (isExpired) {
-      console.log(`ℹ OTP expired for ${cleanEmail}`);
-      // Delete expired OTP
-      await db`
-        DELETE FROM otp_sessions 
-        WHERE phone = ${cleanEmail}
-      `;
+    if (now > expiresAt) {
+      // Delete expired OTP asynchronously
+      db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch(() => {
+        // Ignore errors
+      });
       return null;
     }
 
-    console.log(`✓ Returning valid OTP for ${cleanEmail}`);
     return resolvedOtp;
   } catch (error) {
     console.error("✗ Error getting OTP:", error);
-    console.error(`   Email: ${cleanEmail}`);
     if (!isDev) return null;
     const inMemoryOtp = inMemoryOtpStore.get(cleanEmail);
     if (!inMemoryOtp) return null;
@@ -130,7 +112,6 @@ export async function getOtp(email: string): Promise<string | null> {
       inMemoryOtpStore.delete(cleanEmail);
       return null;
     }
-    console.log(`✓ Using in-memory OTP fallback for ${cleanEmail}`);
     return inMemoryOtp.otp;
   }
 }
@@ -140,30 +121,21 @@ export async function verifyOtp(email: string, otp: string): Promise<boolean> {
   const cleanEmail = email.toLowerCase().trim();
   const cleanOtp = otp.trim();
 
-  console.log(`🔍 OTP Verification Attempt:`);
-  console.log(`   Email: ${cleanEmail}`);
-  console.log(`   Provided OTP: "${cleanOtp}" (length: ${cleanOtp.length})`);
+  console.log(`� Verifying OTP for ${cleanEmail}`);
 
   const stored = await getOtp(cleanEmail);
-  console.log(`   Stored OTP: "${stored}" (length: ${stored?.length || 0})`);
-  console.log(`   Match: ${stored === cleanOtp}`);
 
   if (stored === cleanOtp) {
-    try {
-      const db = getSqlClient();
-      await db`
-        DELETE FROM otp_sessions 
-        WHERE phone = ${cleanEmail}
-      `;
-      console.log(`✓ OTP verified and deleted for ${cleanEmail}`);
-    } catch (error) {
-      console.error("✗ Error deleting OTP:", error);
-      if (isDev) inMemoryOtpStore.delete(cleanEmail);
-    }
+    console.log(`✅ OTP verified for ${cleanEmail}`);
+    // Delete OTP asynchronously after successful verification (don't block response)
+    const db = getSqlClient();
+    db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch(error => {
+      console.error("✗ Error deleting OTP after verification:", error);
+    });
     return true;
   }
 
-  console.log(`✗ OTP verification failed for ${cleanEmail}`);
+  console.log(`❌ OTP verification failed for ${cleanEmail}`);
   return false;
 }
 

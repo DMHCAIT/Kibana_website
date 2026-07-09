@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { db } from "@/lib/db";
+import { orders as ordersTable } from "@/lib/db/schema";
 import { updateOrderStatus } from "@/lib/server-data";
+import { eq } from "drizzle-orm";
 import type { AdminOrder } from "@/lib/server-data";
 
 async function isAdmin() {
@@ -29,4 +32,24 @@ export async function PATCH(
   }
   await updateOrderStatus(id, body.status as AdminOrder["status"]);
   return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  try {
+    await db.delete(ordersTable).where(eq(ordersTable.id, id));
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to delete order" },
+      { status: 500 }
+    );
+  }
 }

@@ -799,7 +799,6 @@
     "category": "sling-bag",
     "gender": "women",
     "isTrending": true,
-    "isNew": true,
     "colors": ["#1A1A1A", "#3C7A5A", "#B8D4E0", "#4169E1"],
     "colorVariants": [
       {

@@ -8,6 +8,7 @@ export const ProductSchema = z.object({
   price: z.number().int().positive(),
   compareAtPrice: z.number().int().positive().optional(),
   image: z.string(),
+  displayImage: z.string().optional(), // New: separate display image for cards
   gallery: z.array(z.string()).default([]),
   category: z.enum([
     "tote-bag",
@@ -30,6 +31,7 @@ export const ProductSchema = z.object({
         hex: z.string().optional(),
         slug: z.string(),
         image: z.string(),
+        displayImage: z.string().optional(), // New: separate display image for cards
         gallery: z.array(z.string()).optional(),
         productTitle: z.string().optional(),
         stockQty: z.number().int().nonnegative().optional(),

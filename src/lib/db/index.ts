@@ -24,7 +24,7 @@ const client =
   globalThis.__kibana_pg ??
   postgres(connectionString ?? "postgres://invalid", {
     prepare: false,          // Required for serverless
-    max: 5,                  // Increased from 1 to allow concurrent operations
+    max: 15,                 // Increased from 5 to handle more concurrent requests
     connect_timeout: 5,      // Increased timeout to 5s for better reliability
     idle_timeout: 60,        // Increased from 10s to prevent premature disconnects
     max_lifetime: 300,       // Increased from 60s for longer connection reuse

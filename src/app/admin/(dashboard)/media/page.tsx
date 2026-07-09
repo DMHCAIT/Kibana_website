@@ -1,63 +1,16 @@
-"use client";
+import { getMediaFiles } from "@/lib/server-data";
+import { MediaClient } from "@/components/admin/media-client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Upload,
-  Image as ImageIcon,
-  Video,
-  Copy,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  X,
-  Link as LinkIcon,
-  Trash2,
-  RefreshCw,
-} from "lucide-react";
-import { ResponsiveImage } from "@/components/ui/responsive-image";
+export const dynamic = "force-dynamic";
 
-interface MediaFile {
-  id: string;
-  url: string;
-  name: string;
-  type: "image" | "video";
-  size: number;
-  bucket: string;
-  path: string;
-  uploadedAt: string;
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([p, new Promise<T>((res) => setTimeout(() => res(fallback), ms))]);
 }
 
-const BUCKETS = [
-  { value: "product-images", label: "Product Images" },
-  { value: "product-videos", label: "Product Videos" },
-  { value: "site-media", label: "Site Media (Hero, Banners)" },
-];
-
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+export default async function AdminMediaPage() {
+  const files = await withTimeout(getMediaFiles(), 2500, []);
+  return <MediaClient initialFiles={files} />;
 }
-
-export default function AdminMediaPage() {
-  const [bucket, setBucket] = useState("product-images");
-  const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState<MediaFile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [copied, setCopied] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function showToast(type: "success" | "error", msg: string) {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 4000);
-  }
-
-  const fetchFiles = useCallback(async () => {
-    setLoading(true);
-    try {
       const res = await fetch("/api/admin/media");
       if (res.ok) {
         const data = (await res.json()) as MediaFile[];

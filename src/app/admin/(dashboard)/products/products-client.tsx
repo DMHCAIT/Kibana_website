@@ -144,7 +144,6 @@ export function ProductsClient({ initialProducts }: Props) {
                       Price <SortIcon col="price" />
                     </span>
                   </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Tags</th>
                   <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500">
                     Actions
                   </th>
@@ -175,25 +174,6 @@ export function ProductsClient({ initialProducts }: Props) {
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {product.isNew && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md font-medium">
-                            New
-                          </span>
-                        )}
-                        {product.isBestSeller && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-md font-medium">
-                            Best Seller
-                          </span>
-                        )}
-                        {product.isTrending && (
-                          <span className="text-xs bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded-md font-medium">
-                            Trending
-                          </span>
-                        )}
-                      </div>
-                    </td>
                     <td className="px-6 py-3">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Link
@@ -214,7 +194,7 @@ export function ProductsClient({ initialProducts }: Props) {
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
                       {query ? `No products matching "${query}"` : "No products yet"}
                     </td>
                   </tr>

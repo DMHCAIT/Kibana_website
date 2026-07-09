@@ -4,7 +4,6 @@ import type { Product } from "@/types/product";
 
 const NEW_ARRIVALS_OLD_IMAGES: Record<string, string> = {
   p11: "/mv/new-3.jpg",
-  p9: "/mv/new-4.jpg",
   p12: "/mv/new-4.jpg",
   p13: "/mv/new-2.jpg",
   p14: "/mv/new-1.jpg",
@@ -12,19 +11,22 @@ const NEW_ARRIVALS_OLD_IMAGES: Record<string, string> = {
 
 const NEW_ARRIVALS_REDIRECTS: Record<string, string> = {
   p11: "/shop/halo-mini?color=forest-green",
-  p9: "/shop/valera-dome?color=milky-blue",
   p12: "/shop/valera-dome?color=milky-blue",
   p13: "/shop/cordia-bag?color=light-purple",
   p14: "/shop/crescent-sling-bag?color=turquoise-blue",
 };
 
 export function NewArrivals({ products }: { products: Product[] }) {
-  const items = products
-    .filter((p) => p.isNew)
-    .slice(0, 4)
+  const NEW_ARRIVALS_IDS = ["p11", "p12", "p13", "p14"];
+  
+  const items = NEW_ARRIVALS_IDS
+    .map((id) => products.find((p) => p.id === id))
+    .filter((p): p is Product => Boolean(p))
     .map((p) => {
-      if (p.slug === "orwyn-backpack") return { ...p, name: "Valera Dome" };
-      if (p.slug === "crescent-sling-bag") return { ...p, name: "CORDIA BAG" };
+      if (p.slug === "halo-mini") return { ...p, name: "Halo Mini" };
+      if (p.slug === "orwyn-backpack" || p.slug === "valera-dome") return { ...p, name: "Valera Dome" };
+      if (p.slug === "cordia-bag") return { ...p, name: "Cordia Bag" };
+      if (p.slug === "crescent-sling-bag") return { ...p, name: "Cordia Bag" };
       if (p.slug === "business-laptop-briefcase") return { ...p, name: "Crescent Sling Bag" };
       return p;
     })

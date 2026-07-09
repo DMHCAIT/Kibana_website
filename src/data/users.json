@@ -79,5 +79,14 @@
     "loginAt": "2026-06-24T10:17:04.436Z",
     "loginCount": 2,
     "registeredAt": "2026-06-24T10:16:45.984Z"
+  },
+  {
+    "id": "c5d0be79-9906-4377-8605-4a150372850f",
+    "email": "signup-test-1783578094049@example.com",
+    "name": "Test User",
+    "phone": "9876543210",
+    "loginAt": "2026-07-09T06:22:06.312Z",
+    "loginCount": 1,
+    "registeredAt": "2026-07-09T06:22:06.312Z"
   }
 ]

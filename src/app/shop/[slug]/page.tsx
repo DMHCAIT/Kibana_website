@@ -6,6 +6,7 @@ import { getProductBySlug, getProducts } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { pickDefaultProductImage } from "@/lib/product-images";
 import { ProductGrid } from "@/components/product/product-grid";
+import { ProductCarousel } from "@/components/product/product-carousel";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
@@ -58,18 +59,45 @@ const CATEGORY_LABELS: Record<Product["category"], string> = {
 async function RelatedProducts({
   category,
   productId,
+  currentProduct,
 }: {
   category: Product["category"];
   productId: string;
+  currentProduct?: Product;
 }) {
   const products = await getProducts();
-  const related = products.filter((p) => p.category === category && p.id !== productId).slice(0, 4);
-  if (related.length === 0) return null;
+  const related = products.filter((p) => p.category === category && p.id !== productId);
+  
+  // If no related products, show current product's color variants (if it's the only one in category)
+  let productsToShow = related;
+  if (related.length === 0 && currentProduct) {
+    productsToShow = [currentProduct];
+  }
+  
+  if (productsToShow.length === 0) return null;
+
+  // Expand each product into its color variants
+  const gridItems = productsToShow.flatMap((product) =>
+    product.colorVariants?.length ? 
+      product.colorVariants.map((variant) => ({
+        key: `${product.id}-${variant.slug}`,
+        product,
+        href: `/shop/${product.slug}?color=${variant.slug}`,
+        displayName: `${product.name} - ${variant.color ? `[${variant.slug}]` : variant.productTitle}`,
+        displayImage: variant.image,
+        variantInStock: variant.inStock !== false, // Default to true if not specified
+      }))
+      : [{
+        key: product.id,
+        product,
+        href: `/shop/${product.slug}`,
+      }]
+  );
 
   return (
     <section className="container py-2 pb-20 sm:py-3 sm:pb-8 md:py-14">
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em]">You may also like</h2>
-      <ProductGrid products={related} />
+      <ProductCarousel items={gridItems} />
     </section>
   );
 }
@@ -392,7 +420,7 @@ export default async function ProductDetailPage({
       </section>
 
       <Suspense fallback={null}>
-        <RelatedProducts category={product.category} productId={product.id} />
+        <RelatedProducts category={product.category} productId={product.id} currentProduct={product} />
       </Suspense>
     </>
   );
