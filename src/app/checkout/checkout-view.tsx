@@ -132,8 +132,9 @@ export function CheckoutView() {
   const hasItems = items.length > 0;
   const shipping = 0;
   const subtotalWithShipping = subtotal + shipping;
+  const codCharges = payment === "cod" ? 100 : 0;
 
-  const total = subtotalWithShipping;
+  const total = subtotalWithShipping + codCharges;
 
   // ── Wait for cart to load ────────────────────────────────────────────────
   if (!mounted || isLoading) {
@@ -792,6 +793,12 @@ export function CheckoutView() {
                   {shipping === 0 ? "FREE" : formatINR(shipping)}
                 </dd>
               </div>
+              {codCharges > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <dt className="text-muted-foreground">COD Charges</dt>
+                  <dd className="font-medium text-foreground">{formatINR(codCharges)}</dd>
+                </div>
+              )}
             </div>
 
             <div className="mb-4 border-t border-border pt-4">
