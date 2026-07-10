@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRef } from "react";
-import { trackViewItem } from "@/lib/analytics";
+import { trackViewContent } from "@/lib/analytics";
 import type { Product } from "@/types/product";
 
 export function TrackProductView({ product }: { product: Product }) {
@@ -10,7 +10,7 @@ export function TrackProductView({ product }: { product: Product }) {
 
   useEffect(() => {
     if (hasTracked.current) return;
-    trackViewItem(product);
+    trackViewContent(product);
     hasTracked.current = true;
   }, [product]);
 
