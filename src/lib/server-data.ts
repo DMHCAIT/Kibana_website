@@ -53,6 +53,14 @@ function withTimeout<T>(promise: Promise<T>, ms = 2000): Promise<T | null> {
 // ── Products ─────────────────────────────────────────────────────────────────
 
 function rowToProduct(row: typeof productsTable.$inferSelect): Product {
+  const colorVariants = (row.colorVariants as Product["colorVariants"]) ?? [];
+  const colors = (row.colors as string[]) ?? [];
+  
+  // Auto-generate colors from colorVariants if colors is empty
+  const finalColors = colors && colors.length > 0 
+    ? colors 
+    : colorVariants.map(v => v.hex || v.color).filter(Boolean);
+
   return {
     id: row.id,
     slug: row.slug,
@@ -67,8 +75,8 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
     isNew: row.isNew,
     isBestSeller: row.isBestSeller,
     isTrending: row.isTrending,
-    colors: (row.colors as string[]) ?? [],
-    colorVariants: (row.colorVariants as Product["colorVariants"]) ?? [],
+    colors: finalColors,
+    colorVariants,
     features: (row.features as string[]) ?? [],
     specs: (row.specs as Record<string, string>) ?? {},
     video: row.video ?? undefined,
@@ -493,7 +501,7 @@ export async function recordUserLogin(user: {
 
 export type AdminOrder = {
   id: string;
-  user: { name: string; phone?: string; email?: string; id?: string } | null;
+  user?: { name: string; phone?: string; email?: string; id?: string };
   items: {
     productId: string;
     name: string;
@@ -508,7 +516,7 @@ export type AdminOrder = {
   shippingAddress?: string;
   paymentMethod?: string;
   paymentStatus?: "paid" | "pending" | "refunded";
-  trackingId?: string | null;
+  trackingId?: string;
 };
 
 function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
@@ -522,7 +530,7 @@ function rowToOrder(row: typeof ordersTable.$inferSelect): AdminOrder {
     shippingAddress: row.shippingAddress ?? undefined,
     paymentMethod: row.paymentMethod ?? undefined,
     paymentStatus: (row.paymentStatus as AdminOrder["paymentStatus"]) ?? undefined,
-    trackingId: row.trackingId,
+    trackingId: row.trackingId ?? undefined,
   };
 }
 

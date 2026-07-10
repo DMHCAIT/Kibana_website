@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
@@ -10,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatINR } from "@/lib/utils";
 
 export function CartView() {
+  const router = useRouter();
   const items = useCart((s) => s.items);
   const setQuantity = useCart((s) => s.setQuantity);
   const remove = useCart((s) => s.remove);
@@ -140,7 +142,7 @@ export function CartView() {
               if (!user) {
                 openAuthModal("Please log in to proceed to checkout.");
               } else {
-                window.location.href = "/checkout";
+                router.push("/checkout");
               }
             }}
           >

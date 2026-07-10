@@ -87,7 +87,8 @@ export async function POST(request: Request) {
               phone: signupData.phone?.trim() || "",
             },
           } as UserData;
-        } catch (dbErr: any) {
+        } catch (err) {
+          const dbErr = err as Error & { code?: string; message?: string };
           // Check if user already exists (unique constraint error)
           if (dbErr.code === '23505' || dbErr.message?.includes('unique')) {
             console.log(`❌ User already exists: ${cleanEmail}`);
@@ -96,7 +97,7 @@ export async function POST(request: Request) {
               { status: 409 },
             );
           }
-          throw dbErr;
+          throw err;
         }
       } catch (err) {
         console.error("❌ Signup error:", err);

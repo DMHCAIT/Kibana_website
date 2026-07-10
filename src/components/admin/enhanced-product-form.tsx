@@ -3,13 +3,11 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Upload,
   X,
   Plus,
   Save,
   Loader2,
   Image as ImageIcon,
-  Video,
   CheckCircle,
   AlertCircle,
   ToggleLeft,
@@ -20,22 +18,6 @@ import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { Product } from "@/types/product";
 
 type Category = { slug: string; name: string };
-
-interface ColorVariantWithStock {
-  color: string;
-  slug: string;
-  image: string;
-  gallery: string[];
-  productTitle?: string;
-  description?: string;
-  features?: string[];
-  specs?: Record<string, string>;
-  price?: number;
-  compareAtPrice?: number;
-  stockQty?: number;
-  inStock: boolean;
-  hex?: string;
-}
 
 interface Props {
   product?: Partial<Product> & { id?: string };
@@ -69,25 +51,32 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
   const router = useRouter();
   const imgInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const variantImageRefs = useRef<Record<string, HTMLInputElement | null>>({});
-  const variantGalleryRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const productId = product?.id ?? generateId();
 
   const extractColorVariants = () => {
-    const variants = (product?.colorVariants as Array<any>) ?? [];
+    const variants = (product?.colorVariants ?? []) as Array<{
+      color?: string;
+      slug?: string;
+      image?: string;
+      gallery?: string[];
+      productTitle?: string;
+      stockQty?: number;
+      inStock?: boolean;
+      hex?: string;
+    }>;
     return variants.map((v) => {
-      const isHexCode = v.color.startsWith("#");
-      const displayName = isHexCode ? slugToName(v.slug) : v.color;
+      const isHexCode = v.color?.startsWith("#");
+      const displayName = isHexCode ? slugToName(v.slug ?? "") : v.color ?? "";
       return {
         color: displayName,
-        slug: v.slug,
+        slug: v.slug ?? "",
         image: v.image || "",
         gallery: v.gallery || [],
         productTitle: v.productTitle || "",
         stockQty: v.stockQty || 0,
         inStock: v.inStock !== undefined ? v.inStock : true,
-        hex: v.hex,
+        hex: v.hex || (isHexCode ? v.color : undefined),
       };
     });
   };
@@ -116,8 +105,6 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
   });
 
   const [newFeature, setNewFeature] = useState("");
-  const [newSpecKey, setNewSpecKey] = useState("");
-  const [newSpecVal, setNewSpecVal] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -277,13 +264,18 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
   async function autoSave() {
     if (!form.name.trim() || !form.slug.trim()) return;
     try {
+      // Auto-generate colors from colorVariants if colors is empty
+      const colors = form.colors && form.colors.length > 0 
+        ? form.colors 
+        : form.colorVariants.map(v => v.hex || v.color).filter(Boolean);
+
       const payload = {
         ...form,
         price: Number(form.price),
         compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : undefined,
         rating: Number(form.rating),
         reviewCount: Number(form.reviewCount),
-        colors: form.colors,
+        colors,
         colorVariants: form.colorVariants,
       };
 

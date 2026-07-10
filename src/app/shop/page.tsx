@@ -4,7 +4,7 @@ import { getProducts, getCategories } from "@/lib/server-data";
 import { productHasShoulderKeyword } from "@/lib/product-filters";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopHeader } from "@/components/shop/shop-header";
-import { pickDefaultProductImage } from "@/lib/product-images";
+import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
 import type { Product } from "@/types/product";
 
 export const metadata: Metadata = {
@@ -37,164 +37,8 @@ type ProductListItem = {
   href?: string;
   displayName?: string;
   displayImage?: string;
+  variantInStock?: boolean;
 };
-
-function getShopDisplayImage(product: Product, variant: Product["colorVariants"][number]) {
-  if (product.slug === "prizma-sling-bag") {
-    if (variant.slug === "teal-blue") {
-      return (
-        variant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
-        variant.gallery?.[5] ??
-        variant.image ??
-        product.image
-      );
-    }
-    if (variant.slug === "tan") {
-      return (
-        variant.image?.replace(/\/\d+\.webp$/i, "/4.webp") ??
-        variant.gallery?.[2] ??
-        variant.image ??
-        product.image
-      );
-    }
-    return variant.gallery?.[0] ?? product.gallery?.[0] ?? variant.image ?? product.image;
-  }
-
-  if (product.slug === "valera-dome") {
-    const valeraImageByColor: Record<string, string> = {
-      black: "06",
-      "forest-green": "02",
-      "milky-blue": "01",
-      "royal-blue": "06",
-    };
-    const targetNumber = valeraImageByColor[variant.slug];
-    if (targetNumber) {
-      return (
-        variant.image?.replace(/Image\d+\.webp$/i, `Image${targetNumber}.webp`) ??
-        variant.image ??
-        product.image
-      );
-    }
-  }
-
-  if (product.slug === "cordia-bag") {
-    const cordiaImageByColor: Record<string, string> = {
-      black: "01",
-      "light-purple": "06",
-      "lime-yellow": "06",
-    };
-    const targetNumber = cordiaImageByColor[variant.slug];
-    if (targetNumber) {
-      return (
-        variant.image?.replace(/Image\d+\.webp$/i, `Image${targetNumber}.webp`) ??
-        variant.image ??
-        product.image
-      );
-    }
-  }
-
-  if (product.slug === "halo-mini" && variant.slug === "turquoise-blue") {
-    return (
-      variant.image?.replace(/Image\d+\.webp$/i, "Image02.webp") ?? variant.image ?? product.image
-    );
-  }
-
-  if (product.slug === "crescent-sling-bag") {
-    const crescentImageByColor: Record<string, string> = {
-      "milky-blue": "01",
-      "turquoise-blue": "06",
-      wine: "05",
-    };
-    const targetNumber = crescentImageByColor[variant.slug];
-    if (targetNumber) {
-      return (
-        variant.image?.replace(/Image\d+\.webp$/i, `Image${targetNumber}.webp`) ??
-        variant.image ??
-        product.image
-      );
-    }
-  }
-
-  if (product.slug === "business-laptop-briefcase") {
-    const targetImageNumber =
-      variant.slug === "black" ? "7" : variant.slug === "tan" ? "4" : undefined;
-    if (targetImageNumber) {
-      return (
-        variant.image?.replace(/\/\d+\.webp$/i, `/${targetImageNumber}.webp`) ??
-        variant.image ??
-        product.image
-      );
-    }
-  }
-
-  if (product.slug === "lekha-wallet") {
-    const targetImage = variant.slug === "wine" ? "/5.webp" : "/2.webp";
-    return (
-      variant.image?.replace(/\/\d+\.webp$/i, targetImage) ?? variant.gallery?.[0] ?? variant.image
-    );
-  }
-
-  if (product.slug === "zippy-wallet") {
-    return variant.image?.replace(/\/\d+\.webp$/i, "/1.webp") ?? variant.image ?? product.image;
-  }
-
-  if (product.slug === "vistara-tote-bag") {
-    // Use the first gallery image for better display
-    return variant.gallery?.[0] ?? variant.image ?? product.image;
-  }
-
-  if (product.slug === "large-aurelia-fan-tote") {
-    if (variant.slug === "mocha") {
-      return "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp";
-    }
-    if (variant.slug === "wine") {
-      return "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/02-04-2026--paulina06342_result.webp";
-    }
-  }
-
-  if (product.slug === "mini-aurelia-fan-tote" && variant.slug === "mocha") {
-    return "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/1.webp";
-  }
-
-  if (product.slug === "sandesh-laptop-bag" && variant.slug === "tan") {
-    return (
-      variant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ?? variant.gallery?.[5] ?? variant.image
-    );
-  }
-
-  if (product.slug === "sandesh-laptop-bag" && variant.slug === "teal-blue") {
-    return (
-      variant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ?? variant.gallery?.[5] ?? variant.image
-    );
-  }
-
-  if (product.slug === "vistapack") {
-    const targetImageNumber =
-      variant.slug === "tan"
-        ? "6"
-        : variant.slug === "milky-blue"
-          ? "1"
-          : variant.slug === "mint-green"
-            ? "6"
-            : variant.slug === "teal-blue"
-              ? "2"
-              : "5";
-    const colorImage = variant.image?.replace(/\/\d+\.webp$/i, `/${targetImageNumber}.webp`);
-    return (
-      colorImage ??
-      variant.gallery?.[3] ??
-      product.gallery?.[3] ??
-      variant.gallery?.[0] ??
-      variant.image ??
-      product.image
-    );
-  }
-
-  return pickDefaultProductImage(
-    variant.image || product.image,
-    variant.gallery ?? product.gallery,
-  );
-}
 
 function toVariantListingItems(product: Product): ProductListItem[] {
   if (!product.colorVariants?.length) {
@@ -213,6 +57,7 @@ function toVariantListingItems(product: Product): ProductListItem[] {
           ? "Mini Aurelia Fan Tote"
           : variant.productTitle || `${product.name} - ${variant.color}`,
       displayImage: getShopDisplayImage(product, variant),
+      variantInStock: variant.inStock !== false,
     }));
 }
 
@@ -262,6 +107,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   // Apply sort
   if (sort === "price-asc") filtered = [...filtered].sort((a, b) => a.price - b.price);
   else if (sort === "price-desc") filtered = [...filtered].sort((a, b) => b.price - a.price);
+  else {
+    // Default "featured" sort - stable sort by ID for consistency
+    filtered = [...filtered].sort((a, b) => a.id.localeCompare(b.id));
+  }
 
   const listingItems = filtered.flatMap(toVariantListingItems);
 

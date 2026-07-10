@@ -8,6 +8,7 @@ type ProductGridItem = {
   href?: string;
   displayName?: string;
   displayImage?: string;
+  variantInStock?: boolean;
 };
 
 type Props = {
@@ -44,6 +45,7 @@ export function ProductGrid({
           href={item.href}
           displayName={item.displayName}
           displayImage={item.displayImage}
+          variantInStock={item.variantInStock}
           variant={variant}
           priority={index < 4}
         />

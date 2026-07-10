@@ -8,11 +8,12 @@ type Props = {
   images: string[];
   productName: string;
   discountPct: number;
+  variantInStock?: boolean;
 };
 
 const SWIPE_THRESHOLD = 48;
 
-export function ProductGallery({ images, productName, discountPct: pct }: Props) {
+export function ProductGallery({ images, productName, discountPct: pct, variantInStock = true }: Props) {
   const [active, setActive] = useState(0);
   const allImages = images.length > 0 ? images : ["/extracted/img-060.jpg"];
 
@@ -114,6 +115,11 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
                 {pct}% OFF
               </Badge>
             )}
+            {!variantInStock && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="bg-red-600 text-white font-bold text-sm sm:text-base px-4 py-2 tracking-wide">OUT OF STOCK</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -175,6 +181,11 @@ export function ProductGallery({ images, productName, discountPct: pct }: Props)
         {/* Main image — fluid up to 512px wide so it never overflows on tablets */}
         <div className="min-w-0 flex-1 rounded-lg bg-[#f5f1ed] p-6">
           <div {...desktopSwipeProps}>
+            {!variantInStock && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                <span className="bg-red-600 text-white font-bold text-lg px-6 py-3 tracking-wide">OUT OF STOCK</span>
+              </div>
+            )}
             <Image
               src={allImages[active]}
               alt={productName}

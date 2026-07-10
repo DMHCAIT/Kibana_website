@@ -4,8 +4,7 @@ import { Suspense } from "react";
 import { Check, Star } from "lucide-react";
 import { getProductBySlug, getProducts } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
-import { pickDefaultProductImage } from "@/lib/product-images";
-import { ProductGrid } from "@/components/product/product-grid";
+import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
 import { ProductCarousel } from "@/components/product/product-carousel";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
@@ -84,7 +83,7 @@ async function RelatedProducts({
         product,
         href: `/shop/${product.slug}?color=${variant.slug}`,
         displayName: `${product.name} - ${variant.color ? `[${variant.slug}]` : variant.productTitle}`,
-        displayImage: variant.image,
+        displayImage: getShopDisplayImage(product, variant),
         variantInStock: variant.inStock !== false, // Default to true if not specified
       }))
       : [{
@@ -118,6 +117,7 @@ export default async function ProductDetailPage({
     product.colorVariants?.find((v) => v.slug === color) ?? product.colorVariants?.[0];
   const activeProductTitle = activeVariant?.productTitle || product.name;
   const activeStockQty = activeVariant?.stockQty;
+  const activeVariantInStock = activeVariant?.inStock !== false;
   const galleryImages = activeVariant?.gallery?.length
     ? activeVariant.gallery
     : (product.gallery ?? []);
@@ -234,7 +234,7 @@ export default async function ProductDetailPage({
           {/* Gallery Column with Header */}
           <div className="w-full min-w-0">
             <ShopHeader heading={categoryLabel} showSort={false} />
-            <ProductGallery images={allImages} productName={product.name} discountPct={pct} />
+            <ProductGallery images={allImages} productName={product.name} discountPct={pct} variantInStock={activeVariantInStock} />
           </div>
 
           {/* Details */}
@@ -276,7 +276,7 @@ export default async function ProductDetailPage({
                   {pct}% OFF
                 </span>
               )}
-              {typeof activeStockQty === "number" && (
+              {activeVariantInStock && typeof activeStockQty === "number" && (
                 <span
                   className={cn(
                     "px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs",
@@ -324,7 +324,7 @@ export default async function ProductDetailPage({
 
             {/* Add to cart */}
             <div className="mt-4 sm:mt-5">
-              <AddToCartButton product={product} />
+              <AddToCartButton product={product} activeVariant={activeVariant} />
             </div>
 
             {/* Delivery & Share */}

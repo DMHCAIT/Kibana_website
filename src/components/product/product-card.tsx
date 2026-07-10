@@ -103,11 +103,11 @@ export function ProductCard({
             {pct}% OFF
           </span>
         )}
-        {/* Out of Stock badge */}
+        {/* Out of Stock banner */}
         {!variantInStock && (
-          <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">OUT OF STOCK</span>
-          </span>
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <span className="bg-red-600 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded tracking-wide">OUT OF STOCK</span>
+          </div>
         )}
         <button
           aria-label="Add to wishlist"

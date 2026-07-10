@@ -8,8 +8,6 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Eye,
-  Edit2,
   Trash2,
   Search,
   ChevronUp,
@@ -220,19 +218,27 @@ export function OrdersClient({ initialOrders }: Props) {
 
               <div className="flex gap-2">
                 <button
-                  onClick={() =>
-                    setSortBy("date") &&
-                    (sortDir === "asc" ? setSortDir("desc") : setSortDir("asc"))
-                  }
+                  onClick={() => {
+                    setSortBy("date");
+                    if (sortDir === "asc") {
+                      setSortDir("desc");
+                    } else {
+                      setSortDir("asc");
+                    }
+                  }}
                   className="flex items-center gap-1 px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs text-gray-700 transition-colors"
                 >
                   Date {sortBy === "date" && (sortDir === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                 </button>
                 <button
-                  onClick={() =>
-                    setSortBy("total") &&
-                    (sortDir === "asc" ? setSortDir("desc") : setSortDir("asc"))
-                  }
+                  onClick={() => {
+                    setSortBy("total");
+                    if (sortDir === "asc") {
+                      setSortDir("desc");
+                    } else {
+                      setSortDir("asc");
+                    }
+                  }}
                   className="flex items-center gap-1 px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs text-gray-700 transition-colors"
                 >
                   Amount {sortBy === "total" && (sortDir === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}

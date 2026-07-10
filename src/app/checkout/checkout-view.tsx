@@ -108,6 +108,7 @@ function saveAddress(addr: Address) {
 // ── Component ─────────────────────────────────────────────────────────────────
 export function CheckoutView() {
   const items = useCart((s) => s.items);
+  const isLoading = useCart((s) => s.isLoading);
   const clearCart = useCart((s) => s.clear);
   const { user, openAuthModal } = useAuth();
 
@@ -118,9 +119,11 @@ export function CheckoutView() {
   const [placing, setPlacing] = useState(false);
   const [errors, setErrors] = useState<Partial<Address>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   // Load saved address on mount
   useEffect(() => {
+    setMounted(true);
     const saved = loadSavedAddress();
     if (saved.fullName) setAddress(saved);
   }, []);
@@ -130,11 +133,24 @@ export function CheckoutView() {
   const shipping = 0;
   const subtotalWithShipping = subtotal + shipping;
 
-  // Cashback/Discount or Extra charges based on payment method
-  const discount = hasItems ? (payment === "card" ? 50 : payment === "upi" ? 50 : 0) : 0;
-  const discountLabel = payment === "card" ? "💳 Cashback" : payment === "upi" ? "📱 Cashback" : "";
-  const codExtraCharge = hasItems && payment === "cod" ? 50 : 0;
-  const total = Math.max(0, subtotalWithShipping - discount + codExtraCharge);
+  const total = subtotalWithShipping;
+
+  // ── Wait for cart to load ────────────────────────────────────────────────
+  if (!mounted || isLoading) {
+    return (
+      <section className="container py-16 md:py-24">
+        <div className="mx-auto flex max-w-md flex-col items-center text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+          <h1 className="mt-5 font-display text-3xl">Loading checkout...</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Please wait while we prepare your order.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   // ── Order confirmed screen ────────────────────────────────────────────────
   if (orderId) {
@@ -642,12 +658,6 @@ export function CheckoutView() {
                       title="Cash on Delivery"
                       subtitle="Pay when your order arrives at your doorstep"
                     />
-                    {payment === "cod" && (
-                      <div className="ml-14 mt-3 rounded-lg border border-border bg-muted p-3">
-                        <p className="text-xs font-semibold text-foreground">🚚 COD Charge: +₹50</p>
-                        <p className="mt-1 text-xs text-muted-foreground">Added to your total</p>
-                      </div>
-                    )}
                   </div>
 
                   {/* UPI */}
@@ -662,9 +672,6 @@ export function CheckoutView() {
                     />
                     {payment === "upi" && (
                       <div className="ml-14 mt-4 space-y-3">
-                        <div className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1">
-                          <p className="text-xs font-bold text-emerald-700">💚 Get ₹50 Cashback!</p>
-                        </div>
                         <UPIPayment
                           amount={total}
                           upiId=""
@@ -690,9 +697,6 @@ export function CheckoutView() {
                     />
                     {payment === "card" && (
                       <div className="ml-14 mt-4 space-y-3">
-                        <div className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1">
-                          <p className="text-xs font-bold text-emerald-700">💳 Get ₹50 Cashback!</p>
-                        </div>
                         <CardPayment
                           amount={total}
                           email={user?.email || ""}
@@ -788,18 +792,6 @@ export function CheckoutView() {
                   {shipping === 0 ? "FREE" : formatINR(shipping)}
                 </dd>
               </div>
-              {discount > 0 && step >= 2 && (
-                <div className="flex items-center justify-between text-sm">
-                  <dt className="font-medium text-accent">{discountLabel}</dt>
-                  <dd className="font-bold text-accent">-{formatINR(discount)}</dd>
-                </div>
-              )}
-              {codExtraCharge > 0 && step >= 2 && (
-                <div className="flex items-center justify-between text-sm">
-                  <dt className="font-medium text-foreground">🚚 COD Charge</dt>
-                  <dd className="font-bold text-foreground">+{formatINR(codExtraCharge)}</dd>
-                </div>
-              )}
             </div>
 
             <div className="mb-4 border-t border-border pt-4">

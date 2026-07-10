@@ -75,10 +75,10 @@ export default async function HomePage() {
   const sections = config.sections.filter((s) => s.visible).sort((a, b) => a.order - b.order);
 
   const SECTION_COMPONENTS: Record<string, (products: Product[]) => React.ReactNode> = {
-    "new-arrivals": (p) => <NewArrivals products={products} />,
+    "new-arrivals": (_) => <NewArrivals products={products} />,
     "best-sellers": (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
     "shop-by-category": (_) => <ShopByCategory categories={categories} />,
-    "most-trending": (p) => <MostTrending products={products} />,
+    "most-trending": (_) => <MostTrending products={products} />,
     "about-us": (_) => <AboutUs />,
     "style-in-motion": (p) => <StyleInMotion products={p} />,
     "customer-review": (_) => <CustomerReview />,

@@ -11,13 +11,19 @@ import { useWishlist } from "@/store/wishlist-store";
 import { cn, formatINR } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
-export function AddToCartButton({ product }: { product: Product }) {
+interface AddToCartButtonProps {
+  product: Product;
+  activeVariant?: Product["colorVariants"][number];
+}
+
+export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps) {
   const [qty, setQty] = useState(1);
   const [inWishlist, setInWishlist] = useState(false);
   const [addedNotification, setAddedNotification] = useState(false);
   const add = useCart((s) => s.add);
   const { user, openAuthModal } = useAuth();
   const { add: addWishlist, remove: removeWishlist, has } = useWishlist();
+  const isOutOfStock = activeVariant?.inStock === false;
 
   useEffect(() => {
     setInWishlist(has(product.id));
@@ -100,31 +106,35 @@ export function AddToCartButton({ product }: { product: Product }) {
         </div>
       )}
 
-      {/* Quantity selector */}
-      <div className="flex items-center gap-4">
-        <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-          Quantity
-        </span>
-        <div className="flex items-center border border-border">
-          <button
-            type="button"
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="px-3 py-2 transition-colors hover:bg-muted"
-            aria-label="Decrease quantity"
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <span className="min-w-[3rem] px-5 py-2 text-center text-sm font-medium">{qty}</span>
-          <button
-            type="button"
-            onClick={() => setQty((q) => q + 1)}
-            className="px-3 py-2 transition-colors hover:bg-muted"
-            aria-label="Increase quantity"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
+      {!isOutOfStock && (
+        <>
+          {/* Quantity selector */}
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              Quantity
+            </span>
+            <div className="flex items-center border border-border">
+              <button
+                type="button"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="px-3 py-2 transition-colors hover:bg-muted"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <span className="min-w-[3rem] px-5 py-2 text-center text-sm font-medium">{qty}</span>
+              <button
+                type="button"
+                onClick={() => setQty((q) => q + 1)}
+                className="px-3 py-2 transition-colors hover:bg-muted"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Action buttons */}
       <div className="flex gap-2">
@@ -132,9 +142,10 @@ export function AddToCartButton({ product }: { product: Product }) {
           size="lg"
           className="flex-1 rounded-none text-xs sm:text-sm"
           onClick={handleAddToCart}
+          disabled={isOutOfStock}
         >
           <ShoppingBag className="h-4 w-4 shrink-0" />
-          Add to Cart
+          {isOutOfStock ? "Out of Stock" : "Add to Cart"}
         </Button>
         <Button
           size="lg"

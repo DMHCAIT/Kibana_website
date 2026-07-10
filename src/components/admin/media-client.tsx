@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Trash2, Search, Download, Copy, Check } from "lucide-react";
+import { Upload, Trash2, Search, Copy, Check } from "lucide-react";
 import { ResponsiveImage } from "@/components/ui/responsive-image";
 import type { MediaFile } from "@/types/media";
 
