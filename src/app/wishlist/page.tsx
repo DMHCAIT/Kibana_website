@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
@@ -33,18 +34,21 @@ export default function WishlistPage() {
 
   if (!user) {
     return (
-      <section className="container py-20 flex flex-col items-center text-center">
-        <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-          <Heart className="h-7 w-7 text-muted-foreground" />
-        </span>
-        <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
-        <p className="text-sm text-muted-foreground mb-6">
-          Log in to see your saved products.
-        </p>
-        <Button onClick={() => openAuthModal()} className="rounded-none px-8">
-          Login / Sign Up
-        </Button>
-      </section>
+      <>
+        <TrackPageView pageName="Wishlist" pageType="wishlist" />
+        <section className="container py-20 flex flex-col items-center text-center">
+          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+            <Heart className="h-7 w-7 text-muted-foreground" />
+          </span>
+          <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            Log in to see your saved products.
+          </p>
+          <Button onClick={() => openAuthModal()} className="rounded-none px-8">
+            Login / Sign Up
+          </Button>
+        </section>
+      </>
     );
   }
 
@@ -52,23 +56,27 @@ export default function WishlistPage() {
 
   if (wishlistProducts.length === 0) {
     return (
-      <section className="container py-20 flex flex-col items-center text-center">
-        <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-          <Heart className="h-7 w-7 text-muted-foreground" />
-        </span>
-        <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
-        <p className="text-sm text-muted-foreground mb-6">
-          You haven&apos;t saved any products yet. Browse and tap the heart icon to save items.
-        </p>
-        <Button asChild className="rounded-none px-8">
-          <Link href="/shop">Browse Products</Link>
-        </Button>
-      </section>
+      <>
+        <TrackPageView pageName="Wishlist" pageType="wishlist" />
+        <section className="container py-20 flex flex-col items-center text-center">
+          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+            <Heart className="h-7 w-7 text-muted-foreground" />
+          </span>
+          <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            You haven&apos;t saved any products yet. Browse and tap the heart icon to save items.
+          </p>
+          <Button asChild className="rounded-none px-8">
+            <Link href="/shop">Browse Products</Link>
+          </Button>
+        </section>
+      </>
     );
   }
 
   return (
     <section className="container py-8 md:py-12">
+      <TrackPageView pageName="Wishlist" pageType="wishlist" />
       <div className="mb-6">
         <h1 className="font-display text-3xl sm:text-4xl tracking-wide">Wishlist</h1>
         <p className="mt-1 text-sm text-muted-foreground">

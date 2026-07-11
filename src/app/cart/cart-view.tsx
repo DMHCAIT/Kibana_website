@@ -9,6 +9,7 @@ import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatINR } from "@/lib/utils";
+import { trackWishlist } from "@/lib/analytics";
 
 export function CartView() {
   const router = useRouter();
@@ -73,7 +74,11 @@ export function CartView() {
                   </Link>
                   <button
                     aria-label="Remove"
-                    onClick={() => remove(product.id)}
+                    onClick={() => {
+                      remove(product.id);
+                      // Track remove from cart event
+                      trackWishlist(product, "remove", user?.id);
+                    }}
                     className="text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />

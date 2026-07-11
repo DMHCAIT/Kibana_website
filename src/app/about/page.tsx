@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 
 export const metadata: Metadata = {
   title: "Our Story — Kibana",
@@ -54,6 +55,7 @@ const sections = [
 export default function AboutPage() {
   return (
     <main className="bg-kibana-cream text-kibana-ink">
+      <TrackPageView pageName="About" pageType="about" />
       {/* ── Hero ── */}
       <section className="relative h-52 overflow-hidden sm:h-72 md:h-[400px]">
         <Image

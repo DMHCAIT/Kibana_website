@@ -11,6 +11,7 @@ import { pickDefaultProductImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { useAuth } from "@/store/auth-store";
+import { trackWishlist } from "@/lib/analytics";
 
 type Props = {
   product: Product;
@@ -65,9 +66,11 @@ export function ProductCard({
     }
     if (inWishlist) {
       removeFromWishlist(product.id);
+      trackWishlist(product, "remove", user.id);
       setInWishlist(false);
     } else {
       addToWishlist(product.id);
+      trackWishlist(product, "add", user.id);
       setInWishlist(true);
     }
   };

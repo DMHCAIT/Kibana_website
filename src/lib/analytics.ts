@@ -281,3 +281,17 @@ export async function trackConversionAPI(
     console.error("Failed to track conversion:", error);
   }
 }
+
+/** UTILITY EVENTS - Track page views for content pages */
+export function trackViewPage(pageName: string, pageType: string) {
+  pushGtmEvent({
+    event: "view_page",
+    page_name: pageName,
+    page_type: pageType,
+    timestamp: new Date().toISOString(),
+  });
+  trackMetaEvent("ViewContent", {
+    content_name: pageName,
+    content_type: pageType,
+  });
+}

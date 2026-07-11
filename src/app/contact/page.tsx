@@ -27,6 +27,20 @@ export default function ContactPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error((data as { error?: string }).error ?? "Something went wrong.");
       }
+      
+      // Track contact form submission
+      if (typeof window !== "undefined") {
+        const fbq = (window as unknown as { fbq?: (event: string, name: string, data?: Record<string, unknown>) => void }).fbq;
+        if (fbq) {
+          fbq("track", "Contact", {
+            content_name: "Contact Form",
+            content_type: "form",
+            value: 0,
+            currency: "INR",
+          });
+        }
+      }
+      
       setSuccess(true);
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err) {

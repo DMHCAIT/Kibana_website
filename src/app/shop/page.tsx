@@ -4,7 +4,8 @@ import { getProducts, getCategories } from "@/lib/server-data";
 import { productHasShoulderKeyword } from "@/lib/product-filters";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopHeader } from "@/components/shop/shop-header";
-import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
+import { getShopDisplayImage } from "@/lib/product-images";
+import { TrackProductListingView } from "@/components/analytics/track-product-listing-view";
 import type { Product } from "@/types/product";
 
 export const metadata: Metadata = {
@@ -127,16 +128,19 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
           : "Shop all bags";
 
   return (
-    <section className="container py-6 md:py-10">
-      <ShopHeader heading={heading} count={listingItems.length} sort={sort} showSort />
+    <>
+      <TrackProductListingView category={selectedCategories[0]} productCount={listingItems.length} />
+      <section className="container py-6 md:py-10">
+        <ShopHeader heading={heading} count={listingItems.length} sort={sort} showSort />
 
-      {listingItems.length > 0 ? (
-        <ProductGrid items={listingItems} variant="full" />
-      ) : (
-        <div className="rounded-xl border border-dashed border-border px-6 py-16 text-center text-sm text-muted-foreground">
-          No products in this category yet — check back soon.
-        </div>
-      )}
-    </section>
+        {listingItems.length > 0 ? (
+          <ProductGrid items={listingItems} variant="full" />
+        ) : (
+          <div className="rounded-xl border border-dashed border-border px-6 py-16 text-center text-sm text-muted-foreground">
+            No products in this category yet — check back soon.
+          </div>
+        )}
+      </section>
+    </>
   );
 }

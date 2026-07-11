@@ -4,6 +4,7 @@ import dynamicImport from "next/dynamic";
 import { HeroBanner } from "@/components/home/hero-banner";
 import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 import { getProducts, getSiteConfig, getCategories } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
@@ -86,6 +87,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <TrackPageView pageName="Home" pageType="homepage" />
       <HeroBanner />
       <AnnouncementBanner text={config.announcementBar} />
       {sections.map((s, i) => {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 
 type FAQ = { q: string; a: string };
 type Category = { id: string; title: string; faqs: FAQ[] };
@@ -198,7 +199,7 @@ export default function FAQsPage() {
 
   return (
     <main className="bg-kibana-cream text-kibana-ink">
-
+      <TrackPageView pageName="FAQs" pageType="faqs" />
       {/* ── Hero ── */}
       <section className="relative bg-kibana-ink overflow-hidden">
         <div className="container relative py-8 md:py-12">

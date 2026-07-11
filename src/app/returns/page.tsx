@@ -1,6 +1,7 @@
 import type { ElementType } from "react";
 import type { Metadata } from "next";
 import { AlertTriangle, RefreshCcw, XCircle, RotateCcw, Globe, Phone, Mail } from "lucide-react";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 
 export const metadata: Metadata = {
   title: "Returns, Refunds & Exchanges — Kibana",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function ReturnsPage() {
   return (
     <main className="bg-kibana-cream text-kibana-ink">
+      <TrackPageView pageName="Returns" pageType="returns" />
       {/* ── Hero ── */}
       <section className="bg-kibana-ink">
         <div className="container flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between md:py-14">

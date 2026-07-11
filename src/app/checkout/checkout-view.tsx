@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { formatINR } from "@/lib/utils";
 import { UPIPayment } from "@/components/payment/upi-payment";
 import { CardPayment } from "@/components/payment/card-payment";
+import { trackCheckout, trackPurchase } from "@/lib/analytics";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Address = {
@@ -128,13 +129,29 @@ export function CheckoutView() {
     if (saved.fullName) setAddress(saved);
   }, []);
 
+  // Track checkout initiation when user reaches payment step
+  useEffect(() => {
+    if (step === 2 && items.length > 0) {
+      const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+      const shipping = 0;
+      const subtotalWithShipping = subtotal + shipping;
+      const codCharges = payment === "cod" ? 100 : 0;
+      const upiDiscount = payment === "upi" ? -100 : 0;
+      const cardDiscount = payment === "card" ? -100 : 0;
+      const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount;
+      trackCheckout(items, total, user?.id);
+    }
+  }, [step, items, payment, user?.id]);
+
   const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
   const hasItems = items.length > 0;
   const shipping = 0;
   const subtotalWithShipping = subtotal + shipping;
   const codCharges = payment === "cod" ? 100 : 0;
+  const upiDiscount = payment === "upi" ? -100 : 0;
+  const cardDiscount = payment === "card" ? -100 : 0;
 
-  const total = subtotalWithShipping + codCharges;
+  const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount;
 
   // ── Wait for cart to load ────────────────────────────────────────────────
   if (!mounted || isLoading) {
@@ -286,6 +303,10 @@ export function CheckoutView() {
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error("Failed to place order");
+      
+      // Track Purchase event for Meta Pixel
+      trackPurchase(id, items, total, user.id, paymentLabel);
+      
       clearCart();
       setOrderId(id);
     } catch {
@@ -332,6 +353,9 @@ export function CheckoutView() {
       });
 
       if (!res.ok) throw new Error("Failed to save order");
+
+      // Track Purchase event for Meta Pixel
+      trackPurchase(id, items, total, user.id, `UPI (${upiId})`);
 
       clearCart();
       setOrderId(id);
@@ -381,6 +405,9 @@ export function CheckoutView() {
       });
 
       if (!res.ok) throw new Error("Failed to save order");
+
+      // Track Purchase event for Meta Pixel
+      trackPurchase(id, items, total, user.id, "Debit / Credit Card");
 
       clearCart();
       setOrderId(id);
@@ -797,6 +824,18 @@ export function CheckoutView() {
                 <div className="flex items-center justify-between text-sm">
                   <dt className="text-muted-foreground">COD Charges</dt>
                   <dd className="font-medium text-foreground">{formatINR(codCharges)}</dd>
+                </div>
+              )}
+              {upiDiscount < 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <dt className="text-muted-foreground">UPI Discount</dt>
+                  <dd className="font-medium text-emerald-600">{formatINR(upiDiscount)}</dd>
+                </div>
+              )}
+              {cardDiscount < 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <dt className="text-muted-foreground">Card Discount</dt>
+                  <dd className="font-medium text-emerald-600">{formatINR(cardDiscount)}</dd>
                 </div>
               )}
             </div>

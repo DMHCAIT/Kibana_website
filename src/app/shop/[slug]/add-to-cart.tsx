@@ -9,6 +9,7 @@ import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { cn, formatINR } from "@/lib/utils";
+import { trackAddToCart } from "@/lib/analytics";
 import type { Product } from "@/types/product";
 
 interface AddToCartButtonProps {
@@ -49,6 +50,10 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
       return;
     }
     await add(product, qty);
+    
+    // Track AddToCart event for Meta Pixel
+    trackAddToCart(product, qty, user.id);
+    
     setAddedNotification(true);
     setTimeout(() => setAddedNotification(false), 4000);
   }

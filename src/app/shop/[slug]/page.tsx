@@ -14,6 +14,8 @@ import { ShopHeader } from "@/components/shop/shop-header";
 import { TrackProductView } from "@/components/analytics/track-product-view";
 import type { Product } from "@/types/product";
 
+export const revalidate = 0; // Disable caching for dynamic content
+
 export async function generateMetadata({
   params,
 }: {
@@ -82,7 +84,7 @@ async function RelatedProducts({
         key: `${product.id}-${variant.slug}`,
         product,
         href: `/shop/${product.slug}?color=${variant.slug}`,
-        displayName: `${product.name} - ${variant.color ? `[${variant.slug}]` : variant.productTitle}`,
+        displayName: variant.productTitle || `${product.name} - [${variant.slug}]`,
         displayImage: getShopDisplayImage(product, variant),
         variantInStock: variant.inStock !== false, // Default to true if not specified
       }))

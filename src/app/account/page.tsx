@@ -7,6 +7,7 @@ import { useAuth } from "@/store/auth-store";
 import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { Button } from "@/components/ui/button";
+import { trackMyAccount } from "@/lib/analytics";
 
 interface Order {
   id: string;
@@ -22,11 +23,18 @@ export default function AccountPage() {
   const { items: wishlistItems } = useWishlist();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     if (_hasHydrated && !user) openAuthModal("Please log in to view your account.");
   }, [_hasHydrated, user, openAuthModal]);
+
+  useEffect(() => {
+    if (user) {
+      trackMyAccount(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -37,6 +45,35 @@ export default function AccountPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+
+    setCancellingOrderId(orderId);
+
+    try {
+      const res = await fetch("/api/orders/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to cancel order");
+        return;
+      }
+
+      // Update the local orders state
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: "cancelled" } : o))
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to cancel order");
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
 
   if (!_hasHydrated) return null;
 
@@ -140,6 +177,7 @@ export default function AccountPage() {
                       order.status === "delivered" ? "bg-emerald-100 text-emerald-800" :
                       order.status === "shipped" ? "bg-blue-100 text-blue-800" :
                       order.status === "processing" ? "bg-yellow-100 text-yellow-800" :
+                      order.status === "cancelled" ? "bg-red-100 text-red-800" :
                       "bg-gray-100 text-gray-800"
                     }`}>
                       {order.status}
@@ -151,6 +189,17 @@ export default function AccountPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {new Date(order.placedAt).toLocaleDateString()}
                   </p>
+                  {(order.status === "pending" || order.status === "processing") && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCancelOrder(order.id)}
+                      disabled={cancellingOrderId === order.id}
+                      className="mt-2 text-red-600 hover:bg-red-50 text-xs h-7 px-2"
+                    >
+                      {cancellingOrderId === order.id ? "Cancelling..." : "Cancel Order"}
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

@@ -136,14 +136,28 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     fd.append("bucket", bucket);
     fd.append("path", path);
 
-    const res = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: fd,
-    });
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
 
-    if (!res.ok) throw new Error("Upload failed");
-    const d = (await res.json()) as { url: string };
-    return d.url;
+      const data = await res.json() as { url?: string; error?: string };
+
+      if (!res.ok) {
+        throw new Error(data.error || `Upload failed with status ${res.status}`);
+      }
+
+      if (!data.url) {
+        throw new Error("Upload successful but no URL returned");
+      }
+
+      return data.url;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      console.error("Upload error:", err);
+      throw new Error(message);
+    }
   }
 
   async function deleteStorageFile(url: string) {
@@ -710,6 +724,26 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                         className="hidden"
                       />
                     </label>
+                  </div>
+
+                  {/* Product Title */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Title (Display Name)</label>
+                    <input
+                      type="text"
+                      value={variant.productTitle || ""}
+                      onChange={(e) => {
+                        const updated = [...form.colorVariants];
+                        updated[index] = {
+                          ...updated[index],
+                          productTitle: e.target.value,
+                        };
+                        update("colorVariants", updated);
+                      }}
+                      placeholder={`e.g., Lekha Envelope Vegan Leather Zip Around Women's Wallet - [${variant.color}]`}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty to use product name with color</p>
                   </div>
 
                   {/* Stock Quantity */}

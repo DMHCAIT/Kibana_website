@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { formatINR } from "@/lib/utils";
+import { trackMyAccount } from "@/lib/analytics";
 
 type OrderItem = { productId: string; name: string; price: number; quantity: number; image: string };
 type Order = {
@@ -36,10 +37,18 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   useEffect(() => {
     if (_hasHydrated && !user) openAuthModal("Please log in to view your orders.");
   }, [_hasHydrated, user, openAuthModal]);
+
+  useEffect(() => {
+    if (user) {
+      trackMyAccount(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -50,6 +59,39 @@ export default function OrdersPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+
+    setCancellingOrderId(orderId);
+    setCancelError(null);
+
+    try {
+      const res = await fetch("/api/orders/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCancelError(data.error || "Failed to cancel order");
+        return;
+      }
+
+      // Update the local orders state
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: "cancelled" } : o))
+      );
+      
+      setCancellingOrderId(null);
+    } catch (err) {
+      setCancelError(err instanceof Error ? err.message : "Failed to cancel order");
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
 
   if (!_hasHydrated) return null;
 
@@ -200,6 +242,23 @@ export default function OrdersPage() {
                           <span className="text-sm font-semibold">Order Total</span>
                           <span className="text-base font-bold">{formatINR(order.total)}</span>
                         </div>
+
+                        {(order.status === "pending" || order.status === "processing") && (
+                          <div className="pt-2 border-t border-border">
+                            {cancelError && (
+                              <p className="text-xs text-red-600 mb-2">{cancelError}</p>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={cancellingOrderId === order.id}
+                              className="w-full rounded-none text-red-600 border-red-300 hover:bg-red-50"
+                            >
+                              {cancellingOrderId === order.id ? "Cancelling..." : "Cancel Order"}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </li>

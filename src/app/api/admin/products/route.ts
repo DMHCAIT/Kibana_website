@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getProducts, saveProduct } from "@/lib/server-data";
+import { getProducts, saveProduct, invalidateCache } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
 async function auth() {
@@ -20,5 +20,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "id, slug, name required" }, { status: 400 });
   }
   await saveProduct(body);
+  // ✅ Invalidate cache so website shows fresh data immediately
+  invalidateCache("products");
+  invalidateCache(`product-${body.id}`);
+  invalidateCache(`product-slug-${body.slug}`);
   return NextResponse.json({ success: true });
 }

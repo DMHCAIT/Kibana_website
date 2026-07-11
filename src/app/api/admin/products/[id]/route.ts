@@ -38,6 +38,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   const body = (await req.json()) as Product & { order?: number };
   await saveProduct({ ...body, id });
+  // ✅ Invalidate cache so website shows fresh data immediately
+  const importedInvalidateCache = (await import("@/lib/server-data")).invalidateCache;
+  importedInvalidateCache("products");
+  importedInvalidateCache(`product-${id}`);
+  importedInvalidateCache(`product-slug-${body.slug}`);
   return NextResponse.json({ success: true });
 }
 
@@ -60,5 +65,9 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   ]);
 
   await deleteProduct(id);
+  // ✅ Invalidate cache so website shows fresh data immediately
+  const importedInvalidateCache = (await import("@/lib/server-data")).invalidateCache;
+  importedInvalidateCache("products");
+  importedInvalidateCache(`product-${id}`);
   return NextResponse.json({ success: true });
 }

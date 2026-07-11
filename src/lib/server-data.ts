@@ -104,24 +104,46 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
-  if (!hasDatabase) return localProducts.find((p) => p.id === id);
+  // Check individual product cache first
+  const cached = getCached(`product-${id}`);
+  if (cached) return cached as Product | undefined;
+
+  if (!hasDatabase) {
+    const product = localProducts.find((p) => p.id === id);
+    setCached(`product-${id}`, product, 60000);
+    return product;
+  }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
-    if (row) return rowToProduct(row);
-    return localProducts.find((p) => p.id === id);
+    const product = row ? rowToProduct(row) : localProducts.find((p) => p.id === id);
+    setCached(`product-${id}`, product, 60000); // Cache for 1 minute
+    return product;
   } catch {
-    return localProducts.find((p) => p.id === id);
+    const product = localProducts.find((p) => p.id === id);
+    setCached(`product-${id}`, product, 60000);
+    return product;
   }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  if (!hasDatabase) return localProducts.find((p) => p.slug === slug);
+  // Check individual product cache first
+  const cached = getCached(`product-slug-${slug}`);
+  if (cached) return cached as Product | undefined;
+
+  if (!hasDatabase) {
+    const product = localProducts.find((p) => p.slug === slug);
+    setCached(`product-slug-${slug}`, product, 60000);
+    return product;
+  }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
-    if (row) return rowToProduct(row);
-    return localProducts.find((p) => p.slug === slug);
+    const product = row ? rowToProduct(row) : localProducts.find((p) => p.slug === slug);
+    setCached(`product-slug-${slug}`, product, 60000); // Cache for 1 minute
+    return product;
   } catch {
-    return localProducts.find((p) => p.slug === slug);
+    const product = localProducts.find((p) => p.slug === slug);
+    setCached(`product-slug-${slug}`, product, 60000);
+    return product;
   }
 }
 

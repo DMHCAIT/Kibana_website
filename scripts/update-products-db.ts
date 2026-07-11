@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
+import path from "path";
+
+// Load .env.local before importing anything else
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+
 import { db } from "@/lib/db";
 import { products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import fs from "fs";
-import path from "path";
 
 async function main() {
   console.log("=== Updating Products Database with Supabase URLs ===\n");
