@@ -161,6 +161,7 @@ function getOrderConfirmationTemplate(options: OrderConfirmationOptions) {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
+    timeZone: "Asia/Kolkata",
   });
 
   return `
