@@ -49,7 +49,7 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
       openAuthModal("Please log in to add items to your cart.");
       return;
     }
-    await add(product, qty);
+    await add(product, qty, activeVariant?.slug);
     
     // Track AddToCart event for Meta Pixel & Conversions API
     trackAddToCart(product, qty, user.id, user.email);

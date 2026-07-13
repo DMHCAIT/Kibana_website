@@ -9,12 +9,13 @@ import { trackAddToCart } from "@/lib/analytics";
 export type CartItem = {
   product: Product;
   quantity: number;
+  selectedColorSlug?: string; // Track which color variant was selected
 };
 
 type CartState = {
   items: CartItem[];
   isLoading: boolean;
-  add: (product: Product, quantity?: number) => Promise<void>;
+  add: (product: Product, quantity?: number, colorSlug?: string) => Promise<void>;
   remove: (productId: string) => Promise<void>;
   setQuantity: (productId: string, quantity: number) => Promise<void>;
   clear: () => void;
@@ -30,19 +31,19 @@ export const useCart = create<CartState>()((set, get) => ({
   items: [],
   isLoading: false,
 
-  add: async (product, quantity = 1) => {
+  add: async (product, quantity = 1, colorSlug?) => {
     // Get the current user from auth store
     const user = useAuth.getState().user;
     if (!user) return;
 
     // OPTIMISTIC UPDATE: Update UI immediately
     const state = get();
-    const existing = state.items.find((i) => i.product.id === product.id);
+    const existing = state.items.find((i) => i.product.id === product.id && i.selectedColorSlug === colorSlug);
     const next = existing
       ? state.items.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
+          i.product.id === product.id && i.selectedColorSlug === colorSlug ? { ...i, quantity: i.quantity + quantity } : i,
         )
-      : [...state.items, { product, quantity }];
+      : [...state.items, { product, quantity, selectedColorSlug: colorSlug }];
     set({ items: next });
     trackAddToCart(product, quantity);
 
@@ -50,7 +51,7 @@ export const useCart = create<CartState>()((set, get) => ({
     fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId: product.id, quantity }),
+      body: JSON.stringify({ productId: product.id, quantity, colorSlug }),
     }).catch((error) => {
       console.error("Failed to sync cart to server:", error);
     });

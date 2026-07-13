@@ -282,13 +282,21 @@ export function CheckoutView() {
     const body = {
       id,
       user: { name: user.name, email: user.email, id: user.id },
-      items: items.map((i) => ({
-        productId: i.product.id,
-        name: i.product.name,
-        price: i.product.price,
-        quantity: i.quantity,
-        image: i.product.image,
-      })),
+      items: items.map((i) => {
+        // Get the display name using variant productTitle if available
+        const variant = i.selectedColorSlug
+          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+          : i.product.colorVariants?.[0];
+        const displayName = variant?.productTitle || i.product.name;
+
+        return {
+          productId: i.product.id,
+          name: displayName,
+          price: i.product.price,
+          quantity: i.quantity,
+          image: variant?.image || i.product.image,
+        };
+      }),
       total,
       status: "pending",
       shippingAddress: shippingText,
@@ -315,12 +323,19 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => ({
-            name: i.product.name,
-            price: i.product.price,
-            quantity: i.quantity,
-            image: i.product.image,
-          })),
+          items: items.map((i) => {
+            const variant = i.selectedColorSlug
+              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+              : i.product.colorVariants?.[0];
+            const displayName = variant?.productTitle || i.product.name;
+
+            return {
+              name: displayName,
+              price: i.product.price,
+              quantity: i.quantity,
+              image: variant?.image || i.product.image,
+            };
+          }),
           total,
           paymentMethod: paymentLabel,
           shippingAddress: shippingText,
@@ -351,13 +366,20 @@ export function CheckoutView() {
       const body = {
         id,
         user: { name: user.name, email: user.email, id: user.id },
-        items: items.map((i) => ({
-          productId: i.product.id,
-          name: i.product.name,
-          price: i.product.price,
-          quantity: i.quantity,
-          image: i.product.image,
-        })),
+        items: items.map((i) => {
+          const variant = i.selectedColorSlug
+            ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+            : i.product.colorVariants?.[0];
+          const displayName = variant?.productTitle || i.product.name;
+
+          return {
+            productId: i.product.id,
+            name: displayName,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: variant?.image || i.product.image,
+          };
+        }),
         total,
         status: "confirmed",
         shippingAddress: shippingText,
@@ -386,12 +408,19 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => ({
-            name: i.product.name,
-            price: i.product.price,
-            quantity: i.quantity,
-            image: i.product.image,
-          })),
+          items: items.map((i) => {
+            const variant = i.selectedColorSlug
+              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+              : i.product.colorVariants?.[0];
+            const displayName = variant?.productTitle || i.product.name;
+
+            return {
+              name: displayName,
+              price: i.product.price,
+              quantity: i.quantity,
+              image: variant?.image || i.product.image,
+            };
+          }),
           total,
           paymentMethod: `UPI (${upiId})`,
           shippingAddress: shippingText,
@@ -424,13 +453,20 @@ export function CheckoutView() {
       const body = {
         id,
         user: { name: user.name, email: user.email, id: user.id },
-        items: items.map((i) => ({
-          productId: i.product.id,
-          name: i.product.name,
-          price: i.product.price,
-          quantity: i.quantity,
-          image: i.product.image,
-        })),
+        items: items.map((i) => {
+          const variant = i.selectedColorSlug
+            ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+            : i.product.colorVariants?.[0];
+          const displayName = variant?.productTitle || i.product.name;
+
+          return {
+            productId: i.product.id,
+            name: displayName,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: variant?.image || i.product.image,
+          };
+        }),
         total,
         status: "confirmed",
         shippingAddress: shippingText,
@@ -459,12 +495,19 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => ({
-            name: i.product.name,
-            price: i.product.price,
-            quantity: i.quantity,
-            image: i.product.image,
-          })),
+          items: items.map((i) => {
+            const variant = i.selectedColorSlug
+              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+              : i.product.colorVariants?.[0];
+            const displayName = variant?.productTitle || i.product.name;
+
+            return {
+              name: displayName,
+              price: i.product.price,
+              quantity: i.quantity,
+              image: variant?.image || i.product.image,
+            };
+          }),
           total,
           paymentMethod: "Debit / Credit Card",
           shippingAddress: shippingText,
