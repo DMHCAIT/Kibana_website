@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone, Clock, CheckCircle } from "lucide-react";
+import { TrackPageView } from "@/components/analytics/track-page-view";
+import { trackViewPage } from "@/lib/analytics";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    trackViewPage("Contact Us", "contact");
+  }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -28,17 +34,14 @@ export default function ContactPage() {
         throw new Error((data as { error?: string }).error ?? "Something went wrong.");
       }
       
-      // Track contact form submission
-      if (typeof window !== "undefined") {
-        const fbq = (window as unknown as { fbq?: (event: string, name: string, data?: Record<string, unknown>) => void }).fbq;
-        if (fbq) {
-          fbq("track", "Contact", {
-            content_name: "Contact Form",
-            content_type: "form",
-            value: 0,
-            currency: "INR",
-          });
-        }
+      // Track contact form submission via unified tracking
+      if (typeof window !== "undefined" && window.fbq) {
+        window.fbq("track", "Contact", {
+          content_name: "Contact Form Submission",
+          content_type: "form",
+          value: 0,
+          currency: "INR",
+        });
       }
       
       setSuccess(true);
@@ -51,6 +54,7 @@ export default function ContactPage() {
   }
   return (
     <main className="bg-kibana-cream text-kibana-ink">
+      <TrackPageView pageName="Contact Us" pageType="contact" />
 
       {/* ── Hero ── */}
       <section className="bg-kibana-ink">

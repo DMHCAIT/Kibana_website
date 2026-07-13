@@ -11,6 +11,7 @@ import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { formatINR } from "@/lib/utils";
 import { trackMyAccount } from "@/lib/analytics";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 
 type OrderItem = { productId: string; name: string; price: number; quantity: number; image: string };
 type Order = {
@@ -110,6 +111,7 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 pb-24 md:pb-12">
+      <TrackPageView pageName="My Orders\" pageType=\"orders\" />
       <div className="container max-w-2xl py-6 px-4 sm:px-6">
         <h1 className="font-display text-2xl sm:text-3xl mb-5">My Orders</h1>
 

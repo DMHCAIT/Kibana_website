@@ -256,13 +256,18 @@ export function trackPurchase(
     payment_method: paymentMethod || "unknown",
     timestamp: new Date().toISOString(),
   });
+  
+  // Meta Pixel Purchase Event with all required fields
   trackMetaEvent("Purchase", {
-    content_type: "purchase",
+    content_type: "product",
     content_ids: items.map((i) => i.product.id),
     content_name: `Order #${orderId}`,
     num_items: items.length,
     value: total,
     currency: "INR",
+    status: "completed",
+    payment_method: paymentMethod || "razorpay",
+    delivery_category: "curbside",
   });
 }
 
