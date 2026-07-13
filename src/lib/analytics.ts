@@ -4,6 +4,7 @@ declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown>>;
     fbq?: (event: string, name: string, data?: Record<string, unknown>) => void;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -38,6 +39,12 @@ function toGa4Item(product: Product, quantity = 1): Ga4Item {
     price: product.price,
     quantity,
   };
+}
+
+// Direct GA4 tracking via gtag() — ensures events reach GA4 even if GTM is misconfigured
+function trackGa4Event(eventName: string, data?: Record<string, unknown>) {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("event", eventName, data || {});
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -93,6 +100,9 @@ export function trackLogin(userId: string, email?: string) {
     timestamp: new Date().toISOString(),
   });
   
+  // Direct GA4 tracking
+  trackGa4Event("login", { method: "email_otp", user_id: userId });
+  
   trackMetaEvent("Login", { user_id: userId });
   
   // Server-side tracking for guaranteed delivery
@@ -111,6 +121,9 @@ export function trackSignUp(userId: string, email?: string) {
     email: email,
     timestamp: new Date().toISOString(),
   });
+  
+  // Direct GA4 tracking
+  trackGa4Event("sign_up", { method: "email_otp", user_id: userId });
   
   trackMetaEvent("CompleteRegistration", { user_id: userId, email: email });
   
@@ -286,6 +299,13 @@ export function trackAddToCart(
     timestamp: new Date().toISOString(),
   });
   
+  // Direct GA4 tracking
+  trackGa4Event("add_to_cart", {
+    items: [toGa4Item(product, quantity)],
+    currency: "INR",
+    value: product.price * quantity,
+  });
+  
   trackMetaEvent("AddToCart", {
     content_name: product.name,
     content_type: "product",
@@ -325,6 +345,14 @@ export function trackCheckout(
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
+  
+  // Direct GA4 tracking
+  trackGa4Event("begin_checkout", {
+    items: ga4Items,
+    currency: "INR",
+    value: total,
+  });
+  
   trackMetaEvent("InitiateCheckout", {
     content_type: "checkout",
     content_ids: items.map((i) => i.product.id),
@@ -368,6 +396,15 @@ export function trackPurchase(
     user_id: userId,
     payment_method: paymentMethod || "unknown",
     timestamp: new Date().toISOString(),
+  });
+  
+  // Direct GA4 tracking (in addition to GTM)
+  trackGa4Event("purchase", {
+    transaction_id: orderId,
+    value: total,
+    currency: "INR",
+    items: ga4Items,
+    payment_method: paymentMethod || "unknown",
   });
   
   // Meta Pixel Purchase Event with ALL required fields per Meta spec

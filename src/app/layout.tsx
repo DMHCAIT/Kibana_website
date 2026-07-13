@@ -84,6 +84,7 @@ export const viewport: Viewport = {
 const FALLBACK_CONFIG = { announcementBar: "" };
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
   return Promise.race([
@@ -120,6 +121,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               />
             </noscript>
           </>
+        ) : null}
+        {/* Google Analytics 4 Script */}
+        {GA4_MEASUREMENT_ID ? (
+          <Script
+            id="ga4-script"
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
+          />
+        ) : null}
+        {GA4_MEASUREMENT_ID ? (
+          <Script id="ga4-config" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA4_MEASUREMENT_ID}', {
+                'allow_google_signals': true,
+                'allow_ad_personalization_signals': true,
+                'anonymize_ip': false
+              });
+            `}
+          </Script>
         ) : null}
         {/* Meta Pixel Script */}
         {META_PIXEL_ID ? (
