@@ -22,6 +22,7 @@ type Props = {
   displayName?: string;
   displayImage?: string;
   variantInStock?: boolean; // New: indicates if color variant is out of stock
+  variantKey?: string; // New: unique key for wishlist tracking per color variant
   priority?: boolean;
 };
 
@@ -34,6 +35,7 @@ export function ProductCard({
   displayName,
   displayImage,
   variantInStock = true, // Default to in stock
+  variantKey, // New: variant-specific wishlist key
   priority = false,
 }: Props) {
   const add = useCart((s) => s.add);
@@ -41,9 +43,12 @@ export function ProductCard({
   const { user, openAuthModal } = useAuth();
   const [inWishlist, setInWishlist] = useState(false);
 
+  // Use variantKey for wishlist tracking (per color variant), fallback to product.id for backward compatibility
+  const wishlistKey = variantKey ?? product.id;
+
   useEffect(() => {
-    setInWishlist(isInWishlist(product.id));
-  }, [product.id, isInWishlist]);
+    setInWishlist(isInWishlist(wishlistKey));
+  }, [wishlistKey, isInWishlist]);
 
   const pct = discountPct(product.price, product.compareAtPrice);
   const productHref = href ?? `/shop/${product.slug}`;
@@ -65,11 +70,11 @@ export function ProductCard({
       return;
     }
     if (inWishlist) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(wishlistKey);
       trackWishlist(product, "remove", user.id);
       setInWishlist(false);
     } else {
-      addToWishlist(product.id);
+      addToWishlist(wishlistKey);
       trackWishlist(product, "add", user.id);
       setInWishlist(true);
     }

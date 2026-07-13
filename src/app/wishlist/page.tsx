@@ -5,22 +5,77 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
+import { useProductCache } from "@/store/product-cache";
 import { TrackPageView } from "@/components/analytics/track-page-view";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
+import { getShopDisplayImage } from "@/lib/product-images";
+
+type WishlistItem = {
+  product: Product;
+  variantKey: string; // e.g., "prod-id-color-slug" or just "prod-id"
+  displayImage: string; // Image specific to this variant
+  displayName: string; // Name specific to this variant
+};
 
 export default function WishlistPage() {
   const { user, openAuthModal, _hasHydrated } = useAuth();
   const { items } = useWishlist();
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
   useEffect(() => {
-    fetch("/api/products")
-      .then((r) => r.json())
-      .then(setAllProducts)
-      .catch(() => {});
-  }, []);
+    const loadWishlistItems = async () => {
+      const products = await useProductCache.getState().fetch();
+
+      // Map wishlist items to products with variant information
+      const mappedItems = items
+        .map((itemKey) => {
+          // itemKey format: "prod-id" or "prod-id-color-slug"
+          const product = products.find((p) => p.id === itemKey);
+
+          if (product) {
+            // Simple product ID (no color variant)
+            return {
+              product,
+              variantKey: itemKey,
+              displayImage: product.displayImage,
+              displayName: product.name,
+            };
+          }
+
+          // Try to parse as "prod-id-color-slug" by finding matching product
+          // We need to check if any product has this ID and a variant with this slug
+          for (const prod of products) {
+            if (itemKey.startsWith(prod.id + "-")) {
+              // This could be the product, extract the variant slug
+              const variantPart = itemKey.substring(prod.id.length + 1);
+              const variant = prod.colorVariants?.find((v) => v.slug === variantPart);
+
+              if (variant) {
+                return {
+                  product: prod,
+                  variantKey: itemKey,
+                  displayImage: getShopDisplayImage(prod, variant),
+                  displayName:
+                    (prod.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
+                    prod.slug === "mini-aurelia-fan-tote"
+                      ? "Mini Aurelia Fan Tote"
+                      : variant.productTitle || `${prod.name} - ${variant.color}`,
+                };
+              }
+            }
+          }
+
+          return null;
+        })
+        .filter((item): item is WishlistItem => item !== null);
+
+      setWishlistItems(mappedItems);
+    };
+
+    loadWishlistItems();
+  }, [items]);
 
   useEffect(() => {
     if (_hasHydrated && !user) {
@@ -52,9 +107,7 @@ export default function WishlistPage() {
     );
   }
 
-  const wishlistProducts = allProducts.filter((p) => items.includes(p.id));
-
-  if (wishlistProducts.length === 0) {
+  if (wishlistItems.length === 0) {
     return (
       <>
         <TrackPageView pageName="Wishlist" pageType="wishlist" />
@@ -80,14 +133,21 @@ export default function WishlistPage() {
       <div className="mb-6">
         <h1 className="font-display text-3xl sm:text-4xl tracking-wide">Wishlist</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Hi {user.name} — {wishlistProducts.length}{" "}
-          {wishlistProducts.length === 1 ? "item" : "items"} saved
+          Hi {user.name} — {wishlistItems.length}{" "}
+          {wishlistItems.length === 1 ? "item" : "items"} saved
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
-        {wishlistProducts.map((product) => (
-          <ProductCard key={product.id} product={product} variant="full" />
+        {wishlistItems.map((item) => (
+          <ProductCard
+            key={item.variantKey}
+            product={item.product}
+            variant="full"
+            variantKey={item.variantKey}
+            displayImage={item.displayImage}
+            displayName={item.displayName}
+          />
         ))}
       </div>
     </section>

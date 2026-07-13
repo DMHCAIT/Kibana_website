@@ -5,11 +5,11 @@ import { create } from "zustand";
 let _userId: string | null = null;
 
 type WishlistState = {
-  items: string[];
+  items: string[]; // Now stores variant keys like "prod-id-color-slug" or just "prod-id"
   isLoading: boolean;
-  add: (productId: string) => Promise<void>;
-  remove: (productId: string) => Promise<void>;
-  has: (productId: string) => boolean;
+  add: (itemKey: string) => Promise<void>; // itemKey can be productId or productId-variantSlug
+  remove: (itemKey: string) => Promise<void>; // itemKey can be productId or productId-variantSlug
+  has: (itemKey: string) => boolean;
   clear: () => void;
   /** Called by auth store after login — loads this user's saved wishlist from API */
   loadForUser: (userId: string) => Promise<void>;

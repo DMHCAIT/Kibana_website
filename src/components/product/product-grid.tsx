@@ -3,12 +3,13 @@ import { ProductCard } from "./product-card";
 import { cn } from "@/lib/utils";
 
 type ProductGridItem = {
-  key: string;
+  key: string; // Unique key for variant, e.g., "prod-id-color-slug"
   product: Product;
   href?: string;
   displayName?: string;
   displayImage?: string;
   variantInStock?: boolean;
+  variantKey?: string; // Optional: variant-specific wishlist key, defaults to key
 };
 
 type Props = {
@@ -46,6 +47,7 @@ export function ProductGrid({
           displayName={item.displayName}
           displayImage={item.displayImage}
           variantInStock={item.variantInStock}
+          variantKey={item.variantKey ?? item.key} // Use variantKey if provided, otherwise use item.key
           variant={variant}
           priority={index < 4}
         />

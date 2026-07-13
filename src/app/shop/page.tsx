@@ -39,11 +39,12 @@ type ProductListItem = {
   displayName?: string;
   displayImage?: string;
   variantInStock?: boolean;
+  variantKey?: string; // Unique key for wishlist tracking per color variant
 };
 
 function toVariantListingItems(product: Product): ProductListItem[] {
   if (!product.colorVariants?.length) {
-    return [{ key: product.id, product }];
+    return [{ key: product.id, product, variantKey: product.id }];
   }
 
   return product.colorVariants
@@ -59,6 +60,7 @@ function toVariantListingItems(product: Product): ProductListItem[] {
           : variant.productTitle || `${product.name} - ${variant.color}`,
       displayImage: getShopDisplayImage(product, variant),
       variantInStock: variant.inStock !== false,
+      variantKey: `${product.id}-${variant.slug}`, // Use key as variantKey for wishlist
     }));
 }
 
