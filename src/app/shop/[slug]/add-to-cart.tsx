@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
-import { cn, formatINR } from "@/lib/utils";
+import { cn, formatINR, getProductDisplayName } from "@/lib/utils";
 import { trackAddToCart } from "@/lib/analytics";
 import type { Product } from "@/types/product";
 
@@ -79,7 +79,7 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
                 />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs font-medium">{activeVariant?.productTitle || product.name}</p>
+                <p className="truncate text-xs font-medium">{getProductDisplayName(product, activeVariant)}</p>
                 <p className="text-xs text-muted-foreground">
                   Qty: {qty} · {formatINR(product.price * qty)}
                 </p>

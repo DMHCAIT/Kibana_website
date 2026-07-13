@@ -17,7 +17,7 @@ import {
 import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getProductDisplayName } from "@/lib/utils";
 import { UPIPayment } from "@/components/payment/upi-payment";
 import { CardPayment } from "@/components/payment/card-payment";
 import { trackCheckout, trackPurchase } from "@/lib/analytics";
@@ -283,11 +283,11 @@ export function CheckoutView() {
       id,
       user: { name: user.name, email: user.email, id: user.id },
       items: items.map((i) => {
-        // Get the display name using variant productTitle if available
+        // Get the display name using variant color
         const variant = i.selectedColorSlug
           ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
           : i.product.colorVariants?.[0];
-        const displayName = variant?.productTitle || i.product.name;
+        const displayName = getProductDisplayName(i.product, variant);
 
         return {
           productId: i.product.id,
@@ -327,7 +327,7 @@ export function CheckoutView() {
             const variant = i.selectedColorSlug
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
-            const displayName = variant?.productTitle || i.product.name;
+            const displayName = getProductDisplayName(i.product, variant);
 
             return {
               name: displayName,
@@ -370,7 +370,7 @@ export function CheckoutView() {
           const variant = i.selectedColorSlug
             ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
             : i.product.colorVariants?.[0];
-          const displayName = variant?.productTitle || i.product.name;
+          const displayName = getProductDisplayName(i.product, variant);
 
           return {
             productId: i.product.id,
@@ -412,7 +412,7 @@ export function CheckoutView() {
             const variant = i.selectedColorSlug
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
-            const displayName = variant?.productTitle || i.product.name;
+            const displayName = getProductDisplayName(i.product, variant);
 
             return {
               name: displayName,
@@ -457,7 +457,7 @@ export function CheckoutView() {
           const variant = i.selectedColorSlug
             ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
             : i.product.colorVariants?.[0];
-          const displayName = variant?.productTitle || i.product.name;
+          const displayName = getProductDisplayName(i.product, variant);
 
           return {
             productId: i.product.id,
@@ -499,7 +499,7 @@ export function CheckoutView() {
             const variant = i.selectedColorSlug
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
-            const displayName = variant?.productTitle || i.product.name;
+            const displayName = getProductDisplayName(i.product, variant);
 
             return {
               name: displayName,

@@ -7,6 +7,7 @@ import { useAuth } from "@/store/auth-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { useProductCache } from "@/store/product-cache";
 import { TrackPageView } from "@/components/analytics/track-page-view";
+import { getProductDisplayName } from "@/lib/utils";
 import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
@@ -57,11 +58,7 @@ export default function WishlistPage() {
                   product: prod,
                   variantKey: itemKey,
                   displayImage: getShopDisplayImage(prod, variant),
-                  displayName:
-                    (prod.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
-                    prod.slug === "mini-aurelia-fan-tote"
-                      ? "Mini Aurelia Fan Tote"
-                      : variant.productTitle || `${prod.name} - ${variant.color}`,
+                  displayName: getProductDisplayName(prod, variant),
                 };
               }
             }

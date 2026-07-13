@@ -8,7 +8,7 @@ import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getProductDisplayName } from "@/lib/utils";
 import { trackWishlist } from "@/lib/analytics";
 
 export function CartView() {
@@ -53,7 +53,7 @@ export function CartView() {
             const variant = selectedColorSlug
               ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
               : product.colorVariants?.[0];
-            const displayName = variant?.productTitle || product.name;
+            const displayName = getProductDisplayName(product, variant);
             const displayImage = variant?.image || product.image;
 
             return (
