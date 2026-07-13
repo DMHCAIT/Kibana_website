@@ -86,12 +86,12 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // Check cache first (60 second TTL)
+  // Check cache first (30 second TTL - reduced from 60 for faster updates on out-of-stock changes)
   const cached = getCached("products");
   if (cached) return cached as Product[];
 
   if (!hasDatabase) {
-    setCached("products", localProducts, 60000);
+    setCached("products", localProducts, 30000);
     return localProducts;
   }
 
@@ -99,50 +99,50 @@ export async function getProducts(): Promise<Product[]> {
     db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
   const result = rows && rows.length > 0 ? rows.map(rowToProduct) : localProducts;
-  setCached("products", result, 60000); // Cache for 1 minute
+  setCached("products", result, 30000); // Cache for 30 seconds (instead of 60)
   return result;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
-  // Check individual product cache first
+  // Check individual product cache first (30 second TTL)
   const cached = getCached(`product-${id}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000);
+    setCached(`product-${id}`, product, 30000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000); // Cache for 1 minute
+    setCached(`product-${id}`, product, 30000); // Cache for 30 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000);
+    setCached(`product-${id}`, product, 30000);
     return product;
   }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  // Check individual product cache first
+  // Check individual product cache first (30 second TTL)
   const cached = getCached(`product-slug-${slug}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000);
+    setCached(`product-slug-${slug}`, product, 30000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000); // Cache for 1 minute
+    setCached(`product-slug-${slug}`, product, 30000); // Cache for 30 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000);
+    setCached(`product-slug-${slug}`, product, 30000);
     return product;
   }
 }

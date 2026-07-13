@@ -96,7 +96,18 @@ export const useCart = create<CartState>()((set, get) => ({
     }
   },
 
-  clear: () => set({ items: [] }),
+  clear: () => {
+    // Clear local state immediately
+    set({ items: [] });
+    
+    // Sync with server to remove all cart items
+    fetch("/api/cart/clear", { 
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    }).catch((error) => {
+      console.error("Failed to clear cart on server:", error);
+    });
+  },
 
   count: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
 
