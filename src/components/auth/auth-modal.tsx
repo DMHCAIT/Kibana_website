@@ -6,7 +6,6 @@ import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { trackLogin, trackSignUp } from "@/lib/analytics";
 
 type Step = "email" | "otp";
 
@@ -148,15 +147,6 @@ export function AuthModal() {
       setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 50);
       return;
-    }
-
-    // Track login/signup events
-    if (result.user && result.user.id) {
-      if (isNewUser) {
-        trackSignUp(result.user.id, email);
-      } else {
-        trackLogin(result.user.id, email);
-      }
     }
 
     // Success! Modal will close automatically via auth state update

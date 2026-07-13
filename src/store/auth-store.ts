@@ -43,7 +43,7 @@ type AuthState = {
     email: string,
     otp: string,
     signupData?: { name: string; phone?: string },
-  ) => Promise<{ error?: string }>;
+  ) => Promise<{ error?: string; user?: AuthUser }>;
 
   logout: () => Promise<void>;
 };
@@ -182,10 +182,11 @@ export const useAuth = create<AuthState>()((set) => ({
           useCart.getState().loadForUser(data.user.id),
         ]);
 
+        // Track login/signup with email for better user matching
         if (signupData) {
-          trackSignUp(data.user.id);
+          trackSignUp(data.user.id, cleanEmail);
         } else {
-          trackLogin(data.user.id);
+          trackLogin(data.user.id, cleanEmail);
         }
 
         // Record login in admin users panel (fire-and-forget)
@@ -194,6 +195,8 @@ export const useAuth = create<AuthState>()((set) => ({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data.user),
         }).catch(() => {});
+
+        return { user: data.user };
       }
 
       return {};
