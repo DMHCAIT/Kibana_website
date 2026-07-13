@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { getProducts } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
-// Cache products for 5 minutes (since they change infrequently)
+// Cache products for 30 seconds — matches server-side cache TTL for inventory updates
 let cachedProducts: Product[] | null = null;
 let cacheTime = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 30 * 1000; // 30 seconds (reduced from 5 minutes)
 
 export async function GET() {
   const now = Date.now();
@@ -14,8 +14,8 @@ export async function GET() {
   if (cachedProducts && now - cacheTime < CACHE_DURATION) {
     return NextResponse.json(cachedProducts, {
       headers: {
-        "Cache-Control": "public, max-age=300", // 5 minutes
-        "CDN-Cache-Control": "max-age=300",
+        "Cache-Control": "private, max-age=30", // 30 seconds (reduced from 300)
+        "CDN-Cache-Control": "max-age=30",
       },
     });
   }
@@ -29,8 +29,8 @@ export async function GET() {
 
   return NextResponse.json(products, {
     headers: {
-      "Cache-Control": "public, max-age=300", // 5 minutes
-      "CDN-Cache-Control": "max-age=300",
+      "Cache-Control": "private, max-age=30", // 30 seconds (reduced from 300)
+      "CDN-Cache-Control": "max-age=30",
     },
   });
 }

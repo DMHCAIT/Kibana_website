@@ -8,6 +8,9 @@ import { getShopDisplayImage } from "@/lib/product-images";
 import { TrackProductListingView } from "@/components/analytics/track-product-listing-view";
 import type { Product } from "@/types/product";
 
+// Disable static caching for dynamic inventory/out-of-stock updates
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Shop Premium Bags | Kibana",
   description:
