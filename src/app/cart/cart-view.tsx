@@ -49,15 +49,22 @@ export function CartView() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px]">
         <ul className="bg-card divide-y divide-border rounded-xl border border-border">
-          {items.map(({ product, quantity }) => (
+          {items.map(({ product, quantity, selectedColorSlug }) => {
+            const variant = selectedColorSlug
+              ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
+              : product.colorVariants?.[0];
+            const displayName = variant?.productTitle || product.name;
+            const displayImage = variant?.image || product.image;
+
+            return (
             <li key={product.id} className="flex gap-3 p-3 sm:gap-4 sm:p-4">
               <Link
-                href={`/shop/${product.slug}`}
+                href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
                 className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-24"
               >
                 <Image
-                  src={product.image}
-                  alt={product.name}
+                  src={displayImage}
+                  alt={displayName}
                   fill
                   sizes="96px"
                   className="object-cover"
@@ -67,10 +74,10 @@ export function CartView() {
               <div className="flex flex-1 flex-col">
                 <div className="flex items-start justify-between gap-2">
                   <Link
-                    href={`/shop/${product.slug}`}
+                    href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
                     className="line-clamp-2 text-sm font-medium hover:underline"
                   >
-                    {product.name}
+                    {displayName}
                   </Link>
                   <button
                     aria-label="Remove"
@@ -119,7 +126,8 @@ export function CartView() {
                 </div>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
 
         <aside className="bg-card h-fit rounded-xl border border-border p-5 lg:sticky lg:top-24">

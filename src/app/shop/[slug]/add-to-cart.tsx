@@ -71,7 +71,7 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
             <div className="mt-1.5 flex items-center gap-2.5">
               <div className="relative h-10 w-9 shrink-0 overflow-hidden rounded bg-muted">
                 <Image
-                  src={product.image}
+                  src={activeVariant?.image || product.image}
                   alt={product.name}
                   fill
                   sizes="36px"
@@ -79,7 +79,7 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
                 />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs font-medium">{product.name}</p>
+                <p className="truncate text-xs font-medium">{activeVariant?.productTitle || product.name}</p>
                 <p className="text-xs text-muted-foreground">
                   Qty: {qty} · {formatINR(product.price * qty)}
                 </p>
