@@ -146,6 +146,13 @@ export function trackSelectCategory(category: string) {
     content_type: "category",
     content_category: category,
   });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("ViewContent", {
+    content_name: `Category: ${category}`,
+    content_type: "category",
+    content_category: category,
+  });
 }
 
 /** 5. VIEW CONTENT EVENT - Fired when user views product details */
@@ -160,6 +167,16 @@ export function trackViewContent(product: Product) {
     timestamp: new Date().toISOString(),
   });
   trackMetaEvent("ViewContent", {
+    content_name: product.name,
+    content_type: "product",
+    content_ids: [product.id],
+    content_category: product.category,
+    value: product.price,
+    currency: "INR",
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("ViewContent", {
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
@@ -184,6 +201,13 @@ export function trackProductListingView(category?: string, productCount?: number
     content_type: "product_list",
     content_category: category,
   });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("ViewContent", {
+    content_name: `Product Listing${category ? ": " + category : ""}`,
+    content_type: "product_list",
+    content_category: category,
+  });
 }
 
 /** 7. MY ACCOUNT EVENT - Fired when user visits account page */
@@ -198,6 +222,13 @@ export function trackMyAccount(userId: string) {
     content_name: "My Account",
     content_type: "account",
     user_id: userId,
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("ViewContent", {
+    user_id: userId,
+    content_name: "My Account",
+    content_type: "account",
   });
 }
 
@@ -219,6 +250,16 @@ export function trackWishlist(
     timestamp: new Date().toISOString(),
   });
   trackMetaEvent("AddToWishlist", {
+    content_name: product.name,
+    content_type: "product",
+    content_ids: [product.id],
+    value: product.price,
+    currency: "INR",
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("AddToWishlist", {
+    user_id: userId,
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
@@ -287,6 +328,16 @@ export function trackCheckout(
   trackMetaEvent("InitiateCheckout", {
     content_type: "checkout",
     content_ids: items.map((i) => i.product.id),
+    num_items: items.length,
+    value: total,
+    currency: "INR",
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("InitiateCheckout", {
+    user_id: userId,
+    content_type: "checkout",
+    content_ids: items.map((i) => i.product.id).join(","),
     num_items: items.length,
     value: total,
     currency: "INR",
@@ -418,6 +469,12 @@ export function trackViewPage(pageName: string, pageType: string) {
     timestamp: new Date().toISOString(),
   });
   trackMetaEvent("ViewContent", {
+    content_name: pageName,
+    content_type: pageType,
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("ViewContent", {
     content_name: pageName,
     content_type: pageType,
   });
