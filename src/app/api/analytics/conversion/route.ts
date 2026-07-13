@@ -75,10 +75,39 @@ export async function POST(request: NextRequest) {
 
     // Build custom data
     const customData: Record<string, unknown> = {};
-    if (data.value) customData.value = data.value;
+    if (data.value !== undefined && data.value !== null) {
+      customData.value = parseFloat(String(data.value));
+    }
     if (data.currency) customData.currency = data.currency;
     if (data.order_id) customData.order_id = data.order_id;
     if (data.num_items) customData.num_items = data.num_items;
+    if (data.content_type) customData.content_type = data.content_type;
+    if (data.content_ids) customData.content_ids = data.content_ids;
+    if (data.content_name) customData.content_name = data.content_name;
+    if (data.content_id) customData.content_id = data.content_id;
+    if (data.payment_method) customData.payment_method = data.payment_method;
+
+    // Validate required fields for Purchase events
+    if (eventName === "Purchase") {
+      if (!customData.value) {
+        console.error("❌ Purchase event missing 'value' field");
+        return NextResponse.json(
+          { success: false, error: "Purchase event requires 'value' field" },
+          { status: 400 }
+        );
+      }
+      if (!customData.currency) {
+        console.error("❌ Purchase event missing 'currency' field");
+        return NextResponse.json(
+          { success: false, error: "Purchase event requires 'currency' field" },
+          { status: 400 }
+        );
+      }
+      if (!customData.content_type) {
+        console.warn("⚠️ Purchase event missing 'content_type' field - adding default 'product'");
+        customData.content_type = "product";
+      }
+    }
 
     // Build Conversions API payload
     const conversionsData = {
@@ -104,6 +133,7 @@ export async function POST(request: NextRequest) {
       timestamp,
       hashedUserDataKeys: Object.keys(hashedUserData),
       customData,
+      userDataCount: Object.keys(hashedUserData).length,
     });
 
     // Send to Meta Conversions API
@@ -121,11 +151,14 @@ export async function POST(request: NextRequest) {
     const result = await response.json();
 
     if (!response.ok) {
-      console.error("Meta API Error:", result);
+      console.error(`❌ Meta API Error (${response.status}):`, result);
+      console.error("Full error response:", JSON.stringify(result, null, 2));
       return NextResponse.json(
         {
           success: false,
-          error: result.error?.message || "Unknown error",
+          error: result.error?.message || "Unknown error from Meta API",
+          errorType: result.error?.type,
+          errorCode: result.error?.code,
           details: result,
         },
         { status: response.status }

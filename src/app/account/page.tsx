@@ -8,6 +8,7 @@ import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { Button } from "@/components/ui/button";
 import { trackMyAccount } from "@/lib/analytics";
+import { TrackPageView } from "@/components/analytics/track-page-view";
 
 interface Order {
   id: string;
@@ -96,6 +97,7 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 pb-24 md:pb-12">
+      <TrackPageView pageName="My Account" pageType="account" />
       <div className="container max-w-4xl py-6 px-4 sm:px-6">
         <h1 className="font-display text-2xl sm:text-3xl mb-5">My Account</h1>
 

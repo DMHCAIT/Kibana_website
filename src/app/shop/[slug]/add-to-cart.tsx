@@ -51,8 +51,8 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
     }
     await add(product, qty);
     
-    // Track AddToCart event for Meta Pixel
-    trackAddToCart(product, qty, user.id);
+    // Track AddToCart event for Meta Pixel & Conversions API
+    trackAddToCart(product, qty, user.id, user.email);
     
     setAddedNotification(true);
     setTimeout(() => setAddedNotification(false), 4000);

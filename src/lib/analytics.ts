@@ -44,8 +44,39 @@ function toGa4Item(product: Product, quantity = 1): Ga4Item {
 // META PIXEL HELPER FUNCTIONS
 // ────────────────────────────────────────────────────────────────────────────
 
+// Valid Meta Pixel standard events
+const META_STANDARD_EVENTS = [
+  "Purchase",
+  "AddToCart",
+  "ViewContent",
+  "CompleteRegistration",
+  "Login",
+  "PageView",
+  "InitiateCheckout",
+  "AddToWishlist",
+  "ViewContent",
+  "Contact",
+] as const;
+
+function validateEventName(eventName: string): boolean {
+  return META_STANDARD_EVENTS.includes(eventName as any);
+}
+
 function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
   if (typeof window === "undefined" || !window.fbq) return;
+  
+  // Validate event name
+  if (!validateEventName(eventName)) {
+    console.warn(`⚠️ Meta event "${eventName}" may not be recognized. Use standard Meta event names.`);
+  }
+  
+  // Ensure required fields for Purchase events
+  if (eventName === "Purchase" && data) {
+    if (!data.value) console.warn("⚠️ Purchase event missing 'value' field");
+    if (!data.currency) console.warn("⚠️ Purchase event missing 'currency' field");
+    if (!data.content_type) console.warn("⚠️ Purchase event missing 'content_type' field");
+  }
+  
   window.fbq("track", eventName, data || {});
 }
 
@@ -54,14 +85,21 @@ function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** 1. LOGIN EVENT - Fired when user logs in */
-export function trackLogin(userId: string) {
+export function trackLogin(userId: string, email?: string) {
   pushGtmEvent({
     event: "login",
     method: "email_otp",
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
+  
   trackMetaEvent("Login", { user_id: userId });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("Login", {
+    user_id: userId,
+    email: email,
+  });
 }
 
 /** 2. SIGN UP EVENT - Fired when user completes registration */
@@ -73,7 +111,14 @@ export function trackSignUp(userId: string, email?: string) {
     email: email,
     timestamp: new Date().toISOString(),
   });
+  
   trackMetaEvent("CompleteRegistration", { user_id: userId, email: email });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("CompleteRegistration", {
+    user_id: userId,
+    email: email,
+  });
 }
 
 /** 3. PAGE VIEW EVENT - Fired on every page load */
@@ -186,7 +231,8 @@ export function trackWishlist(
 export function trackAddToCart(
   product: Product,
   quantity: number,
-  userId?: string
+  userId?: string,
+  userEmail?: string
 ) {
   pushGtmEvent({
     event: "add_to_cart",
@@ -198,13 +244,26 @@ export function trackAddToCart(
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
+  
   trackMetaEvent("AddToCart", {
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
+    content_category: product.category,
     quantity: quantity,
     value: product.price * quantity,
     currency: "INR",
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("AddToCart", {
+    user_id: userId,
+    email: userEmail,
+    value: product.price * quantity,
+    currency: "INR",
+    content_type: "product",
+    content_ids: [product.id].join(","),
+    content_name: product.name,
   });
 }
 
@@ -240,9 +299,12 @@ export function trackPurchase(
   items: Array<{ product: Product; quantity: number }>,
   total: number,
   userId?: string,
-  paymentMethod?: string
+  paymentMethod?: string,
+  userEmail?: string
 ) {
   const ga4Items = items.map((item) => toGa4Item(item.product, item.quantity));
+  
+  // GA4/GTM Event
   pushGtmEvent({
     event: "purchase",
     transaction_id: orderId,
@@ -257,17 +319,32 @@ export function trackPurchase(
     timestamp: new Date().toISOString(),
   });
   
-  // Meta Pixel Purchase Event with all required fields
-  trackMetaEvent("Purchase", {
+  // Meta Pixel Purchase Event with ALL required fields per Meta spec
+  const metaPurchaseData = {
     content_type: "product",
     content_ids: items.map((i) => i.product.id),
-    content_name: `Order #${orderId}`,
+    content_name: `Order ${orderId}`,
     num_items: items.length,
     value: total,
     currency: "INR",
-    status: "completed",
-    payment_method: paymentMethod || "razorpay",
-    delivery_category: "curbside",
+    payment_method: paymentMethod || "unknown",
+  };
+  
+  trackMetaEvent("Purchase", metaPurchaseData);
+  
+  // SERVER-SIDE CONVERSIONS API for guaranteed delivery
+  // This ensures Meta receives the conversion even if client-side tracking is blocked
+  trackConversionAPI("Purchase", {
+    user_id: userId,
+    email: userEmail,
+    value: total,
+    currency: "INR",
+    order_id: orderId,
+    num_items: items.length,
+    content_type: "product",
+    content_ids: items.map((i) => i.product.id).join(","),
+    content_name: `Order ${orderId}`,
+    payment_method: paymentMethod || "unknown",
   });
 }
 

@@ -304,8 +304,8 @@ export function CheckoutView() {
       });
       if (!res.ok) throw new Error("Failed to place order");
       
-      // Track Purchase event for Meta Pixel
-      trackPurchase(id, items, total, user.id, paymentLabel);
+      // Track Purchase event for Meta Pixel & Conversions API
+      trackPurchase(id, items, total, user.id, paymentLabel, user.email);
       
       clearCart();
       setOrderId(id);
@@ -354,8 +354,8 @@ export function CheckoutView() {
 
       if (!res.ok) throw new Error("Failed to save order");
 
-      // Track Purchase event for Meta Pixel
-      trackPurchase(id, items, total, user.id, `UPI (${upiId})`);
+      // Track Purchase event for Meta Pixel & Conversions API
+      trackPurchase(id, items, total, user.id, `UPI (${upiId})`, user.email);
 
       clearCart();
       setOrderId(id);
@@ -406,8 +406,8 @@ export function CheckoutView() {
 
       if (!res.ok) throw new Error("Failed to save order");
 
-      // Track Purchase event for Meta Pixel
-      trackPurchase(id, items, total, user.id, "Debit / Credit Card");
+      // Track Purchase event for Meta Pixel & Conversions API
+      trackPurchase(id, items, total, user.id, "Debit / Credit Card", user.email);
 
       clearCart();
       setOrderId(id);
