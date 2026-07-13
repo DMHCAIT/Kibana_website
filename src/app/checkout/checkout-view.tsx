@@ -307,6 +307,27 @@ export function CheckoutView() {
       // Track Purchase event for Meta Pixel & Conversions API
       trackPurchase(id, items, total, user.id, paymentLabel, user.email);
       
+      // Send order confirmation email (async, don't wait for it)
+      fetch("/api/orders/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          orderId: id,
+          items: items.map((i) => ({
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+          })),
+          total,
+          paymentMethod: paymentLabel,
+          shippingAddress: shippingText,
+          placedAt: new Date().toISOString(),
+        }),
+      }).catch((error) => console.error("Failed to send order email:", error));
+      
       clearCart();
       setOrderId(id);
     } catch {
@@ -356,6 +377,27 @@ export function CheckoutView() {
 
       // Track Purchase event for Meta Pixel & Conversions API
       trackPurchase(id, items, total, user.id, `UPI (${upiId})`, user.email);
+
+      // Send order confirmation email (async, don't wait for it)
+      fetch("/api/orders/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          orderId: id,
+          items: items.map((i) => ({
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+          })),
+          total,
+          paymentMethod: `UPI (${upiId})`,
+          shippingAddress: shippingText,
+          placedAt: new Date().toISOString(),
+        }),
+      }).catch((error) => console.error("Failed to send order email:", error));
 
       clearCart();
       setOrderId(id);
@@ -408,6 +450,27 @@ export function CheckoutView() {
 
       // Track Purchase event for Meta Pixel & Conversions API
       trackPurchase(id, items, total, user.id, "Debit / Credit Card", user.email);
+
+      // Send order confirmation email (async, don't wait for it)
+      fetch("/api/orders/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          orderId: id,
+          items: items.map((i) => ({
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+          })),
+          total,
+          paymentMethod: "Debit / Credit Card",
+          shippingAddress: shippingText,
+          placedAt: new Date().toISOString(),
+        }),
+      }).catch((error) => console.error("Failed to send order email:", error));
 
       clearCart();
       setOrderId(id);
