@@ -6,6 +6,7 @@ import { ProductGrid } from "@/components/product/product-grid";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { getShopDisplayImage } from "@/lib/product-images";
 import { TrackProductListingView } from "@/components/analytics/track-product-listing-view";
+import { TrackSearch } from "@/components/analytics/track-search";
 import type { Product } from "@/types/product";
 
 // Disable static caching for dynamic inventory/out-of-stock updates
@@ -134,6 +135,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
 
   return (
     <>
+      {q && <TrackSearch query={q} resultsCount={listingItems.length} />}
       <TrackProductListingView category={selectedCategories[0]} productCount={listingItems.length} />
       <section className="container py-6 md:py-10">
         <ShopHeader heading={heading} count={listingItems.length} sort={sort} showSort />

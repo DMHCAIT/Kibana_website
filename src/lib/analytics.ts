@@ -54,8 +54,8 @@ const META_STANDARD_EVENTS = [
   "PageView",
   "InitiateCheckout",
   "AddToWishlist",
-  "ViewContent",
   "Contact",
+  "Search",
 ] as const;
 
 function validateEventName(eventName: string): boolean {
@@ -362,6 +362,51 @@ export async function trackConversionAPI(
   } catch (error) {
     console.error("Failed to track conversion:", error);
   }
+}
+
+/** 12. CONTACT EVENT - Fired when user submits contact form */
+export function trackContact(email?: string, phone?: string) {
+  pushGtmEvent({
+    event: "contact",
+    email: email,
+    phone: phone,
+    timestamp: new Date().toISOString(),
+  });
+  
+  trackMetaEvent("Contact", {
+    content_name: "Contact Form Submission",
+    content_type: "lead",
+    email: email,
+    phone: phone,
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("Contact", {
+    email: email,
+    phone: phone,
+  });
+}
+
+/** 13. SEARCH EVENT - Fired when user searches products */
+export function trackSearch(query: string, resultsCount?: number) {
+  pushGtmEvent({
+    event: "search",
+    search_term: query,
+    results_count: resultsCount,
+    timestamp: new Date().toISOString(),
+  });
+  
+  trackMetaEvent("Search", {
+    search_string: query,
+    content_name: `Product Search: ${query}`,
+    content_type: "search",
+  });
+  
+  // Server-side tracking for guaranteed delivery
+  trackConversionAPI("Search", {
+    search_term: query,
+    results_count: resultsCount,
+  });
 }
 
 /** UTILITY EVENTS - Track page views for content pages */

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone, Clock, CheckCircle } from "lucide-react";
 import { TrackPageView } from "@/components/analytics/track-page-view";
-import { trackViewPage } from "@/lib/analytics";
+import { trackViewPage, trackContact } from "@/lib/analytics";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -34,15 +34,8 @@ export default function ContactPage() {
         throw new Error((data as { error?: string }).error ?? "Something went wrong.");
       }
       
-      // Track contact form submission via unified tracking
-      if (typeof window !== "undefined" && window.fbq) {
-        window.fbq("track", "Contact", {
-          content_name: "Contact Form Submission",
-          content_type: "form",
-          value: 0,
-          currency: "INR",
-        });
-      }
+      // Track contact form submission via unified tracking with server-side API
+      trackContact(form.email, form.phone);
       
       setSuccess(true);
       setForm({ name: "", email: "", phone: "", message: "" });
