@@ -18,6 +18,7 @@ import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { formatINR, getProductDisplayName } from "@/lib/utils";
+import { getShopDisplayImage } from "@/lib/product-images";
 import { UPIPayment } from "@/components/payment/upi-payment";
 import { CardPayment } from "@/components/payment/card-payment";
 import { trackCheckout, trackPurchase } from "@/lib/analytics";
@@ -288,13 +289,14 @@ export function CheckoutView() {
           ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
           : i.product.colorVariants?.[0];
         const displayName = getProductDisplayName(i.product, variant);
+        const displayImage = variant ? getShopDisplayImage(i.product, variant) : i.product.displayImage || i.product.image;
 
         return {
           productId: i.product.id,
           name: displayName,
           price: i.product.price,
           quantity: i.quantity,
-          image: variant?.image || i.product.image,
+          image: displayImage,
         };
       }),
       total,
@@ -328,12 +330,13 @@ export function CheckoutView() {
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
             const displayName = getProductDisplayName(i.product, variant);
+            const displayImage = variant ? getShopDisplayImage(i.product, variant) : i.product.displayImage || i.product.image;
 
             return {
               name: displayName,
               price: i.product.price,
               quantity: i.quantity,
-              image: variant?.image || i.product.image,
+              image: displayImage,
             };
           }),
           total,

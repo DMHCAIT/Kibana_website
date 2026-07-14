@@ -51,7 +51,7 @@ export const useCart = create<CartState>()((set, get) => ({
     fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId: product.id, quantity, colorSlug }),
+      body: JSON.stringify({ productId: product.id, quantity, color: colorSlug }),
     }).catch((error) => {
       console.error("Failed to sync cart to server:", error);
     });
@@ -61,12 +61,19 @@ export const useCart = create<CartState>()((set, get) => ({
     const user = useAuth.getState().user;
     if (!user) return;
 
+    // Get the color variant for this product if it exists
+    const cartItem = get().items.find((i) => i.product.id === productId);
+    const color = cartItem?.selectedColorSlug;
+
     // OPTIMISTIC UPDATE: Remove immediately
     const next = get().items.filter((i) => i.product.id !== productId);
     set({ items: next });
 
     // SYNC WITH SERVER in background
-    fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch((error) => {
+    const deleteUrl = color 
+      ? `/api/cart?productId=${productId}&color=${encodeURIComponent(color)}`
+      : `/api/cart?productId=${productId}`;
+    fetch(deleteUrl, { method: "DELETE" }).catch((error) => {
       console.error("Failed to sync cart to server:", error);
     });
   },
@@ -74,6 +81,10 @@ export const useCart = create<CartState>()((set, get) => ({
   setQuantity: async (productId, quantity) => {
     const user = useAuth.getState().user;
     if (!user) return;
+
+    // Get the color variant for this product
+    const cartItem = get().items.find((i) => i.product.id === productId);
+    const color = cartItem?.selectedColorSlug;
 
     // OPTIMISTIC UPDATE: Update quantity immediately
     const next = get()
@@ -83,14 +94,19 @@ export const useCart = create<CartState>()((set, get) => ({
 
     // SYNC WITH SERVER in background
     if (quantity === 0) {
-      fetch(`/api/cart?productId=${productId}`, { method: "DELETE" }).catch((error) => {
+      const deleteUrl = color 
+        ? `/api/cart?productId=${productId}&color=${encodeURIComponent(color)}`
+        : `/api/cart?productId=${productId}`;
+      fetch(deleteUrl, { method: "DELETE" }).catch((error) => {
         console.error("Failed to sync cart to server:", error);
       });
     } else {
+      const cartItem = get().items.find((i) => i.product.id === productId);
+      const color = cartItem?.selectedColorSlug;
       fetch("/api/cart", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, quantity }),
+        body: JSON.stringify({ productId, quantity, color }),
       }).catch((error) => {
         console.error("Failed to sync cart to server:", error);
       });
@@ -132,12 +148,13 @@ export const useCart = create<CartState>()((set, get) => ({
 
         // Map cart items to CartItem format
         const mappedItems: CartItem[] = cartData
-          .map((cartItem: { productId: string; quantity: number }) => {
+          .map((cartItem: { productId: string; quantity: number; color?: string | null }) => {
             const product = products.find((p: Product) => p.id === cartItem.productId);
             if (!product) return null;
             return {
               product,
               quantity: cartItem.quantity,
+              selectedColorSlug: cartItem.color || undefined, // Preserve color variant
             };
           })
           .filter((item: CartItem | null) => item !== null);

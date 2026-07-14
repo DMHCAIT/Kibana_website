@@ -9,6 +9,7 @@ import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatINR, getProductDisplayName } from "@/lib/utils";
+import { getShopDisplayImage } from "@/lib/product-images";
 import { trackWishlist } from "@/lib/analytics";
 
 export function CartView() {
@@ -54,7 +55,7 @@ export function CartView() {
               ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
               : product.colorVariants?.[0];
             const displayName = getProductDisplayName(product, variant);
-            const displayImage = variant?.image || product.image;
+            const displayImage = variant ? getShopDisplayImage(product, variant) : product.displayImage || product.image;
 
             return (
             <li key={product.id} className="flex gap-3 p-3 sm:gap-4 sm:p-4">

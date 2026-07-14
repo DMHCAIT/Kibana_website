@@ -21,7 +21,7 @@ export function discountPct(price: number, compareAt?: number) {
 
 /**
  * Get the display name for a product with color variant
- * Uses variant.productTitle (full name) if available, otherwise product.name
+ * Uses variant.productTitle (full name without color) and appends color
  * Format: "Full Product Name - [Color]" or just "Product Name" if no variant
  * Example: "Vistara Geometric Vegan Leather Tote Bag - [Mint Green]"
  */
@@ -30,7 +30,15 @@ export function getProductDisplayName(
   variant?: Product["colorVariants"][number]
 ): string {
   if (!variant) return product.name;
+  
   // Use variant's productTitle (full name) if available, otherwise fall back to product.name
   const baseTitle = variant.productTitle || product.name;
+  
+  // Remove duplicate color if productTitle already includes it
+  const colorPattern = ` - \[${variant.color}\]`;
+  if (baseTitle.endsWith(colorPattern)) {
+    return baseTitle; // Already has color, return as-is
+  }
+  
   return `${baseTitle} - [${variant.color}]`;
 }
