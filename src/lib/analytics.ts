@@ -442,6 +442,25 @@ export async function trackConversionAPI(
   data: { user_id?: string; email?: string; phone?: string; [key: string]: unknown }
 ) {
   try {
+    // If no email/phone provided, try to fetch current user to include customer data
+    // Meta Conversions API requires at least one customer information parameter
+    if (!data.email && !data.phone && typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const user = await res.json();
+          if (user.email && !data.email) {
+            data.email = user.email;
+          }
+          if (user.phone && !data.phone) {
+            data.phone = user.phone;
+          }
+        }
+      } catch {
+        // Failed to fetch user, continue without user data
+      }
+    }
+
     await fetch("/api/analytics/conversion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

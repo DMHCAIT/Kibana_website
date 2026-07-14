@@ -104,8 +104,18 @@ export async function POST(request: NextRequest) {
         );
       }
       if (!customData.content_type) {
-        console.warn("⚠️ Purchase event missing 'content_type' field - adding default 'product'");
-        customData.content_type = "product";
+        console.error("❌ Purchase event missing 'content_type' field");
+        return NextResponse.json(
+          { success: false, error: "Purchase event requires 'content_type' field" },
+          { status: 400 }
+        );
+      }
+      if (!customData.content_ids || customData.content_ids.length === 0) {
+        console.error("❌ Purchase event missing 'content_ids' field");
+        return NextResponse.json(
+          { success: false, error: "Purchase event requires 'content_ids' field" },
+          { status: 400 }
+        );
       }
     }
 
