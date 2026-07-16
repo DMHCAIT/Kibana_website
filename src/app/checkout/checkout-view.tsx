@@ -133,7 +133,13 @@ export function CheckoutView() {
   // Track checkout initiation when user reaches payment step
   useEffect(() => {
     if (step === 2 && items.length > 0) {
-      const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+      const subtotal = items.reduce((acc, i) => {
+        const variant = i.selectedColorSlug
+          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+          : undefined;
+        const price = variant?.price ?? i.product.price;
+        return acc + price * i.quantity;
+      }, 0);
       const shipping = 0;
       const subtotalWithShipping = subtotal + shipping;
       const codCharges = payment === "cod" ? 100 : 0;
@@ -144,7 +150,13 @@ export function CheckoutView() {
     }
   }, [step, items, payment, user?.id]);
 
-  const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+  const subtotal = items.reduce((acc, i) => {
+    const variant = i.selectedColorSlug
+      ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+      : undefined;
+    const price = variant?.price ?? i.product.price;
+    return acc + price * i.quantity;
+  }, 0);
   const hasItems = items.length > 0;
   const shipping = 0;
   const subtotalWithShipping = subtotal + shipping;
@@ -289,7 +301,9 @@ export function CheckoutView() {
           ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
           : i.product.colorVariants?.[0];
         const displayName = getProductDisplayName(i.product, variant);
-        const displayImage = variant ? getShopDisplayImage(i.product, variant) : i.product.displayImage || i.product.image;
+        const displayImage = variant
+          ? getShopDisplayImage(i.product, variant)
+          : i.product.displayImage || i.product.image;
 
         return {
           productId: i.product.id,
@@ -297,6 +311,8 @@ export function CheckoutView() {
           price: i.product.price,
           quantity: i.quantity,
           image: displayImage,
+          color: variant?.color,
+          colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
         };
       }),
       total,
@@ -313,10 +329,10 @@ export function CheckoutView() {
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error("Failed to place order");
-      
+
       // Track Purchase event for Meta Pixel & Conversions API
       trackPurchase(id, items, total, user.id, paymentLabel, user.email);
-      
+
       // Send order confirmation email (async, don't wait for it)
       fetch("/api/orders/send-confirmation", {
         method: "POST",
@@ -330,7 +346,9 @@ export function CheckoutView() {
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
             const displayName = getProductDisplayName(i.product, variant);
-            const displayImage = variant ? getShopDisplayImage(i.product, variant) : i.product.displayImage || i.product.image;
+            const displayImage = variant
+              ? getShopDisplayImage(i.product, variant)
+              : i.product.displayImage || i.product.image;
 
             return {
               name: displayName,
@@ -345,7 +363,7 @@ export function CheckoutView() {
           placedAt: new Date().toISOString(),
         }),
       }).catch((error) => console.error("Failed to send order email:", error));
-      
+
       clearCart();
       setOrderId(id);
     } catch {
@@ -381,6 +399,8 @@ export function CheckoutView() {
             price: i.product.price,
             quantity: i.quantity,
             image: variant?.image || i.product.image,
+            color: variant?.color,
+            colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
           };
         }),
         total,
@@ -468,6 +488,8 @@ export function CheckoutView() {
             price: i.product.price,
             quantity: i.quantity,
             image: variant?.image || i.product.image,
+            color: variant?.color,
+            colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
           };
         }),
         total,
@@ -587,36 +609,46 @@ export function CheckoutView() {
                   </div>
                 </div>
                 <ul className="divide-y divide-border">
-                  {items.map(({ product, quantity }) => (
-                    <li
-                      key={product.id}
-                      className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-slate-50/50"
-                    >
-                      <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1 py-1">
-                        <p className="text-sm font-semibold text-slate-900">{product.name}</p>
-                        <p className="mt-1 text-xs capitalize text-slate-500">
-                          {product.category.replace("-", " ")}
-                        </p>
-                        <div className="mt-2 flex items-center gap-3">
-                          <span className="rounded bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                            Qty: {quantity}
-                          </span>
-                          <p className="text-sm font-bold text-slate-900">
-                            {formatINR(product.price * quantity)}
-                          </p>
+                  {items.map(({ product, quantity, selectedColorSlug }) => {
+                    const variant = selectedColorSlug
+                      ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
+                      : product.colorVariants?.[0];
+                    const displayName = getProductDisplayName(product, variant);
+                    const displayImage = variant
+                      ? getShopDisplayImage(product, variant)
+                      : product.displayImage || product.image;
+
+                    return (
+                      <li
+                        key={`${product.id}-${selectedColorSlug}`}
+                        className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-slate-50/50"
+                      >
+                        <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                          <Image
+                            src={displayImage}
+                            alt={displayName}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
                         </div>
-                      </div>
-                    </li>
-                  ))}
+                        <div className="min-w-0 flex-1 py-1">
+                          <p className="text-sm font-semibold text-slate-900">{displayName}</p>
+                          <p className="mt-1 text-xs capitalize text-slate-500">
+                            {product.category.replace("-", " ")}
+                          </p>
+                          <div className="mt-2 flex items-center gap-3">
+                            <span className="rounded bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                              Qty: {quantity}
+                            </span>
+                            <p className="text-sm font-bold text-slate-900">
+                              {formatINR(product.price * quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
                 <div className="border-t border-border bg-muted px-6 py-4">
                   <Button
@@ -894,26 +926,39 @@ export function CheckoutView() {
             {step >= 1 && (
               <>
                 <ul className="mb-4 space-y-3 border-b border-slate-200 pb-4">
-                  {items.map(({ product, quantity }) => (
-                    <li key={product.id} className="flex items-start gap-3 text-xs">
-                      <div className="relative h-12 w-10 flex-shrink-0 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          sizes="40px"
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-slate-900">{product.name}</p>
-                        <p className="mt-1 text-slate-500">Qty: {quantity}</p>
-                      </div>
-                      <p className="shrink-0 text-right font-bold text-slate-900">
-                        {formatINR(product.price * quantity)}
-                      </p>
-                    </li>
-                  ))}
+                  {items.map(({ product, quantity, selectedColorSlug }) => {
+                    const variant = selectedColorSlug
+                      ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
+                      : product.colorVariants?.[0];
+                    const displayName = getProductDisplayName(product, variant);
+                    const displayImage = variant
+                      ? getShopDisplayImage(product, variant)
+                      : product.displayImage || product.image;
+
+                    return (
+                      <li
+                        key={`${product.id}-${selectedColorSlug}`}
+                        className="flex items-start gap-3 text-xs"
+                      >
+                        <div className="relative h-12 w-10 flex-shrink-0 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                          <Image
+                            src={displayImage}
+                            alt={displayName}
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium text-slate-900">{displayName}</p>
+                          <p className="mt-1 text-slate-500">Qty: {quantity}</p>
+                        </div>
+                        <p className="shrink-0 text-right font-bold text-slate-900">
+                          {formatINR(product.price * quantity)}
+                        </p>
+                      </li>
+                    );
+                  })}
                 </ul>
               </>
             )}

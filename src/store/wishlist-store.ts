@@ -47,10 +47,10 @@ export const useWishlist = create<WishlistState>()((set, get) => ({
 
     // SYNC WITH SERVER in background
     if (_userId) {
-      fetch(`/api/wishlist?productId=${productId}`, { method: "DELETE" }).catch(
+      fetch(`/api/wishlist?productId=${encodeURIComponent(productId)}`, { method: "DELETE" }).catch(
         (error) => {
           console.error("Failed to sync wishlist to server:", error);
-        }
+        },
       );
     }
   },

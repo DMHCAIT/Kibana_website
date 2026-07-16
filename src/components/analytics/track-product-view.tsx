@@ -5,14 +5,21 @@ import { useRef } from "react";
 import { trackViewContent } from "@/lib/analytics";
 import type { Product } from "@/types/product";
 
-export function TrackProductView({ product }: { product: Product }) {
+export function TrackProductView({
+  product,
+  variant,
+}: {
+  product: Product;
+  variant?: Product["colorVariants"][number];
+}) {
   const hasTracked = useRef(false);
 
   useEffect(() => {
     if (hasTracked.current) return;
-    trackViewContent(product);
+    const variantPrice = variant?.price ?? product.price;
+    trackViewContent(product, variantPrice);
     hasTracked.current = true;
-  }, [product]);
+  }, [product, variant]);
 
   return null;
 }

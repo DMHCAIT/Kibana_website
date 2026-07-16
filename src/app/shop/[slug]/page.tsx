@@ -68,31 +68,33 @@ async function RelatedProducts({
 }) {
   const products = await getProducts();
   const related = products.filter((p) => p.category === category && p.id !== productId);
-  
+
   // If no related products, show current product's color variants (if it's the only one in category)
   let productsToShow = related;
   if (related.length === 0 && currentProduct) {
     productsToShow = [currentProduct];
   }
-  
+
   if (productsToShow.length === 0) return null;
 
   // Expand each product into its color variants
   const gridItems = productsToShow.flatMap((product) =>
-    product.colorVariants?.length ? 
-      product.colorVariants.map((variant) => ({
-        key: `${product.id}-${variant.slug}`,
-        product,
-        href: `/shop/${product.slug}?color=${variant.slug}`,
-        displayName: variant.productTitle || `${product.name} - [${variant.slug}]`,
-        displayImage: getShopDisplayImage(product, variant),
-        variantInStock: variant.inStock !== false, // Default to true if not specified
-      }))
-      : [{
-        key: product.id,
-        product,
-        href: `/shop/${product.slug}`,
-      }]
+    product.colorVariants?.length
+      ? product.colorVariants.map((variant) => ({
+          key: `${product.id}-${variant.slug}`,
+          product,
+          href: `/shop/${product.slug}?color=${variant.slug}`,
+          displayName: variant.productTitle || `${product.name} - [${variant.slug}]`,
+          displayImage: getShopDisplayImage(product, variant),
+          variantInStock: variant.inStock !== false, // Default to true if not specified
+        }))
+      : [
+          {
+            key: product.id,
+            product,
+            href: `/shop/${product.slug}`,
+          },
+        ],
   );
 
   return (
@@ -115,8 +117,34 @@ export default async function ProductDetailPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  console.log(
+    "📄 PRODUCT PAGE DEBUG:",
+    JSON.stringify(
+      {
+        slug,
+        colorFromSearchParams: color,
+        colorVariantSlugs: product.colorVariants?.map((v) => v.slug),
+      },
+      null,
+      2,
+    ),
+  );
+
   const activeVariant =
     product.colorVariants?.find((v) => v.slug === color) ?? product.colorVariants?.[0];
+
+  console.log(
+    "📄 ACTIVE VARIANT DETERMINED:",
+    JSON.stringify(
+      {
+        activeVariantSlug: activeVariant?.slug,
+        activeVariantTitle: activeVariant?.productTitle,
+        matchedByColor: !!product.colorVariants?.find((v) => v.slug === color),
+      },
+      null,
+      2,
+    ),
+  );
   const activeProductTitle = activeVariant?.productTitle || product.name;
   const activeStockQty = activeVariant?.stockQty;
   const activeVariantInStock = activeVariant?.inStock !== false;
@@ -230,13 +258,18 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <TrackProductView product={product} />
+      <TrackProductView product={product} variant={activeVariant} />
       <section className="container py-1 pb-16 sm:py-4 sm:pb-20 md:py-8 md:pb-8">
         <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-8 sm:px-4 md:px-8 lg:grid-cols-[minmax(0,620px)_1fr] lg:gap-12">
           {/* Gallery Column with Header */}
           <div className="w-full min-w-0">
             <ShopHeader heading={categoryLabel} showSort={false} />
-            <ProductGallery images={allImages} productName={product.name} discountPct={pct} variantInStock={activeVariantInStock} />
+            <ProductGallery
+              images={allImages}
+              productName={product.name}
+              discountPct={pct}
+              variantInStock={activeVariantInStock}
+            />
           </div>
 
           {/* Details */}
@@ -326,7 +359,7 @@ export default async function ProductDetailPage({
 
             {/* Add to cart */}
             <div className="mt-4 sm:mt-5">
-              <AddToCartButton product={product} activeVariant={activeVariant} />
+              <AddToCartButton product={product} activeVariantSlug={activeVariant?.slug} />
             </div>
 
             {/* Delivery & Share */}
@@ -422,7 +455,11 @@ export default async function ProductDetailPage({
       </section>
 
       <Suspense fallback={null}>
-        <RelatedProducts category={product.category} productId={product.id} currentProduct={product} />
+        <RelatedProducts
+          category={product.category}
+          productId={product.id}
+          currentProduct={product}
+        />
       </Suspense>
     </>
   );

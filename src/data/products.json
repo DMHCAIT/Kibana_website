@@ -37,7 +37,8 @@
           "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/09-10-2025-product%20shoot00110_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/Artboard%201_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Milky%20Blue/Artboard%202_result.webp"
-        ]
+        ],
+        "variantId": "p1-milky-blue"
       },
       {
         "color": "#98D8C8",
@@ -54,7 +55,8 @@
           "/kibana_product_images/1%20collection/Vistara%20tote/Mint%20green/09-10-2025-product%20shoot00141_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Mint%20green/Artboard%201_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Mint%20green/Artboard%202_result.webp"
-        ]
+        ],
+        "variantId": "p1-mint-green"
       },
       {
         "color": "#2D8B8B",
@@ -72,7 +74,8 @@
           "/kibana_product_images/1%20collection/Vistara%20tote/Teal%20Blue/09-10-2025-product%20shoot00120_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Teal%20Blue/Artboard%201_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Teal%20Blue/Artboard%202_result.webp"
-        ]
+        ],
+        "variantId": "p1-teal-blue"
       },
       {
         "color": "#C9A77B",
@@ -89,7 +92,8 @@
           "/kibana_product_images/1%20collection/Vistara%20tote/Ten/09-10-2025-product%20shoot00130_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Ten/Artboard%201_result.webp",
           "/kibana_product_images/1%20collection/Vistara%20tote/Ten/Artboard%202_result.webp"
-        ]
+        ],
+        "variantId": "p1-tan"
       }
     ],
     "features": [
@@ -149,7 +153,8 @@
           "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/7.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Milky%20Blue/8.webp"
-        ]
+        ],
+        "variantId": "p2-milky-blue"
       },
       {
         "color": "#98D8C8",
@@ -166,7 +171,8 @@
           "/kibana_product_images/1%20collection/Prizma%20Sling/mint%20green/6.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/mint%20green/7.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/mint%20green/8.webp"
-        ]
+        ],
+        "variantId": "p2-mint-green"
       },
       {
         "color": "#2D8B8B",
@@ -183,7 +189,8 @@
           "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/7.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/8.webp"
-        ]
+        ],
+        "variantId": "p2-teal-blue"
       },
       {
         "color": "#C9A77B",
@@ -200,7 +207,8 @@
           "/kibana_product_images/1%20collection/Prizma%20Sling/Ten/6.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Ten/7.webp",
           "/kibana_product_images/1%20collection/Prizma%20Sling/Ten/8.webp"
-        ]
+        ],
+        "variantId": "p2-tan"
       }
     ],
     "features": [
@@ -259,7 +267,8 @@
           "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/7.webp",
           "/kibana_product_images/1%20collection/Vistapack/Milky%20Blue/8.webp"
-        ]
+        ],
+        "variantId": "p3-milky-blue"
       },
       {
         "color": "#98D8C8",
@@ -275,7 +284,8 @@
           "/kibana_product_images/1%20collection/Vistapack/Mint%20green/5.webp",
           "/kibana_product_images/1%20collection/Vistapack/Mint%20green/6.webp",
           "/kibana_product_images/1%20collection/Vistapack/Mint%20green/7.webp"
-        ]
+        ],
+        "variantId": "p3-mint-green"
       },
       {
         "color": "#2D8B8B",
@@ -292,7 +302,8 @@
           "/kibana_product_images/1%20collection/Vistapack/Teal%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Vistapack/Teal%20Blue/7.webp",
           "/kibana_product_images/1%20collection/Vistapack/Teal%20Blue/8.webp"
-        ]
+        ],
+        "variantId": "p3-teal-blue"
       },
       {
         "color": "#C9A77B",
@@ -309,7 +320,8 @@
           "/kibana_product_images/1%20collection/Vistapack/Ten/6.webp",
           "/kibana_product_images/1%20collection/Vistapack/Ten/7.webp",
           "/kibana_product_images/1%20collection/Vistapack/Ten/8.webp"
-        ]
+        ],
+        "variantId": "p3-tan"
       }
     ],
     "features": [
@@ -364,7 +376,8 @@
           "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/4.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/5.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/Milky%20Blue/6.webp"
-        ]
+        ],
+        "variantId": "p4-milky-blue"
       },
       {
         "color": "#98D8C8",
@@ -378,10 +391,9 @@
           "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/3.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/4.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/5.webp",
-          "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/6.webp",
-          "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/7.webp",
-          "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/8.webp"
-        ]
+          "/kibana_product_images/1%20collection/laptop%20bag/mint%20green/6.webp"
+        ],
+        "variantId": "p4-mint-green"
       },
       {
         "color": "#C9A77B",
@@ -397,7 +409,8 @@
           "/kibana_product_images/1%20collection/laptop%20bag/tan/5.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/tan/6.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/tan/7.webp"
-        ]
+        ],
+        "variantId": "p4-tan"
       },
       {
         "color": "#2D8B8B",
@@ -413,7 +426,8 @@
           "/kibana_product_images/1%20collection/laptop%20bag/Teal%20Blue/5.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/Teal%20Blue/6.webp",
           "/kibana_product_images/1%20collection/laptop%20bag/Teal%20Blue/7.webp"
-        ]
+        ],
+        "variantId": "p4-teal-blue"
       }
     ],
     "features": [
@@ -469,7 +483,8 @@
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/5.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Milky%20Blue/7.webp"
-        ]
+        ],
+        "variantId": "p5-milky-blue"
       },
       {
         "color": "#98D8C8",
@@ -484,7 +499,8 @@
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/4.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/5.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Mint%20Green/6.webp"
-        ]
+        ],
+        "variantId": "p5-mint-green"
       },
       {
         "color": "#C9A77B",
@@ -500,7 +516,8 @@
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Ten/5.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Ten/6.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Ten/7.webp"
-        ]
+        ],
+        "variantId": "p5-tan"
       },
       {
         "color": "#40E0D0",
@@ -516,7 +533,8 @@
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Turquoise%20Blue/5.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Turquoise%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Turquoise%20Blue/7.webp"
-        ]
+        ],
+        "variantId": "p5-turquoise-blue"
       },
       {
         "color": "#722F37",
@@ -532,7 +550,8 @@
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Wine/5.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Wine/6.webp",
           "/kibana_product_images/1%20collection/Lekha%20Wallet/Wine/7.webp"
-        ]
+        ],
+        "variantId": "p5-wine"
       }
     ],
     "features": [
@@ -587,7 +606,8 @@
           "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/5.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/7.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/mint%20green/8.webp"
-        ]
+        ],
+        "variantId": "p6-mint-green"
       },
       {
         "color": "#B8D4E0",
@@ -603,7 +623,8 @@
           "/kibana_product_images/1%20collection/Zippy%20Wallet/New%20folder/5.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/New%20folder/6.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/New%20folder/7.webp"
-        ]
+        ],
+        "variantId": "p6-milky-blue"
       },
       {
         "color": "#C9A77B",
@@ -618,7 +639,8 @@
           "/kibana_product_images/1%20collection/Zippy%20Wallet/tan/4.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/tan/5.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/tan/6.webp"
-        ]
+        ],
+        "variantId": "p6-tan"
       },
       {
         "color": "#40E0D0",
@@ -634,7 +656,8 @@
           "/kibana_product_images/1%20collection/Zippy%20Wallet/Turquoise%20Blue/6.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/Turquoise%20Blue/7.webp",
           "/kibana_product_images/1%20collection/Zippy%20Wallet/Turquoise%20Blue/8.webp"
-        ]
+        ],
+        "variantId": "p6-turquoise-blue"
       }
     ],
     "features": [
@@ -690,7 +713,8 @@
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/04-02-2026-product%20shoot0345_result.webp",
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/04-02-2026-product%20shoot0350_result.webp",
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/04-02-2026-product%20shoot0353_result.webp"
-        ]
+        ],
+        "variantId": "p7-mocha"
       },
       {
         "color": "#722F37",
@@ -707,7 +731,8 @@
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/04-02-2026-product%20shoot0328_result.webp",
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/04-02-2026-product%20shoot0329_result.webp",
           "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/04-02-2026-product%20shoot0332_result.webp"
-        ]
+        ],
+        "variantId": "p7-wine"
       }
     ],
     "features": [
@@ -764,7 +789,8 @@
           "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/5.webp",
           "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/6.webp",
           "/kibana_product_images/2%20collection/mini%20Aurelia%20fab%20tote/mocha/7.webp"
-        ]
+        ],
+        "variantId": "p8-mocha"
       }
     ],
     "features": [
@@ -819,7 +845,8 @@
           "/kibana_product_images/2%20collection/Valera%20Dome/black/Image04.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/black/Image05.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/black/Image06.webp"
-        ]
+        ],
+        "variantId": "p9-black"
       },
       {
         "color": "#3C7A5A",
@@ -834,7 +861,8 @@
           "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image04.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image05.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image06.webp"
-        ]
+        ],
+        "variantId": "p9-forest-green"
       },
       {
         "color": "#B8D4E0",
@@ -849,7 +877,8 @@
           "/kibana_product_images/2%20collection/Valera%20Dome/Milky%20Blue/Image04.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Milky%20Blue/Image05.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Milky%20Blue/Image06.webp"
-        ]
+        ],
+        "variantId": "p9-milky-blue"
       },
       {
         "color": "#4169E1",
@@ -864,7 +893,8 @@
           "/kibana_product_images/2%20collection/Valera%20Dome/Royal%20Blue/Image04.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Royal%20Blue/Image05.webp",
           "/kibana_product_images/2%20collection/Valera%20Dome/Royal%20Blue/Image06.webp"
-        ]
+        ],
+        "variantId": "p9-royal-blue"
       }
     ],
     "features": [
@@ -919,7 +949,8 @@
           "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image04.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image05.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image06.webp"
-        ]
+        ],
+        "variantId": "p10-black"
       },
       {
         "color": "#C8A2C8",
@@ -934,7 +965,8 @@
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Light%20Purple/Image04.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Light%20Purple/Image05.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Light%20Purple/Image06.webp"
-        ]
+        ],
+        "variantId": "p10-light-purple"
       },
       {
         "color": "#D9E76A",
@@ -949,7 +981,8 @@
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image04.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image05.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image06.webp"
-        ]
+        ],
+        "variantId": "p10-lime-yellow"
       },
       {
         "color": "#C9A77B",
@@ -964,7 +997,8 @@
           "/kibana_product_images/2%20collection/CORDIA%20BAG/tan/Image04.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/tan/Image05.webp",
           "/kibana_product_images/2%20collection/CORDIA%20BAG/tan/Image06.webp"
-        ]
+        ],
+        "variantId": "p10-tan"
       }
     ],
     "features": [
@@ -1020,7 +1054,8 @@
           "/kibana_product_images/2%20collection/halo%20mini/black/Image03.webp",
           "/kibana_product_images/2%20collection/halo%20mini/black/Image04.webp",
           "/kibana_product_images/2%20collection/halo%20mini/black/Image05.webp"
-        ]
+        ],
+        "variantId": "p11-black"
       },
       {
         "color": "#3C7A5A",
@@ -1035,7 +1070,8 @@
           "/kibana_product_images/2%20collection/halo%20mini/green/4_result.webp",
           "/kibana_product_images/2%20collection/halo%20mini/green/5_result.webp",
           "/kibana_product_images/2%20collection/halo%20mini/green/6_result.webp"
-        ]
+        ],
+        "variantId": "p11-forest-green"
       },
       {
         "color": "#C9A77B",
@@ -1050,7 +1086,8 @@
           "/kibana_product_images/2%20collection/halo%20mini/tan/Image04.webp",
           "/kibana_product_images/2%20collection/halo%20mini/tan/Image05.webp",
           "/kibana_product_images/2%20collection/halo%20mini/tan/Image06.webp"
-        ]
+        ],
+        "variantId": "p11-tan"
       },
       {
         "color": "#40E0D0",
@@ -1065,7 +1102,8 @@
           "/kibana_product_images/2%20collection/halo%20mini/Turquoise%20Blue/Image04.webp",
           "/kibana_product_images/2%20collection/halo%20mini/Turquoise%20Blue/Image05.webp",
           "/kibana_product_images/2%20collection/halo%20mini/Turquoise%20Blue/Image06.webp"
-        ]
+        ],
+        "variantId": "p11-turquoise-blue"
       },
       {
         "color": "#722F37",
@@ -1080,7 +1118,8 @@
           "/kibana_product_images/2%20collection/halo%20mini/wine/Image04.webp",
           "/kibana_product_images/2%20collection/halo%20mini/wine/Image05.webp",
           "/kibana_product_images/2%20collection/halo%20mini/wine/Image06.webp"
-        ]
+        ],
+        "variantId": "p11-wine"
       }
     ],
     "features": [
@@ -1134,7 +1173,8 @@
           "/kibana_product_images/2%20collection/bag%20pack/black/4.webp",
           "/kibana_product_images/2%20collection/bag%20pack/black/5.webp",
           "/kibana_product_images/2%20collection/bag%20pack/black/Image06.webp"
-        ]
+        ],
+        "variantId": "p12-black"
       },
       {
         "color": "#C9A77B",
@@ -1149,7 +1189,8 @@
           "/kibana_product_images/2%20collection/bag%20pack/tan/4.webp",
           "/kibana_product_images/2%20collection/bag%20pack/tan/5.webp",
           "/kibana_product_images/2%20collection/bag%20pack/tan/6.webp"
-        ]
+        ],
+        "variantId": "p12-tan"
       }
     ],
     "features": [
@@ -1204,7 +1245,8 @@
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image04.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image05.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Milky%20Blue/Image06.webp"
-        ]
+        ],
+        "variantId": "p13-milky-blue"
       },
       {
         "color": "#40E0D0",
@@ -1219,7 +1261,8 @@
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Turquoise%20Blue/Image04.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Turquoise%20Blue/Image05.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/Turquoise%20Blue/Image06.webp"
-        ]
+        ],
+        "variantId": "p13-turquoise-blue"
       },
       {
         "color": "#722F37",
@@ -1234,7 +1277,8 @@
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/wine/Image04.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/wine/Image05.webp",
           "/kibana_product_images/2%20collection/Crescent%20Sling%20Bag/wine/Image06.webp"
-        ]
+        ],
+        "variantId": "p13-wine"
       }
     ],
     "features": [
@@ -1289,7 +1333,8 @@
           "/kibana_product_images/2%20collection/veyra%20briefcase/Black/5.webp",
           "/kibana_product_images/2%20collection/veyra%20briefcase/Black/6.webp",
           "/kibana_product_images/2%20collection/veyra%20briefcase/Black/7.webp"
-        ]
+        ],
+        "variantId": "p14-black"
       },
       {
         "color": "#C9A77B",
@@ -1304,7 +1349,8 @@
           "/kibana_product_images/2%20collection/veyra%20briefcase/Ten/4.webp",
           "/kibana_product_images/2%20collection/veyra%20briefcase/Ten/5.webp",
           "/kibana_product_images/2%20collection/veyra%20briefcase/Ten/6.webp"
-        ]
+        ],
+        "variantId": "p14-tan"
       }
     ],
     "features": [

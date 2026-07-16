@@ -48,13 +48,9 @@ export function UsersClient({ initialUsers }: Props) {
     })
     .sort((a, b) => {
       if (sortBy === "name") {
-        return sortDir === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
+        return sortDir === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
       } else if (sortBy === "logins") {
-        return sortDir === "asc"
-          ? a.loginCount - b.loginCount
-          : b.loginCount - a.loginCount;
+        return sortDir === "asc" ? a.loginCount - b.loginCount : b.loginCount - a.loginCount;
       } else {
         const aDate = new Date(a.loginAt).getTime();
         const bDate = new Date(b.loginAt).getTime();
@@ -70,6 +66,7 @@ export function UsersClient({ initialUsers }: Props) {
     try {
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       if (res.ok) {
@@ -93,10 +90,9 @@ export function UsersClient({ initialUsers }: Props) {
       formatDate2(u.registeredAt),
     ]);
 
-    const csv = [
-      headers.join(","),
-      ...rows.map((r) => r.map((c) => `"${c}"`).join(",")),
-    ].join("\n");
+    const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join(
+      "\n",
+    );
 
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -112,21 +108,21 @@ export function UsersClient({ initialUsers }: Props) {
   return (
     <div className="space-y-6">
       {/* Header Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Users</div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="mb-1 text-xs uppercase tracking-wider text-gray-500">Total Users</div>
           <div className="text-2xl font-bold text-gray-900">{filtered.length}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Logins</div>
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="mb-1 text-xs uppercase tracking-wider text-gray-500">Total Logins</div>
           <div className="text-2xl font-bold text-blue-600">{totalLogins}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Avg Logins</div>
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="mb-1 text-xs uppercase tracking-wider text-gray-500">Avg Logins</div>
           <div className="text-2xl font-bold text-purple-600">{avgLogins}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Active Today</div>
+        <div className="rounded-lg bg-white p-4 shadow">
+          <div className="mb-1 text-xs uppercase tracking-wider text-gray-500">Active Today</div>
           <div className="text-2xl font-bold text-green-600">
             {
               filtered.filter((u) => {
@@ -139,15 +135,15 @@ export function UsersClient({ initialUsers }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Users List */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow p-6 space-y-4">
-            <div className="flex items-center justify-between mb-4">
+          <div className="space-y-4 rounded-lg bg-white p-6 shadow">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Login Details</h2>
               <button
                 onClick={exportToCSV}
-                className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs font-medium transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200"
               >
                 <Download size={14} />
                 Export CSV
@@ -155,22 +151,25 @@ export function UsersClient({ initialUsers }: Props) {
             </div>
 
             {/* Filters & Search */}
-            <div className="space-y-3 pb-4 border-b border-gray-200">
+            <div className="space-y-3 border-b border-gray-200 pb-4">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search by name, email, phone, or ID..."
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSortBy("date")}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                     sortBy === "date"
                       ? "bg-gray-900 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -180,7 +179,7 @@ export function UsersClient({ initialUsers }: Props) {
                 </button>
                 <button
                   onClick={() => setSortBy("name")}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                     sortBy === "name"
                       ? "bg-gray-900 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -190,7 +189,7 @@ export function UsersClient({ initialUsers }: Props) {
                 </button>
                 <button
                   onClick={() => setSortBy("logins")}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                     sortBy === "logins"
                       ? "bg-gray-900 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -199,10 +198,8 @@ export function UsersClient({ initialUsers }: Props) {
                   Login Count
                 </button>
                 <button
-                  onClick={() =>
-                    setSortDir((d) => (d === "asc" ? "desc" : "asc"))
-                  }
-                  className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors ml-auto"
+                  onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+                  className="ml-auto rounded-lg bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
                 >
                   {sortDir === "asc" ? "↑ ASC" : "↓ DESC"}
                 </button>
@@ -210,9 +207,9 @@ export function UsersClient({ initialUsers }: Props) {
             </div>
 
             {/* Users List */}
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="max-h-96 space-y-2 overflow-y-auto">
               {filtered.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="py-8 text-center text-gray-500">
                   <Users size={32} className="mx-auto mb-2 opacity-50" />
                   <p>No users found</p>
                 </div>
@@ -220,28 +217,24 @@ export function UsersClient({ initialUsers }: Props) {
                 filtered.map((user) => (
                   <button
                     key={user.id}
-                    onClick={() =>
-                      setSelectedUser(selectedUser === user.id ? null : user.id)
-                    }
-                    className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                    onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}
+                    className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
                       selectedUser === user.id
                         ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300 bg-white"
+                        : "border-gray-200 bg-white hover:border-gray-300"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900">{user.name}</h3>
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                      <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
                         {user.loginCount} logins
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 mb-1">
+                    <div className="mb-1 text-sm text-gray-600">
                       {user.email && <p>{user.email}</p>}
                       {user.phone && <p>{user.phone}</p>}
                     </div>
-                    <p className="text-xs text-gray-500">
-                      Last login: {formatDate(user.loginAt)}
-                    </p>
+                    <p className="text-xs text-gray-500">Last login: {formatDate(user.loginAt)}</p>
                   </button>
                 ))
               )}
@@ -251,61 +244,59 @@ export function UsersClient({ initialUsers }: Props) {
 
         {/* User Details */}
         {selectedUserData && (
-          <div className="bg-white rounded-lg shadow p-6 space-y-4 h-fit sticky top-6">
-            <h3 className="font-semibold text-gray-900 text-lg">User Details</h3>
+          <div className="sticky top-6 h-fit space-y-4 rounded-lg bg-white p-6 shadow">
+            <h3 className="text-lg font-semibold text-gray-900">User Details</h3>
 
             {/* Name */}
             <div>
-              <label className="text-xs text-gray-500 uppercase tracking-wider">Name</label>
-              <p className="font-medium text-gray-900 text-lg">{selectedUserData.name}</p>
+              <label className="text-xs uppercase tracking-wider text-gray-500">Name</label>
+              <p className="text-lg font-medium text-gray-900">{selectedUserData.name}</p>
             </div>
 
             {/* User ID */}
             <div>
-              <label className="text-xs text-gray-500 uppercase tracking-wider">User ID</label>
-              <p className="font-mono text-sm text-gray-600 break-all">
-                {selectedUserData.id}
-              </p>
+              <label className="text-xs uppercase tracking-wider text-gray-500">User ID</label>
+              <p className="break-all font-mono text-sm text-gray-600">{selectedUserData.id}</p>
             </div>
 
             {/* Email */}
             {selectedUserData.email && (
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Email</label>
-                <p className="text-gray-900 break-all">{selectedUserData.email}</p>
+                <label className="text-xs uppercase tracking-wider text-gray-500">Email</label>
+                <p className="break-all text-gray-900">{selectedUserData.email}</p>
               </div>
             )}
 
             {/* Phone */}
             {selectedUserData.phone && (
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Phone</label>
-                <p className="text-gray-900 font-mono">{selectedUserData.phone}</p>
+                <label className="text-xs uppercase tracking-wider text-gray-500">Phone</label>
+                <p className="font-mono text-gray-900">{selectedUserData.phone}</p>
               </div>
             )}
 
             {/* Login Stats */}
-            <div className="pt-4 border-t border-gray-200 space-y-3">
+            <div className="space-y-3 border-t border-gray-200 pt-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Total Logins</label>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {selectedUserData.loginCount}
-                  </p>
+                  <label className="text-xs uppercase tracking-wider text-gray-500">
+                    Total Logins
+                  </label>
+                  <p className="text-2xl font-bold text-gray-900">{selectedUserData.loginCount}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Status</label>
+                  <label className="text-xs uppercase tracking-wider text-gray-500">Status</label>
                   <p className="text-lg font-semibold text-green-600">Active</p>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Last Login</label>
+                <label className="text-xs uppercase tracking-wider text-gray-500">Last Login</label>
                 <p className="text-gray-900">{formatDate(selectedUserData.loginAt)}</p>
               </div>
 
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Registered</label>
+                <label className="text-xs uppercase tracking-wider text-gray-500">Registered</label>
                 <p className="text-gray-900">{formatDate(selectedUserData.registeredAt)}</p>
               </div>
             </div>
@@ -313,7 +304,7 @@ export function UsersClient({ initialUsers }: Props) {
             {/* Delete */}
             <button
               onClick={() => deleteUser(selectedUserData.id)}
-              className="w-full px-3 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 font-medium text-sm transition-colors flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-200"
             >
               <Trash2 size={16} />
               Delete User

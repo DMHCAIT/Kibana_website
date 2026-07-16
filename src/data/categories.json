@@ -1,14 +1,8 @@
 [
-  { "slug": "tote-bag", "name": "Tote Bag", "image": "/mv/cat-5.jpeg", "order": 1 },
+  { "slug": "shoulder-bag", "name": "Shoulder Bags", "image": "/mv/cat-5.jpeg", "order": 1 },
   { "slug": "laptop-bag", "name": "Laptop Bag", "image": "/mv/cat-3.jpeg", "order": 2 },
   { "slug": "sling-bag", "name": "Sling Bag", "image": "/mv/cat-4.jpeg", "order": 3 },
-  {
-    "slug": "shoulder-bag",
-    "name": "Shoulder Bags",
-    "image": "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image01.webp",
-    "order": 4
-  },
-  { "slug": "clutch", "name": "Clutch", "image": "/mv/cat-2.jpeg", "order": 5 },
-  { "slug": "backpack", "name": "Backpack", "image": "/mv/cat-1.jpeg", "order": 6 },
-  { "slug": "wallet", "name": "Wallet", "image": "/mv/cat-6.jpeg", "order": 7 }
+  { "slug": "clutch", "name": "Clutch", "image": "/mv/cat-2.jpeg", "order": 4 },
+  { "slug": "backpack", "name": "Backpack", "image": "/mv/cat-1.jpeg", "order": 5 },
+  { "slug": "wallet", "name": "Wallet", "image": "/mv/cat-6.jpeg", "order": 6 }
 ]

@@ -53,7 +53,10 @@ export function ProductCard({
   const pct = discountPct(product.price, product.compareAtPrice);
   const productHref = href ?? `/shop/${product.slug}`;
   const cardName = displayName ?? product.name;
-  const cardImage = displayImage ?? product.displayImage ?? pickDefaultProductImage(product.image, product.gallery ?? []);
+  const cardImage =
+    displayImage ??
+    product.displayImage ??
+    pickDefaultProductImage(product.image, product.gallery ?? []);
   const visibleColorVariants = product.colorVariants?.length
     ? product.colorVariants
     : product.colors.map((color) => ({
@@ -113,13 +116,15 @@ export function ProductCard({
         )}
         {/* Out of Stock banner */}
         {!variantInStock && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="bg-red-600 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded tracking-wide">OUT OF STOCK</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <span className="rounded bg-red-600 px-4 py-2 text-xs font-bold tracking-wide text-white sm:text-sm">
+              OUT OF STOCK
+            </span>
           </div>
         )}
         <button
           aria-label="Add to wishlist"
-          className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center transition-all hover:scale-110 sm:h-8 sm:w-8"
+          className="absolute right-2 top-2 z-10 inline-flex h-7 w-7 items-center justify-center transition-all hover:scale-110 sm:h-8 sm:w-8"
           onClick={toggleWishlist}
         >
           <Heart
@@ -151,11 +156,11 @@ export function ProductCard({
         )}
         {variant === "full" && visibleColorVariants.length > 0 && (
           <div className="mt-0.5 flex items-center gap-1.5">
-            <div className="flex items-center">
-              {visibleColorVariants.slice(0, 6).map((variantColor) => (
+            <div className="flex items-center gap-0.5">
+              {visibleColorVariants.map((variantColor) => (
                 <span
                   key={variantColor.slug}
-                  className="-ml-1 h-3.5 w-3.5 rounded-full border border-white shadow-sm first:ml-0"
+                  className="h-3.5 w-3.5 rounded-full border border-white shadow-sm"
                   style={{ backgroundColor: variantColor.hex || variantColor.color }}
                   title={variantColor.color}
                 />

@@ -18,6 +18,7 @@ type WishlistItem = {
   variantKey: string; // e.g., "prod-id-color-slug" or just "prod-id"
   displayImage: string; // Image specific to this variant
   displayName: string; // Name specific to this variant
+  href: string; // Link with color query param if applicable
 };
 
 export default function WishlistPage() {
@@ -42,6 +43,7 @@ export default function WishlistPage() {
               variantKey: itemKey,
               displayImage: product.displayImage,
               displayName: product.name,
+              href: `/shop/${product.slug}`,
             };
           }
 
@@ -59,6 +61,7 @@ export default function WishlistPage() {
                   variantKey: itemKey,
                   displayImage: getShopDisplayImage(prod, variant),
                   displayName: getProductDisplayName(prod, variant),
+                  href: `/shop/${prod.slug}?color=${variantPart}`,
                 };
               }
             }
@@ -88,14 +91,12 @@ export default function WishlistPage() {
     return (
       <>
         <TrackPageView pageName="Wishlist" pageType="wishlist" />
-        <section className="container py-20 flex flex-col items-center text-center">
-          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+        <section className="container flex flex-col items-center py-20 text-center">
+          <span className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Heart className="h-7 w-7 text-muted-foreground" />
           </span>
-          <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Log in to see your saved products.
-          </p>
+          <h1 className="mb-2 font-display text-3xl">Your Wishlist</h1>
+          <p className="mb-6 text-sm text-muted-foreground">Log in to see your saved products.</p>
           <Button onClick={() => openAuthModal()} className="rounded-none px-8">
             Login / Sign Up
           </Button>
@@ -108,12 +109,12 @@ export default function WishlistPage() {
     return (
       <>
         <TrackPageView pageName="Wishlist" pageType="wishlist" />
-        <section className="container py-20 flex flex-col items-center text-center">
-          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+        <section className="container flex flex-col items-center py-20 text-center">
+          <span className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Heart className="h-7 w-7 text-muted-foreground" />
           </span>
-          <h1 className="font-display text-3xl mb-2">Your Wishlist</h1>
-          <p className="text-sm text-muted-foreground mb-6">
+          <h1 className="mb-2 font-display text-3xl">Your Wishlist</h1>
+          <p className="mb-6 text-sm text-muted-foreground">
             You haven&apos;t saved any products yet. Browse and tap the heart icon to save items.
           </p>
           <Button asChild className="rounded-none px-8">
@@ -128,10 +129,10 @@ export default function WishlistPage() {
     <section className="container py-8 md:py-12">
       <TrackPageView pageName="Wishlist" pageType="wishlist" />
       <div className="mb-6">
-        <h1 className="font-display text-3xl sm:text-4xl tracking-wide">Wishlist</h1>
+        <h1 className="font-display text-3xl tracking-wide sm:text-4xl">Wishlist</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Hi {user.name} — {wishlistItems.length}{" "}
-          {wishlistItems.length === 1 ? "item" : "items"} saved
+          Hi {user.name} — {wishlistItems.length} {wishlistItems.length === 1 ? "item" : "items"}{" "}
+          saved
         </p>
       </div>
 
@@ -144,6 +145,7 @@ export default function WishlistPage() {
             variantKey={item.variantKey}
             displayImage={item.displayImage}
             displayName={item.displayName}
+            href={item.href}
           />
         ))}
       </div>

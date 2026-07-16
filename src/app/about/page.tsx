@@ -17,7 +17,7 @@ const sections = [
     paragraphs: [
       "Kibana, established in 2024, is a luxury-inspired handbag brand created for both men and women who appreciate style with purpose. Our vision is to design versatile bags that seamlessly fit into every aspect of life - from office wear and daily use to parties, weddings, and special occasions. We aim to create pieces that are not just functional, but also elevate personal style.",
     ],
-    image: "/extracted/img-016.jpg",
+    image: "/our story images/Startup Idea & Year.jpg",
     reverse: false,
   },
   {
@@ -27,7 +27,7 @@ const sections = [
     paragraphs: [
       "At Kibana, we use 100% premium Vegan leather, carefully selected for its durability, smooth texture, and refined appearance. This material allows us to deliver a luxurious look while ensuring practicality and long-lasting performance, making our bags ideal for everyday modern use.",
     ],
-    image: "/extracted/img-014.jpg",
+    image: "/our story images/Material.png",
     reverse: true,
   },
   {
@@ -37,7 +37,7 @@ const sections = [
     paragraphs: [
       "Every Kibana bag is thoughtfully designed with a unique concept and meaning behind it. Our designs are inspired by real lifestyles, trends, and individuality, ensuring each piece stands out. We focus on creating bags that combine elegance, functionality, and timeless appeal, so they remain relevant beyond seasonal trends.",
     ],
-    image: "/extracted/img-060.jpg",
+    image: "/our story images/Design.png",
     reverse: false,
   },
   {
@@ -47,7 +47,7 @@ const sections = [
     paragraphs: [
       "All Kibana bags are crafted at our own manufacturing facility by a dedicated team of skilled professionals. A significant part of the process involves expert handwork, especially in detailing and finishing, which adds precision and character to every piece. This blend of careful craftsmanship and attention to detail ensures that each bag meets high standards of quality and carries a distinctive, premium feel.",
     ],
-    image: "/extracted/img-100.jpg",
+    image: "/our story images/How Bags Are Formed.jpg",
     reverse: true,
   },
 ];
@@ -59,22 +59,13 @@ export default function AboutPage() {
       {/* ── Hero ── */}
       <section className="relative h-52 overflow-hidden sm:h-72 md:h-[400px]">
         <Image
-          src="/extracted/img-102.jpg"
+          src="/our story images/Ourstory_herosection.jpg.jpeg"
           alt="Kibana — Our Story"
           fill
           className="object-cover object-center"
           priority
         />
         <div className="absolute inset-0 bg-kibana-cream/30" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.45em] text-kibana-camel sm:text-sm md:text-base">
-            Our Story
-          </p>
-          <h1 className="font-display text-3xl leading-tight text-kibana-ink sm:text-5xl md:text-6xl">
-            Style With Purpose
-          </h1>
-          <div className="mt-4 h-px w-12 bg-kibana-tan" />
-        </div>
       </section>
 
       {/* ── Intro ── */}

@@ -1,0 +1,1 @@
+ALTER TABLE "user_cart" ADD COLUMN "variant_id" text;

@@ -12,8 +12,7 @@ import * as schema from "./schema";
 // We only enable DB on Vercel when the pooler URL (port 6543) is configured.
 const rawUrl = process.env.DATABASE_URL;
 const isVercel = process.env.VERCEL === "1";
-const connectionString =
-  isVercel && rawUrl && !rawUrl.includes(":6543") ? undefined : rawUrl;
+const connectionString = isVercel && rawUrl && !rawUrl.includes(":6543") ? undefined : rawUrl;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -23,12 +22,16 @@ declare global {
 const client =
   globalThis.__kibana_pg ??
   postgres(connectionString ?? "postgres://invalid", {
-    prepare: false,          // Required for serverless
-    max: 15,                 // Increased from 5 to handle more concurrent requests
-    connect_timeout: 5,      // Increased timeout to 5s for better reliability
-    idle_timeout: 60,        // Increased from 10s to prevent premature disconnects
-    max_lifetime: 300,       // Increased from 60s for longer connection reuse
-    ssl: "require",          // Always require SSL for Supabase
+    prepare: false, // Required for serverless
+    max: 5, // Keep connections low for pgBouncer
+    connect_timeout: 10, // Allow more time to establish connection
+    idle_timeout: 15, // Close idle connections quickly (pgBouncer closes at ~30s)
+    max_lifetime: 60, // Shorter lifetime for pooler compatibility
+    socket_timeout: 10, // Socket timeout for read/write operations
+    application_name: "kibana_nextjs", // Identify app for pooler monitoring
+    ssl: "require", // Always require SSL for Supabase
+    transform: postgres.camel, // Auto-convert snake_case to camelCase
+    onerror: (err) => console.error("❌ Database error:", err.message),
   });
 
 if (process.env.NODE_ENV !== "production") globalThis.__kibana_pg = client;

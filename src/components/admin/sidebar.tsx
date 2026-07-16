@@ -32,41 +32,39 @@ export function AdminSidebar() {
   const router = useRouter();
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
     router.push("/admin/login");
     router.refresh();
   }
 
   return (
-    <aside className="w-64 bg-gray-900 flex flex-col h-full shrink-0">
+    <aside className="flex h-full w-64 shrink-0 flex-col bg-gray-900">
       {/* Logo */}
-      <div className="p-5 border-b border-gray-800">
+      <div className="border-b border-gray-800 p-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shrink-0">
-            <span className="text-gray-900 text-base font-bold">K</span>
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white">
+            <span className="text-base font-bold text-gray-900">K</span>
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">Kibana Admin</p>
-            <p className="text-gray-400 text-xs">Store Management</p>
+            <p className="text-sm font-bold leading-tight text-white">Kibana Admin</p>
+            <p className="text-xs text-gray-400">Store Management</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
         {NAV_ITEMS.map((item) => {
-          const active = item.exact
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+          const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                 active
                   ? "bg-white text-gray-900"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  : "text-gray-400 hover:bg-gray-800 hover:text-white",
               )}
             >
               <item.icon size={18} className="shrink-0" />
@@ -83,18 +81,18 @@ export function AdminSidebar() {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-all"
+          className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs text-gray-500 transition-all hover:bg-gray-800 hover:text-gray-300"
         >
-          <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+          <span className="h-1.5 w-1.5 rounded-full bg-green-400"></span>
           View Store
         </a>
       </div>
 
       {/* Logout */}
-      <div className="p-3 border-t border-gray-800">
+      <div className="border-t border-gray-800 p-3">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-all"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-all hover:bg-gray-800 hover:text-red-400"
         >
           <LogOut size={18} />
           <span>Logout</span>

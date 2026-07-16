@@ -30,13 +30,13 @@ function pushGtmEvent(payload: Record<string, unknown>) {
   window.dataLayer.push(payload);
 }
 
-function toGa4Item(product: Product, quantity = 1): Ga4Item {
+function toGa4Item(product: Product, quantity = 1, variantPrice?: number): Ga4Item {
   return {
     item_id: product.id,
     item_name: product.name,
     item_category: product.category,
     item_brand: "Kibana",
-    price: product.price,
+    price: variantPrice ?? product.price,
     quantity,
   };
 }
@@ -71,19 +71,21 @@ function validateEventName(eventName: string): boolean {
 
 function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
   if (typeof window === "undefined" || !window.fbq) return;
-  
+
   // Validate event name
   if (!validateEventName(eventName)) {
-    console.warn(`⚠️ Meta event "${eventName}" may not be recognized. Use standard Meta event names.`);
+    console.warn(
+      `⚠️ Meta event "${eventName}" may not be recognized. Use standard Meta event names.`,
+    );
   }
-  
+
   // Ensure required fields for Purchase events
   if (eventName === "Purchase" && data) {
     if (!data.value) console.warn("⚠️ Purchase event missing 'value' field");
     if (!data.currency) console.warn("⚠️ Purchase event missing 'currency' field");
     if (!data.content_type) console.warn("⚠️ Purchase event missing 'content_type' field");
   }
-  
+
   window.fbq("track", eventName, data || {});
 }
 
@@ -99,12 +101,16 @@ export function trackLogin(userId: string, email?: string) {
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
-  
+
   // Direct GA4 tracking
   trackGa4Event("login", { method: "email_otp", user_id: userId });
-  
-  trackMetaEvent("Login", { user_id: userId });
-  
+
+  // Meta Pixel Login Event - Include email for better user matching
+  trackMetaEvent("Login", {
+    user_id: userId,
+    email: email,
+  });
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("Login", {
     user_id: userId,
@@ -121,12 +127,12 @@ export function trackSignUp(userId: string, email?: string) {
     email: email,
     timestamp: new Date().toISOString(),
   });
-  
+
   // Direct GA4 tracking
   trackGa4Event("sign_up", { method: "email_otp", user_id: userId });
-  
+
   trackMetaEvent("CompleteRegistration", { user_id: userId, email: email });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("CompleteRegistration", {
     user_id: userId,
@@ -159,7 +165,7 @@ export function trackSelectCategory(category: string) {
     content_type: "category",
     content_category: category,
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
     content_name: `Category: ${category}`,
@@ -169,13 +175,14 @@ export function trackSelectCategory(category: string) {
 }
 
 /** 5. VIEW CONTENT EVENT - Fired when user views product details */
-export function trackViewContent(product: Product) {
+export function trackViewContent(product: Product, variantPrice?: number) {
+  const price = variantPrice ?? product.price;
   pushGtmEvent({
     event: "view_item",
     ecommerce: {
       currency: "INR",
-      value: product.price,
-      items: [toGa4Item(product)],
+      value: price,
+      items: [toGa4Item(product, 1, price)],
     },
     timestamp: new Date().toISOString(),
   });
@@ -184,17 +191,17 @@ export function trackViewContent(product: Product) {
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
-    value: product.price,
+    value: price,
     currency: "INR",
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
-    value: product.price,
+    value: price,
     currency: "INR",
   });
 }
@@ -214,7 +221,7 @@ export function trackProductListingView(category?: string, productCount?: number
     content_type: "product_list",
     content_category: category,
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
     content_name: `Product Listing${category ? ": " + category : ""}`,
@@ -236,7 +243,7 @@ export function trackMyAccount(userId: string) {
     content_type: "account",
     user_id: userId,
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
     user_id: userId,
@@ -249,15 +256,17 @@ export function trackMyAccount(userId: string) {
 export function trackWishlist(
   product: Product,
   action: "add" | "remove" = "add",
-  userId?: string
+  userId?: string,
+  variantPrice?: number,
 ) {
+  const price = variantPrice ?? product.price;
   const eventName = action === "add" ? "add_to_wishlist" : "remove_from_wishlist";
   pushGtmEvent({
     event: eventName,
     ecommerce: {
       currency: "INR",
-      value: product.price,
-      items: [toGa4Item(product)],
+      value: price,
+      items: [toGa4Item(product, 1, price)],
     },
     user_id: userId,
     timestamp: new Date().toISOString(),
@@ -266,17 +275,17 @@ export function trackWishlist(
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
-    value: product.price,
+    value: price,
     currency: "INR",
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("AddToWishlist", {
     user_id: userId,
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
-    value: product.price,
+    value: price,
     currency: "INR",
   });
 }
@@ -286,41 +295,44 @@ export function trackAddToCart(
   product: Product,
   quantity: number,
   userId?: string,
-  userEmail?: string
+  userEmail?: string,
+  variantPrice?: number,
 ) {
+  const price = variantPrice ?? product.price;
+  const totalValue = price * quantity;
   pushGtmEvent({
     event: "add_to_cart",
     ecommerce: {
       currency: "INR",
-      value: product.price * quantity,
-      items: [toGa4Item(product, quantity)],
+      value: totalValue,
+      items: [toGa4Item(product, quantity, price)],
     },
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
-  
+
   // Direct GA4 tracking
   trackGa4Event("add_to_cart", {
-    items: [toGa4Item(product, quantity)],
+    items: [toGa4Item(product, quantity, price)],
     currency: "INR",
-    value: product.price * quantity,
+    value: totalValue,
   });
-  
+
   trackMetaEvent("AddToCart", {
     content_name: product.name,
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
     quantity: quantity,
-    value: product.price * quantity,
+    value: totalValue,
     currency: "INR",
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("AddToCart", {
     user_id: userId,
     email: userEmail,
-    value: product.price * quantity,
+    value: totalValue,
     currency: "INR",
     content_type: "product",
     content_ids: [product.id].join(","),
@@ -330,11 +342,18 @@ export function trackAddToCart(
 
 /** 10. CHECKOUT EVENT - Fired when user initiates checkout */
 export function trackCheckout(
-  items: Array<{ product: Product; quantity: number }>,
+  items: Array<{ product: Product; quantity: number; selectedColorSlug?: string }>,
   total: number,
-  userId?: string
+  userId?: string,
 ) {
-  const ga4Items = items.map((item) => toGa4Item(item.product, item.quantity));
+  // Calculate GA4 items using variant prices if available
+  const ga4Items = items.map((item) => {
+    const variant = item.selectedColorSlug
+      ? item.product.colorVariants?.find((v) => v.slug === item.selectedColorSlug)
+      : undefined;
+    const variantPrice = variant?.price ?? item.product.price;
+    return toGa4Item(item.product, item.quantity, variantPrice);
+  });
   pushGtmEvent({
     event: "begin_checkout",
     ecommerce: {
@@ -345,14 +364,14 @@ export function trackCheckout(
     user_id: userId,
     timestamp: new Date().toISOString(),
   });
-  
+
   // Direct GA4 tracking
   trackGa4Event("begin_checkout", {
     items: ga4Items,
     currency: "INR",
     value: total,
   });
-  
+
   trackMetaEvent("InitiateCheckout", {
     content_type: "checkout",
     content_ids: items.map((i) => i.product.id),
@@ -360,7 +379,7 @@ export function trackCheckout(
     value: total,
     currency: "INR",
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("InitiateCheckout", {
     user_id: userId,
@@ -375,14 +394,21 @@ export function trackCheckout(
 /** 11. PURCHASE EVENT - Fired when user completes purchase (MOST IMPORTANT) */
 export function trackPurchase(
   orderId: string,
-  items: Array<{ product: Product; quantity: number }>,
+  items: Array<{ product: Product; quantity: number; selectedColorSlug?: string }>,
   total: number,
   userId?: string,
   paymentMethod?: string,
-  userEmail?: string
+  userEmail?: string,
 ) {
-  const ga4Items = items.map((item) => toGa4Item(item.product, item.quantity));
-  
+  // Calculate GA4 items using variant prices if available
+  const ga4Items = items.map((item) => {
+    const variant = item.selectedColorSlug
+      ? item.product.colorVariants?.find((v) => v.slug === item.selectedColorSlug)
+      : undefined;
+    const variantPrice = variant?.price ?? item.product.price;
+    return toGa4Item(item.product, item.quantity, variantPrice);
+  });
+
   // GA4/GTM Event
   pushGtmEvent({
     event: "purchase",
@@ -397,7 +423,7 @@ export function trackPurchase(
     payment_method: paymentMethod || "unknown",
     timestamp: new Date().toISOString(),
   });
-  
+
   // Direct GA4 tracking (in addition to GTM)
   trackGa4Event("purchase", {
     transaction_id: orderId,
@@ -406,7 +432,7 @@ export function trackPurchase(
     items: ga4Items,
     payment_method: paymentMethod || "unknown",
   });
-  
+
   // Meta Pixel Purchase Event with ALL required fields per Meta spec
   const metaPurchaseData = {
     content_type: "product",
@@ -417,9 +443,9 @@ export function trackPurchase(
     currency: "INR",
     payment_method: paymentMethod || "unknown",
   };
-  
+
   trackMetaEvent("Purchase", metaPurchaseData);
-  
+
   // SERVER-SIDE CONVERSIONS API for guaranteed delivery
   // This ensures Meta receives the conversion even if client-side tracking is blocked
   trackConversionAPI("Purchase", {
@@ -439,7 +465,7 @@ export function trackPurchase(
 // SERVER-SIDE CONVERSIONS API
 export async function trackConversionAPI(
   eventName: string,
-  data: { user_id?: string; email?: string; phone?: string; [key: string]: unknown }
+  data: { user_id?: string; email?: string; phone?: string; [key: string]: unknown },
 ) {
   try {
     // If no email/phone provided, try to fetch current user to include customer data
@@ -479,15 +505,14 @@ export function trackContact(email?: string, phone?: string) {
     phone: phone,
     timestamp: new Date().toISOString(),
   });
-  
+
+  // Meta Pixel Contact Event - Use only Meta-standard fields
   trackMetaEvent("Contact", {
     content_name: "Contact Form Submission",
     content_type: "lead",
-    email: email,
-    phone: phone,
   });
-  
-  // Server-side tracking for guaranteed delivery
+
+  // Server-side tracking for guaranteed delivery (includes PII)
   trackConversionAPI("Contact", {
     email: email,
     phone: phone,
@@ -502,13 +527,13 @@ export function trackSearch(query: string, resultsCount?: number) {
     results_count: resultsCount,
     timestamp: new Date().toISOString(),
   });
-  
+
   trackMetaEvent("Search", {
     search_string: query,
     content_name: `Product Search: ${query}`,
     content_type: "search",
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("Search", {
     search_term: query,
@@ -528,7 +553,7 @@ export function trackViewPage(pageName: string, pageType: string) {
     content_name: pageName,
     content_type: pageType,
   });
-  
+
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
     content_name: pageName,

@@ -27,6 +27,7 @@ export const ProductSchema = z.object({
   colorVariants: z
     .array(
       z.object({
+        variantId: z.string(), // UNIQUE: productId + "-" + slug (e.g., "p1-tan")
         color: z.string(),
         hex: z.string().optional(),
         slug: z.string(),

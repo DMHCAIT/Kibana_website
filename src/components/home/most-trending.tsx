@@ -10,10 +10,10 @@ import type { Product } from "@/types/product";
 
 const TREND_CARD_IMAGES: Record<string, string> = {
   p1: "/mv/Trend1.webp",
-  p2: "/kibana_product_images/1%20collection/Prizma%20Sling/Teal%20Blue/7.webp",
+  p2: "/kibana_product_images/1 collection/Prizma Sling/Teal Blue/7.webp",
   p7: "/mv/Trend3.webp",
-  p9: "/kibana_product_images/2%20collection/Valera%20Dome/Forest%20Green/Image02.webp",
-  p10: "/kibana_product_images/2%20collection/CORDIA%20BAG/Lime%20Yellow/Image06.webp",
+  p9: "/kibana_product_images/2 collection/Valera Dome/Forest Green/Image02.webp",
+  p10: "/kibana_product_images/2 collection/CORDIA BAG/Lime Yellow/Image06.webp",
 };
 
 const TREND_CARD_LINKS: Record<string, string> = {

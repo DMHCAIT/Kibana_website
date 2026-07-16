@@ -7,11 +7,7 @@ export const categories: Category[] = [
   { slug: "tote-bag", name: "Tote Bag", image: "/mv/cat-5.jpeg" },
   { slug: "laptop-bag", name: "Laptop Bag", image: "/mv/cat-3.jpeg" },
   { slug: "sling-bag", name: "Sling Bag", image: "/mv/cat-4.jpeg" },
-  {
-    slug: "shoulder-bag",
-    name: "Shoulder Bags",
-    image: "/kibana_product_images/2%20collection/CORDIA%20BAG/black/Image01.webp",
-  },
+  { slug: "shoulder-bag", name: "Shoulder Bags", image: "/mv/cat-5.jpeg" },
   { slug: "clutch", name: "Clutch", image: "/mv/cat-2.jpeg" },
   { slug: "backpack", name: "Backpack", image: "/mv/cat-1.jpeg" },
   { slug: "wallet", name: "Wallet", image: "/mv/cat-6.jpeg" },

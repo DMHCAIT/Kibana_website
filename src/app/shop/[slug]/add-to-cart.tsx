@@ -14,32 +14,61 @@ import type { Product } from "@/types/product";
 
 interface AddToCartButtonProps {
   product: Product;
-  activeVariant?: Product["colorVariants"][number];
+  activeVariantSlug?: string;
 }
 
-export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps) {
+export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonProps) {
   const [qty, setQty] = useState(1);
   const [inWishlist, setInWishlist] = useState(false);
   const [addedNotification, setAddedNotification] = useState(false);
+  const [addedVariant, setAddedVariant] = useState<Product["colorVariants"][number] | undefined>(
+    undefined,
+  );
   const add = useCart((s) => s.add);
   const { user, openAuthModal } = useAuth();
   const { add: addWishlist, remove: removeWishlist, has } = useWishlist();
+
+  // Find the active variant from product using the slug
+  const activeVariant = product.colorVariants?.find((v) => v.slug === activeVariantSlug);
   const isOutOfStock = activeVariant?.inStock === false;
 
+  // Log the received props
+  console.log(
+    "🛒 ADD-TO-CART BUTTON - Props received:",
+    JSON.stringify(
+      {
+        productId: product.id,
+        productName: product.name,
+        activeVariantSlugReceived: activeVariantSlug,
+        activeVariantFound: !!activeVariant,
+        activeVariantTitle: activeVariant?.productTitle,
+        productColorVariantsCount: product.colorVariants?.length,
+        productColorVariants: product.colorVariants?.map((v) => ({
+          slug: v.slug,
+          title: v.productTitle,
+        })),
+      },
+      null,
+      2,
+    ),
+  );
+
   useEffect(() => {
-    setInWishlist(has(product.id));
-  }, [has, product.id]);
+    const itemKey = activeVariantSlug ? `${product.id}-${activeVariantSlug}` : product.id;
+    setInWishlist(has(itemKey));
+  }, [has, product.id, activeVariantSlug]);
 
   function handleWishlist() {
     if (!user) {
       openAuthModal("Please log in to save items to your wishlist.");
       return;
     }
+    const itemKey = activeVariant?.slug ? `${product.id}-${activeVariant.slug}` : product.id;
     if (inWishlist) {
-      removeWishlist(product.id);
+      removeWishlist(itemKey);
       setInWishlist(false);
     } else {
-      addWishlist(product.id);
+      addWishlist(itemKey);
       setInWishlist(true);
     }
   }
@@ -49,11 +78,53 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
       openAuthModal("Please log in to add items to your cart.");
       return;
     }
-    await add(product, qty, activeVariant?.slug);
-    
+
+    // CRITICAL: Get the current color from URL in real-time
+    // This ensures we're using the exact color the user selected, not a cached prop value
+    const urlParams = new URLSearchParams(window.location.search);
+    const colorFromUrl = urlParams.get("color");
+
+    // Priority order:
+    // 1. Color from URL (what the user clicked)
+    // 2. activeVariantSlug prop (from server)
+    // 3. activeVariant?.slug (computed from prop)
+    // 4. First variant slug (fallback)
+    const colorSlugToUse =
+      colorFromUrl || activeVariantSlug || activeVariant?.slug || product.colorVariants?.[0]?.slug;
+
+    // Find the variant using the determined color slug
+    const variantToAdd =
+      product.colorVariants?.find((v) => v.slug === colorSlugToUse) || product.colorVariants?.[0];
+
+    console.log(
+      "🛒 ADD TO CART DEBUG - Full Trace:",
+      JSON.stringify(
+        {
+          productId: product.id,
+          colorFromUrl,
+          activeVariantSlug_fromProps: activeVariantSlug,
+          activeVariant_slug: activeVariant?.slug,
+          firstVariant_slug: product.colorVariants?.[0]?.slug,
+          colorSlugToUse_final: colorSlugToUse,
+          variantToAdd_slug: variantToAdd?.slug,
+          variantToAdd_productTitle: variantToAdd?.productTitle,
+          qty,
+          totalColorVariants: product.colorVariants?.length,
+        },
+        null,
+        2,
+      ),
+    );
+
+    // Pass the color slug to cart
+    await add(product, qty, colorSlugToUse);
+
     // Track AddToCart event for Meta Pixel & Conversions API
-    trackAddToCart(product, qty, user.id, user.email);
-    
+    const variantPrice = variantToAdd?.price ?? product.price;
+    trackAddToCart(product, qty, user.id, user.email, variantPrice);
+
+    // Save the variant that was added for the notification
+    setAddedVariant(variantToAdd);
     setAddedNotification(true);
     setTimeout(() => setAddedNotification(false), 4000);
   }
@@ -71,7 +142,7 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
             <div className="mt-1.5 flex items-center gap-2.5">
               <div className="relative h-10 w-9 shrink-0 overflow-hidden rounded bg-muted">
                 <Image
-                  src={activeVariant?.image || product.image}
+                  src={addedVariant?.image || product.image}
                   alt={product.name}
                   fill
                   sizes="36px"
@@ -79,7 +150,9 @@ export function AddToCartButton({ product, activeVariant }: AddToCartButtonProps
                 />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs font-medium">{getProductDisplayName(product, activeVariant)}</p>
+                <p className="truncate text-xs font-medium">
+                  {getProductDisplayName(product, addedVariant)}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Qty: {qty} · {formatINR(product.price * qty)}
                 </p>

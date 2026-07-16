@@ -4,15 +4,12 @@ import { db } from "@/lib/db";
 import { userCart } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-/**
- * DELETE /api/cart/clear
- * Clears all items from the user's cart
- */
+export const dynamic = "force-dynamic";
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
     const userId = cookieStore.get("kibana-user-id")?.value;
-    
+
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -50,83 +50,153 @@ export function CartView() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px]">
         <ul className="bg-card divide-y divide-border rounded-xl border border-border">
-          {items.map(({ product, quantity, selectedColorSlug }) => {
-            const variant = selectedColorSlug
-              ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
-              : product.colorVariants?.[0];
-            const displayName = getProductDisplayName(product, variant);
-            const displayImage = variant ? getShopDisplayImage(product, variant) : product.displayImage || product.image;
+          {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
+            console.log(
+              "🛒 CART ITEM DEBUG:",
+              JSON.stringify(
+                {
+                  productId: product.id,
+                  productName: product.name,
+                  selectedColorSlug,
+                  variantId,
+                  productVariantCount: product.colorVariants?.length,
+                  productVariants: product.colorVariants?.map((v) => ({
+                    slug: v.slug,
+                    variantId: v.variantId,
+                    productTitle: v.productTitle,
+                  })),
+                },
+                null,
+                2,
+              ),
+            );
+
+            // PRIMARY: Use selectedColorSlug (most reliable - directly from user selection)
+            // SECONDARY: Try variantId lookup
+            // FALLBACK: Use first variant
+            let variant = null;
+
+            // Try selectedColorSlug FIRST - this is most reliable
+            if (selectedColorSlug && product.colorVariants) {
+              variant = product.colorVariants.find((v) => v.slug === selectedColorSlug);
+              if (variant) {
+                console.log(
+                  "✅ VARIANT FOUND BY SLUG:",
+                  JSON.stringify({
+                    slug: selectedColorSlug,
+                    variantTitle: variant.productTitle,
+                  }),
+                );
+              }
+            }
+
+            // Fall back to variantId lookup if slug didn't work
+            if (!variant && variantId && product.colorVariants) {
+              variant = product.colorVariants.find((v) => v.variantId === variantId);
+              if (variant) {
+                console.log(
+                  "✅ VARIANT FOUND BY VARIANTID:",
+                  JSON.stringify({
+                    variantId,
+                    variantTitle: variant.productTitle,
+                  }),
+                );
+              }
+            }
+
+            // Last resort: Use first variant
+            if (!variant && product.colorVariants?.length) {
+              variant = product.colorVariants[0];
+              console.warn(
+                "⚠️ USING FIRST VARIANT AS FALLBACK:",
+                JSON.stringify({
+                  slug: variant.slug,
+                  variantTitle: variant.productTitle,
+                  selectedColorSlugWas: selectedColorSlug,
+                  variantIdWas: variantId,
+                }),
+              );
+            }
+
+            // Display name and image
+            let displayName = variant ? getProductDisplayName(product, variant) : product.name;
+            let displayImage = variant ? getShopDisplayImage(product, variant) : product.image;
 
             return (
-            <li key={product.id} className="flex gap-3 p-3 sm:gap-4 sm:p-4">
-              <Link
-                href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
-                className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-24"
+              <li
+                key={`${product.id}-${selectedColorSlug || "default"}`}
+                className="flex gap-3 p-3 sm:gap-4 sm:p-4"
               >
-                <Image
-                  src={displayImage}
-                  alt={displayName}
-                  fill
-                  sizes="96px"
-                  className="object-cover"
-                />
-              </Link>
+                <Link
+                  href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
+                  className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-24"
+                >
+                  <Image
+                    src={displayImage}
+                    alt={displayName}
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                  />
+                </Link>
 
-              <div className="flex flex-1 flex-col">
-                <div className="flex items-start justify-between gap-2">
-                  <Link
-                    href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
-                    className="line-clamp-2 text-sm font-medium hover:underline"
-                  >
-                    {displayName}
-                  </Link>
-                  <button
-                    aria-label="Remove"
-                    onClick={() => {
-                      remove(product.id);
-                      // Track remove from cart event
-                      trackWishlist(product, "remove", user?.id);
-                    }}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <p className="mt-1 text-xs capitalize text-muted-foreground">
-                  {product.category.replace("-", " ")}
-                </p>
-
-                <div className="mt-auto flex items-center justify-between pt-2">
-                  <div className="inline-flex items-center rounded-md border border-border">
-                    <button
-                      aria-label="Decrease quantity"
-                      className="inline-flex h-8 w-8 items-center justify-center hover:bg-muted"
-                      onClick={() => setQuantity(product.id, Math.max(0, quantity - 1))}
+                <div className="flex flex-1 flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <Link
+                      href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
+                      className="line-clamp-2 text-sm font-medium hover:underline"
                     >
-                      <Minus className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="min-w-8 text-center text-sm">{quantity}</span>
+                      {displayName}
+                    </Link>
                     <button
-                      aria-label="Increase quantity"
-                      className="inline-flex h-8 w-8 items-center justify-center hover:bg-muted"
-                      onClick={() => setQuantity(product.id, quantity + 1)}
+                      aria-label="Remove"
+                      onClick={() => {
+                        remove(product.id, selectedColorSlug);
+                        // Track remove from cart event
+                        trackWishlist(product, "remove", user?.id);
+                      }}
+                      className="text-muted-foreground hover:text-destructive"
                     >
-                      <Plus className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-sm font-semibold">{formatINR(product.price * quantity)}</p>
-                    {product.compareAtPrice && (
-                      <p className="text-xs text-muted-foreground line-through">
-                        {formatINR(product.compareAtPrice * quantity)}
-                      </p>
-                    )}
+                  <p className="mt-1 text-xs capitalize text-muted-foreground">
+                    {product.category.replace("-", " ")}
+                  </p>
+
+                  <div className="mt-auto flex items-center justify-between pt-2">
+                    <div className="inline-flex items-center rounded-md border border-border">
+                      <button
+                        aria-label="Decrease quantity"
+                        className="inline-flex h-8 w-8 items-center justify-center hover:bg-muted"
+                        onClick={() =>
+                          setQuantity(product.id, Math.max(0, quantity - 1), selectedColorSlug)
+                        }
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="min-w-8 text-center text-sm">{quantity}</span>
+                      <button
+                        aria-label="Increase quantity"
+                        className="inline-flex h-8 w-8 items-center justify-center hover:bg-muted"
+                        onClick={() => setQuantity(product.id, quantity + 1, selectedColorSlug)}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-semibold">{formatINR(product.price * quantity)}</p>
+                      {product.compareAtPrice && (
+                        <p className="text-xs text-muted-foreground line-through">
+                          {formatINR(product.compareAtPrice * quantity)}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
+              </li>
             );
           })}
         </ul>

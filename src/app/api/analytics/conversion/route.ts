@@ -18,7 +18,7 @@ async function hashSHA256(value: string): Promise<string> {
 
 /**
  * POST /api/analytics/conversion
- * 
+ *
  * Server-side event tracking for Meta Conversions API
  * This provides more reliable conversion tracking as it's not affected by:
  * - Ad blockers
@@ -27,24 +27,38 @@ async function hashSHA256(value: string): Promise<string> {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { eventName, data, timestamp } = await request.json();
+    // Check if request has a body
+    const contentLength = request.headers.get("content-length");
+    if (!contentLength || contentLength === "0") {
+      return NextResponse.json({ success: false, message: "Empty request body" }, { status: 200 });
+    }
+
+    let eventData;
+    try {
+      eventData = await request.json();
+    } catch (e) {
+      return NextResponse.json(
+        { success: false, message: "Invalid JSON in request body" },
+        { status: 200 },
+      );
+    }
+
+    const { eventName, data, timestamp } = eventData;
 
     // Validate required environment variables
     if (!META_ACCESS_TOKEN) {
-      console.warn(
-        "Meta Conversions API Token not configured. Set META_CONVERSIONS_API_TOKEN in .env.local"
-      );
+      // Return 200 with success: false for graceful degradation (analytics non-critical)
       return NextResponse.json(
         { success: false, message: "Conversions API not configured" },
-        { status: 400 }
+        { status: 200 },
       );
     }
 
     if (!PIXEL_ID) {
-      console.warn("Meta Pixel ID not configured");
+      // Return 200 with success: false for graceful degradation (analytics non-critical)
       return NextResponse.json(
         { success: false, message: "Pixel ID not configured" },
-        { status: 400 }
+        { status: 200 },
       );
     }
 
@@ -90,32 +104,28 @@ export async function POST(request: NextRequest) {
     // Validate required fields for Purchase events
     if (eventName === "Purchase") {
       if (!customData.value) {
-        console.error("❌ Purchase event missing 'value' field");
         return NextResponse.json(
           { success: false, error: "Purchase event requires 'value' field" },
-          { status: 400 }
+          { status: 400 },
         );
       }
       if (!customData.currency) {
-        console.error("❌ Purchase event missing 'currency' field");
         return NextResponse.json(
           { success: false, error: "Purchase event requires 'currency' field" },
-          { status: 400 }
+          { status: 400 },
         );
       }
       if (!customData.content_type) {
-        console.error("❌ Purchase event missing 'content_type' field");
         return NextResponse.json(
           { success: false, error: "Purchase event requires 'content_type' field" },
-          { status: 400 }
+          { status: 400 },
         );
       }
       const contentIdsStr = String(customData.content_ids || "").trim();
       if (!contentIdsStr) {
-        console.error("❌ Purchase event missing 'content_ids' field");
         return NextResponse.json(
           { success: false, error: "Purchase event requires 'content_ids' field" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -140,13 +150,6 @@ export async function POST(request: NextRequest) {
       delete conversionsData.test_event_code;
     }
 
-    console.log(`📊 Meta Conversion Event: ${eventName}`, {
-      timestamp,
-      hashedUserDataKeys: Object.keys(hashedUserData),
-      customData,
-      userDataCount: Object.keys(hashedUserData).length,
-    });
-
     // Send to Meta Conversions API
     const response = await fetch(
       `https://graph.facebook.com/v17.0/${PIXEL_ID}/events?access_token=${META_ACCESS_TOKEN}`,
@@ -156,14 +159,12 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(conversionsData),
-      }
+      },
     );
 
     const result = await response.json();
 
     if (!response.ok) {
-      console.error(`❌ Meta API Error (${response.status}):`, result);
-      console.error("Full error response:", JSON.stringify(result, null, 2));
       return NextResponse.json(
         {
           success: false,
@@ -172,17 +173,12 @@ export async function POST(request: NextRequest) {
           errorCode: result.error?.code,
           details: result,
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
-    console.log(`✅ Conversion tracked: ${eventName}`, result);
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error("Conversions API error:", error);
-    return NextResponse.json(
-      { success: false, error: String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
   }
 }

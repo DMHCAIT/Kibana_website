@@ -51,21 +51,19 @@ function toVariantListingItems(product: Product): ProductListItem[] {
     return [{ key: product.id, product, variantKey: product.id }];
   }
 
-  return product.colorVariants
-    .filter((variant) => !(product.slug === "sandesh-laptop-bag" && variant.slug === "mint-green"))
-    .map((variant) => ({
-      key: `${product.id}-${variant.slug}`,
-      product,
-      href: `/shop/${product.slug}?color=${variant.slug}`,
-      displayName:
-        (product.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
-        product.slug === "mini-aurelia-fan-tote"
-          ? "Mini Aurelia Fan Tote"
-          : variant.productTitle || `${product.name} - ${variant.color}`,
-      displayImage: getShopDisplayImage(product, variant),
-      variantInStock: variant.inStock !== false,
-      variantKey: `${product.id}-${variant.slug}`, // Use key as variantKey for wishlist
-    }));
+  return product.colorVariants.map((variant) => ({
+    key: `${product.id}-${variant.slug}`,
+    product,
+    href: `/shop/${product.slug}?color=${variant.slug}`,
+    displayName:
+      (product.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
+      product.slug === "mini-aurelia-fan-tote"
+        ? "Mini Aurelia Fan Tote"
+        : variant.productTitle || `${product.name} - ${variant.color}`,
+    displayImage: getShopDisplayImage(product, variant),
+    variantInStock: variant.inStock !== false,
+    variantKey: `${product.id}-${variant.slug}`, // Use key as variantKey for wishlist
+  }));
 }
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -136,7 +134,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   return (
     <>
       {q && <TrackSearch query={q} resultsCount={listingItems.length} />}
-      <TrackProductListingView category={selectedCategories[0]} productCount={listingItems.length} />
+      <TrackProductListingView
+        category={selectedCategories[0]}
+        productCount={listingItems.length}
+      />
       <section className="container py-6 md:py-10">
         <ShopHeader heading={heading} count={listingItems.length} sort={sort} showSort />
 

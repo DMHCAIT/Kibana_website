@@ -67,7 +67,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     }>;
     return variants.map((v) => {
       const isHexCode = v.color?.startsWith("#");
-      const displayName = isHexCode ? slugToName(v.slug ?? "") : v.color ?? "";
+      const displayName = isHexCode ? slugToName(v.slug ?? "") : (v.color ?? "");
       return {
         color: displayName,
         slug: v.slug ?? "",
@@ -126,11 +126,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     setSaved(false);
   }
 
-  async function uploadFile(
-    file: File,
-    path: string,
-    bucket = "product-images"
-  ): Promise<string> {
+  async function uploadFile(file: File, path: string, bucket = "product-images"): Promise<string> {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("bucket", bucket);
@@ -140,9 +136,10 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: fd,
+        credentials: "include",
       });
 
-      const data = await res.json() as { url?: string; error?: string };
+      const data = (await res.json()) as { url?: string; error?: string };
 
       if (!res.ok) {
         throw new Error(data.error || `Upload failed with status ${res.status}`);
@@ -164,6 +161,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     try {
       await fetch(`/api/admin/upload?url=${encodeURIComponent(url)}`, {
         method: "DELETE",
+        credentials: "include",
       });
     } catch {
       // Non-fatal
@@ -197,10 +195,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const ext = file.name.split(".").pop() || "jpg";
-        const url = await uploadFile(
-          file,
-          `products/${form.id}/gallery-${Date.now()}-${i}.${ext}`
-        );
+        const url = await uploadFile(file, `products/${form.id}/gallery-${Date.now()}-${i}.${ext}`);
         urls.push(url);
       }
       update("gallery", [...form.gallery, ...urls]);
@@ -214,10 +209,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     }
   }
 
-  async function handleVariantImageUpload(
-    index: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  async function handleVariantImageUpload(index: number, e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(`variant-image-${index}`);
@@ -226,7 +218,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       const ext = file.name.split(".").pop() || "jpg";
       const url = await uploadFile(
         file,
-        `products/${form.id}/variants/${variant.slug}/main.${ext}`
+        `products/${form.id}/variants/${variant.slug}/main.${ext}`,
       );
       const updated = [...form.colorVariants];
       updated[index] = { ...updated[index], image: url };
@@ -240,10 +232,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     }
   }
 
-  async function handleVariantGalleryUpload(
-    index: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  async function handleVariantGalleryUpload(index: number, e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
     setUploading(`variant-gallery-${index}`);
@@ -255,7 +244,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
         const ext = file.name.split(".").pop() || "jpg";
         const url = await uploadFile(
           file,
-          `products/${form.id}/variants/${variant.slug}/gallery-${Date.now()}-${i}.${ext}`
+          `products/${form.id}/variants/${variant.slug}/gallery-${Date.now()}-${i}.${ext}`,
         );
         urls.push(url);
       }
@@ -279,9 +268,10 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     if (!form.name.trim() || !form.slug.trim()) return;
     try {
       // Auto-generate colors from colorVariants if colors is empty
-      const colors = form.colors && form.colors.length > 0 
-        ? form.colors 
-        : form.colorVariants.map(v => v.hex || v.color).filter(Boolean);
+      const colors =
+        form.colors && form.colors.length > 0
+          ? form.colors
+          : form.colorVariants.map((v) => v.hex || v.color).filter(Boolean);
 
       const payload = {
         ...form,
@@ -300,6 +290,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -362,25 +353,23 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
     <form onSubmit={handleSubmit} className="space-y-8 pb-8">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 border rounded-lg p-4 ${toastBg} flex items-center gap-2 z-50`}>
-          {toast.type === "success" ? (
-            <CheckCircle size={18} />
-          ) : (
-            <AlertCircle size={18} />
-          )}
+        <div
+          className={`fixed right-4 top-4 rounded-lg border p-4 ${toastBg} z-50 flex items-center gap-2`}
+        >
+          {toast.type === "success" ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
           {toast.msg}
         </div>
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center sticky top-0 bg-white z-40 p-4 -mx-8 px-8 border-b">
+      <div className="sticky top-0 z-40 -mx-8 flex items-center justify-between border-b bg-white p-4 px-8">
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? "Create Product" : "Edit Product"}
         </h1>
         <button
           type="submit"
           disabled={saving || !form.name.trim()}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
         >
           {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
           Save Product
@@ -388,44 +377,44 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       </div>
 
       {saved && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-2 text-green-700">
+        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">
           <CheckCircle size={18} />
           Auto-saved successfully
         </div>
       )}
 
       {/* Basic Info */}
-      <section className="bg-white rounded-lg shadow p-6 space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow">
         <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Product Name *</label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., Valera Dome"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Slug *</label>
           <input
             type="text"
             value={form.slug}
             onChange={(e) => update("slug", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., valera-dome"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
           <textarea
             value={form.description}
             onChange={(e) => update("description", e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
             rows={3}
             placeholder="Product description..."
           />
@@ -433,32 +422,36 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Price (₹) *</label>
             <input
               type="number"
               value={form.price}
               onChange={(e) => update("price", Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Compare At Price (₹)</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Compare At Price (₹)
+            </label>
             <input
               type="number"
               value={form.compareAtPrice}
-              onChange={(e) => update("compareAtPrice", e.target.value ? Number(e.target.value) : "")}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              onChange={(e) =>
+                update("compareAtPrice", e.target.value ? Number(e.target.value) : "")
+              }
+              className="w-full rounded-lg border border-gray-300 px-4 py-2"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Category *</label>
             <select
               value={form.category}
               onChange={(e) => update("category", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2"
             >
               <option value="">Select category</option>
               {categories.map((cat) => (
@@ -469,11 +462,11 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Gender</label>
             <select
               value={form.gender}
               onChange={(e) => update("gender", e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2"
             >
               {GENDERS.map((g) => (
                 <option key={g} value={g}>
@@ -485,7 +478,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
         </div>
 
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
               checked={form.isNew}
@@ -494,7 +487,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
             />
             <span className="text-sm text-gray-700">Mark as New</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
               checked={form.isBestSeller}
@@ -503,7 +496,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
             />
             <span className="text-sm text-gray-700">Best Seller</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
               checked={form.isTrending}
@@ -516,14 +509,16 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       </section>
 
       {/* Product Images */}
-      <section className="bg-white rounded-lg shadow p-6 space-y-6">
+      <section className="space-y-6 rounded-lg bg-white p-6 shadow">
         <h2 className="text-lg font-semibold text-gray-900">Product Images</h2>
 
         {/* Main Image */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Main Product Image *</label>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Main Product Image *
+          </label>
           {form.image && (
-            <div className="mb-3 relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200">
+            <div className="relative mb-3 h-40 w-40 overflow-hidden rounded-lg border border-gray-200">
               <ResponsiveImage src={form.image} alt="Main" fill className="object-cover" priority />
               <button
                 type="button"
@@ -531,13 +526,13 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                   deleteStorageFile(form.image);
                   update("image", "");
                 }}
-                className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                className="absolute right-1 top-1 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
               >
                 <X size={16} />
               </button>
             </div>
           )}
-          <label className="block border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400 transition-colors">
+          <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-gray-400">
             <div className="flex flex-col items-center gap-2 text-gray-600">
               <ImageIcon size={24} />
               <span className="text-sm font-medium">Click to upload main image</span>
@@ -556,26 +551,31 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
 
         {/* Gallery Images */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
-          <div className="grid grid-cols-4 gap-3 mb-3">
+          <label className="mb-2 block text-sm font-medium text-gray-700">Gallery Images</label>
+          <div className="mb-3 grid grid-cols-4 gap-3">
             {form.gallery.map((img, i) => (
-              <div key={i} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
+              <div
+                key={i}
+                className="group relative h-24 w-24 overflow-hidden rounded-lg border border-gray-200"
+              >
                 <ResponsiveImage src={img} alt={`Gallery ${i}`} fill className="object-cover" />
                 <button
                   type="button"
                   onClick={() => removeGalleryImage(i)}
-                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
                 >
                   <Trash2 size={16} className="text-white" />
                 </button>
               </div>
             ))}
           </div>
-          <label className="block border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-gray-400 transition-colors">
+          <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-gray-400">
             <div className="flex flex-col items-center gap-2 text-gray-600">
               <ImageIcon size={24} />
               <span className="text-sm font-medium">Click to add gallery images</span>
-              <span className="text-xs text-gray-500">(Multiple images for product detail page)</span>
+              <span className="text-xs text-gray-500">
+                (Multiple images for product detail page)
+              </span>
             </div>
             <input
               ref={galleryInputRef}
@@ -591,23 +591,25 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       </section>
 
       {/* Color Variants & Stock Control */}
-      <section className="bg-white rounded-lg shadow p-6 space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow">
         <h2 className="text-lg font-semibold text-gray-900">Color Variants & Stock Control</h2>
-        <p className="text-sm text-gray-600">Toggle stock status for each color variant. When OFF, it will display "Out of Stock" for that variant.</p>
+        <p className="text-sm text-gray-600">
+          Toggle stock status for each color variant. When OFF, it will display "Out of Stock" for
+          that variant.
+        </p>
 
         <div className="space-y-3">
           {form.colorVariants.map((variant, index) => (
-            <div key={variant.slug} className="border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
+            <div key={variant.slug} className="overflow-hidden rounded-lg border border-gray-200">
+              <div
                 onClick={() =>
                   setExpandedVariant(expandedVariant === variant.slug ? null : variant.slug)
                 }
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                className="flex w-full cursor-pointer items-center justify-between p-4 transition-colors hover:bg-gray-50"
               >
                 <div className="flex items-center gap-3">
                   {variant.image && (
-                    <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden">
+                    <div className="h-12 w-12 overflow-hidden rounded border border-gray-200">
                       <ResponsiveImage
                         src={variant.image}
                         alt={variant.color}
@@ -621,14 +623,11 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                     <p className="text-xs text-gray-500">{variant.slug}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleVariantStock(index);
-                    }}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded text-sm font-medium transition-colors"
+                    onClick={() => toggleVariantStock(index)}
+                    className="flex items-center gap-1.5 rounded px-2 py-1 text-sm font-medium transition-colors"
                   >
                     {variant.inStock ? (
                       <>
@@ -645,20 +644,22 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="text-red-600 hover:text-red-700 p-1"
+                    className="p-1 text-red-600 hover:text-red-700"
                   >
                     <Trash2 size={18} />
                   </button>
                 </div>
-              </button>
+              </div>
 
               {expandedVariant === variant.slug && (
-                <div className="px-4 pb-4 border-t border-gray-200 space-y-4">
+                <div className="space-y-4 border-t border-gray-200 px-4 pb-4">
                   {/* Variant Image */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Variant Image</label>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Variant Image
+                    </label>
                     {variant.image && (
-                      <div className="mb-3 relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                      <div className="relative mb-3 h-24 w-24 overflow-hidden rounded-lg border border-gray-200">
                         <ResponsiveImage
                           src={variant.image}
                           alt={variant.color}
@@ -672,17 +673,19 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                             updated[index] = { ...updated[index], image: "" };
                             update("colorVariants", updated);
                           }}
-                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5"
+                          className="absolute right-1 top-1 rounded-full bg-red-600 p-0.5 text-white"
                         >
                           <X size={12} />
                         </button>
                       </div>
                     )}
-                    <label className="block border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-400 transition-colors">
+                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-3 transition-colors hover:border-gray-400">
                       <div className="flex items-center justify-center text-gray-600">
                         <ImageIcon size={18} />
                       </div>
-                      <span className="text-xs text-center text-gray-600">Upload variant image</span>
+                      <span className="text-center text-xs text-gray-600">
+                        Upload variant image
+                      </span>
                       <input
                         type="file"
                         accept="image/*"
@@ -695,26 +698,36 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
 
                   {/* Variant Gallery */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Variant Gallery</label>
-                    <div className="grid grid-cols-4 gap-2 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Variant Gallery
+                    </label>
+                    <div className="mb-2 grid grid-cols-4 gap-2">
                       {variant.gallery?.map((img, i) => (
-                        <div key={i} className="relative w-20 h-20 rounded border border-gray-200 group">
-                          <ResponsiveImage src={img} alt={`Gallery ${i}`} fill className="object-cover" />
+                        <div
+                          key={i}
+                          className="group relative h-20 w-20 rounded border border-gray-200"
+                        >
+                          <ResponsiveImage
+                            src={img}
+                            alt={`Gallery ${i}`}
+                            fill
+                            className="object-cover"
+                          />
                           <button
                             type="button"
                             onClick={() => removeVariantGalleryImage(index, i)}
-                            className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
                           >
                             <Trash2 size={14} className="text-white" />
                           </button>
                         </div>
                       ))}
                     </div>
-                    <label className="block border-2 border-dashed border-gray-300 rounded-lg p-2 cursor-pointer hover:border-gray-400 transition-colors">
+                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-2 transition-colors hover:border-gray-400">
                       <div className="flex items-center justify-center text-gray-600">
                         <Plus size={16} />
                       </div>
-                      <span className="text-xs text-center text-gray-600">Add gallery images</span>
+                      <span className="text-center text-xs text-gray-600">Add gallery images</span>
                       <input
                         type="file"
                         multiple
@@ -728,7 +741,9 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
 
                   {/* Product Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Product Title (Display Name)</label>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Product Title (Display Name)
+                    </label>
                     <input
                       type="text"
                       value={variant.productTitle || ""}
@@ -741,14 +756,18 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                         update("colorVariants", updated);
                       }}
                       placeholder={`e.g., Lekha Envelope Vegan Leather Zip Around Women's Wallet - [${variant.color}]`}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Leave empty to use product name with color</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Leave empty to use product name with color
+                    </p>
                   </div>
 
                   {/* Stock Quantity */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Stock Quantity
+                    </label>
                     <input
                       type="number"
                       value={variant.stockQty ?? 0}
@@ -760,7 +779,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                         };
                         update("colorVariants", updated);
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2"
                     />
                   </div>
                 </div>
@@ -771,12 +790,12 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
       </section>
 
       {/* Features & Specs */}
-      <section className="bg-white rounded-lg shadow p-6 space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow">
         <h2 className="text-lg font-semibold text-gray-900">Features & Specifications</h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
-          <div className="space-y-2 mb-2">
+          <label className="mb-2 block text-sm font-medium text-gray-700">Features</label>
+          <div className="mb-2 space-y-2">
             {form.features.map((feature, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
@@ -787,7 +806,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                     updated[i] = e.target.value;
                     update("features", updated);
                   }}
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+                  className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
                 />
                 <button
                   type="button"
@@ -808,7 +827,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
               value={newFeature}
               onChange={(e) => setNewFeature(e.target.value)}
               placeholder="Add a feature..."
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -827,7 +846,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                   setNewFeature("");
                 }
               }}
-              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-blue-600 px-3 py-2 text-white transition-colors hover:bg-blue-700"
             >
               <Plus size={18} />
             </button>

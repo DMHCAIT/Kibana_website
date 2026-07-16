@@ -51,6 +51,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Save failed");
       showToast("success", "Content saved! Changes are live on the website.");
@@ -66,7 +67,11 @@ export function ContentEditor({ config: initialConfig }: Props) {
     fd.append("file", file);
     fd.append("bucket", "site-media");
     fd.append("path", path);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: fd,
+      credentials: "include",
+    });
     const data = (await res.json()) as { url?: string; error?: string };
     if (!res.ok) throw new Error(data.error ?? "Upload failed");
     return data.url!;
@@ -75,7 +80,12 @@ export function ContentEditor({ config: initialConfig }: Props) {
   /** Delete a file from Supabase Storage via the upload API (best-effort) */
   async function deleteStorageFile(url: string) {
     if (!url || !url.includes(".supabase.co/storage")) return;
-    await fetch(`/api/admin/upload?url=${encodeURIComponent(url)}`, { method: "DELETE" }).catch(() => {/* non-fatal */});
+    await fetch(`/api/admin/upload?url=${encodeURIComponent(url)}`, {
+      method: "DELETE",
+      credentials: "include",
+    }).catch(() => {
+      /* non-fatal */
+    });
   }
 
   async function uploadHeroImage(file: File) {
@@ -108,9 +118,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
   function toggleSection(id: string) {
     setConfig((c) => ({
       ...c,
-      sections: c.sections.map((s) =>
-        s.id === id ? { ...s, visible: !s.visible } : s
-      ),
+      sections: c.sections.map((s) => (s.id === id ? { ...s, visible: !s.visible } : s)),
     }));
   }
 
@@ -129,11 +137,11 @@ export function ContentEditor({ config: initialConfig }: Props) {
   }
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="space-y-5 p-6">
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
+          className={`fixed right-4 top-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-lg ${
             toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
           }`}
         >
@@ -149,14 +157,14 @@ export function ContentEditor({ config: initialConfig }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="mt-0.5 text-sm text-gray-500">
             Changes auto-reflect on the live website after saving
           </p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm rounded-xl hover:bg-gray-800 disabled:opacity-60 transition-colors font-medium"
+          className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
         >
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           {saving ? "Saving..." : "Save Changes"}
@@ -164,14 +172,14 @@ export function ContentEditor({ config: initialConfig }: Props) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit flex-wrap">
+      <div className="flex w-fit flex-wrap gap-1 rounded-xl bg-gray-100 p-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
               activeTab === tab.id
-                ? "bg-white shadow text-gray-900"
+                ? "bg-white text-gray-900 shadow"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -181,11 +189,11 @@ export function ContentEditor({ config: initialConfig }: Props) {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
+      <div className="space-y-5 rounded-2xl border border-gray-200 bg-white p-6">
         {/* Hero Banner */}
         {activeTab === "hero" && (
           <div className="space-y-5">
-            <h2 className="font-semibold text-gray-900 text-lg">Hero Banner</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Hero Banner</h2>
 
             <Field label="Headline Title">
               <input
@@ -237,25 +245,31 @@ export function ContentEditor({ config: initialConfig }: Props) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Hero Slideshow Images
               </label>
 
               {/* Existing images */}
               {(config.hero.images ?? []).length > 0 && (
-                <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="mb-3 grid grid-cols-3 gap-3">
                   {(config.hero.images ?? []).map((url, i) => (
-                    <div key={i} className="relative group">
-                      <ResponsiveImage src={url} alt={`Hero ${i + 1}`} width={400} height={112} className="rounded-xl border border-gray-200" />
-                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                    <div key={i} className="group relative">
+                      <ResponsiveImage
+                        src={url}
+                        alt={`Hero ${i + 1}`}
+                        width={400}
+                        height={112}
+                        className="rounded-xl border border-gray-200"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
                         <button
                           onClick={() => removeHeroImage(i)}
-                          className="bg-red-500 text-white rounded-full p-1 shadow"
+                          className="rounded-full bg-red-500 p-1 text-white shadow"
                         >
                           <X size={14} />
                         </button>
                       </div>
-                      <span className="absolute top-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-md">
+                      <span className="absolute left-1 top-1 rounded-md bg-black/60 px-1.5 py-0.5 text-xs text-white">
                         {i + 1}
                       </span>
                     </div>
@@ -266,12 +280,12 @@ export function ContentEditor({ config: initialConfig }: Props) {
               {/* Upload */}
               <div
                 onClick={() => !uploading && fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors"
+                className="cursor-pointer rounded-xl border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400"
               >
                 {uploading ? (
-                  <Loader2 size={20} className="animate-spin text-gray-400 mx-auto mb-1" />
+                  <Loader2 size={20} className="mx-auto mb-1 animate-spin text-gray-400" />
                 ) : (
-                  <Upload size={20} className="text-gray-400 mx-auto mb-1" />
+                  <Upload size={20} className="mx-auto mb-1 text-gray-400" />
                 )}
                 <p className="text-sm text-gray-600">
                   {uploading ? "Uploading..." : "Upload hero image"}
@@ -317,16 +331,16 @@ export function ContentEditor({ config: initialConfig }: Props) {
         {activeTab === "sections" && (
           <div className="space-y-4">
             <div>
-              <h2 className="font-semibold text-gray-900 text-lg">Homepage Sections</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <h2 className="text-lg font-semibold text-gray-900">Homepage Sections</h2>
+              <p className="mt-0.5 text-sm text-gray-500">
                 Toggle visibility and reorder homepage sections
               </p>
             </div>
 
             {config.sections.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
+              <div className="py-8 text-center text-gray-400">
                 <p>No sections configured.</p>
-                <p className="text-xs mt-1">Sections will appear after initial setup.</p>
+                <p className="mt-1 text-xs">Sections will appear after initial setup.</p>
               </div>
             )}
 
@@ -336,13 +350,13 @@ export function ContentEditor({ config: initialConfig }: Props) {
                 .map((section, index) => (
                   <div
                     key={section.id}
-                    className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                    className={`flex items-center gap-3 rounded-xl border p-4 transition-colors ${
                       section.visible
-                        ? "bg-white border-gray-200"
-                        : "bg-gray-50 border-gray-200 opacity-60"
+                        ? "border-gray-200 bg-white"
+                        : "border-gray-200 bg-gray-50 opacity-60"
                     }`}
                   >
-                    <GripVertical size={18} className="text-gray-300 shrink-0" />
+                    <GripVertical size={18} className="shrink-0 text-gray-300" />
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{section.label}</p>
                       <p className="text-xs text-gray-400">{section.id}</p>
@@ -351,20 +365,20 @@ export function ContentEditor({ config: initialConfig }: Props) {
                       <button
                         onClick={() => moveSectionUp(index)}
                         disabled={index === 0}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors"
+                        className="rounded-lg p-1.5 transition-colors hover:bg-gray-100 disabled:opacity-30"
                       >
                         <ChevronDown size={16} className="rotate-180" />
                       </button>
                       <button
                         onClick={() => moveSectionDown(index)}
                         disabled={index === config.sections.length - 1}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors"
+                        className="rounded-lg p-1.5 transition-colors hover:bg-gray-100 disabled:opacity-30"
                       >
                         <ChevronDown size={16} />
                       </button>
                       <button
                         onClick={() => toggleSection(section.id)}
-                        className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                        className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors ${
                           section.visible
                             ? "border-green-200 bg-green-50 text-green-700"
                             : "border-gray-300 text-gray-500 hover:bg-gray-50"
@@ -383,7 +397,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
         {/* Announcement Bar */}
         {activeTab === "announcement" && (
           <div className="space-y-4">
-            <h2 className="font-semibold text-gray-900 text-lg">Announcement Bar</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Announcement Bar</h2>
             <p className="text-sm text-gray-500">
               Displayed at the top of every page. Leave empty to hide.
             </p>
@@ -391,15 +405,13 @@ export function ContentEditor({ config: initialConfig }: Props) {
               <input
                 type="text"
                 value={config.announcementBar ?? ""}
-                onChange={(e) =>
-                  setConfig((c) => ({ ...c, announcementBar: e.target.value }))
-                }
+                onChange={(e) => setConfig((c) => ({ ...c, announcementBar: e.target.value }))}
                 placeholder="e.g. Free shipping on orders over ₹999! Use code FREESHIP"
                 className={inputClass}
               />
             </Field>
             {config.announcementBar && (
-              <div className="bg-gray-900 text-white text-center text-sm py-2.5 px-4 rounded-xl">
+              <div className="rounded-xl bg-gray-900 px-4 py-2.5 text-center text-sm text-white">
                 Preview: {config.announcementBar}
               </div>
             )}
@@ -409,7 +421,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
         {/* Pages */}
         {activeTab === "pages" && (
           <div className="space-y-5">
-            <h2 className="font-semibold text-gray-900 text-lg">Page Content</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Page Content</h2>
 
             {/* About */}
             <CollapsibleSection title="About Us Page">
@@ -434,7 +446,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, about: { ...c.pages.about, subtitle: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          about: { ...c.pages.about, subtitle: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -460,7 +475,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, about: { ...c.pages.about, heroImage: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          about: { ...c.pages.about, heroImage: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -480,7 +498,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, contact: { ...c.pages.contact, title: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          contact: { ...c.pages.contact, title: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -493,7 +514,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, contact: { ...c.pages.contact, email: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          contact: { ...c.pages.contact, email: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -506,7 +530,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, contact: { ...c.pages.contact, phone: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          contact: { ...c.pages.contact, phone: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -519,7 +546,10 @@ export function ContentEditor({ config: initialConfig }: Props) {
                     onChange={(e) =>
                       setConfig((c) => ({
                         ...c,
-                        pages: { ...c.pages, contact: { ...c.pages.contact, address: e.target.value } },
+                        pages: {
+                          ...c.pages,
+                          contact: { ...c.pages.contact, address: e.target.value },
+                        },
                       }))
                     }
                     className={inputClass}
@@ -545,7 +575,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
                   />
                 </Field>
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <label className="text-sm font-medium text-gray-700">FAQ Items</label>
                     <button
                       onClick={() =>
@@ -563,14 +593,17 @@ export function ContentEditor({ config: initialConfig }: Props) {
                           },
                         }))
                       }
-                      className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 border border-gray-300 px-2.5 py-1 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
                     >
                       <Plus size={13} /> Add FAQ
                     </button>
                   </div>
                   <div className="space-y-3">
                     {config.pages.faqs.items.map((faq, i) => (
-                      <div key={faq.id} className="bg-gray-50 rounded-xl border border-gray-200 p-3 space-y-2">
+                      <div
+                        key={faq.id}
+                        className="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3"
+                      >
                         <div className="flex items-start gap-2">
                           <div className="flex-1 space-y-2">
                             <input
@@ -615,7 +648,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
                                 },
                               }))
                             }
-                            className="p-1.5 text-red-400 hover:text-red-600 transition-colors mt-0.5"
+                            className="mt-0.5 p-1.5 text-red-400 transition-colors hover:text-red-600"
                           >
                             <X size={16} />
                           </button>
@@ -635,7 +668,7 @@ export function ContentEditor({ config: initialConfig }: Props) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white text-sm rounded-xl hover:bg-gray-800 disabled:opacity-60 transition-colors font-medium"
+          className="flex items-center gap-2 rounded-xl bg-gray-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
         >
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           {saving ? "Saving..." : "Save All Changes"}
@@ -650,39 +683,31 @@ export function ContentEditor({ config: initialConfig }: Props) {
 const inputClass =
   "w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all bg-white";
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <label className="mb-1.5 block text-sm font-medium text-gray-700">{label}</label>
       {children}
     </div>
   );
 }
 
-function CollapsibleSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function CollapsibleSection({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-gray-200">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+        className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-gray-50"
       >
         <span className="font-medium text-gray-900">{title}</span>
-        {open ? <ChevronDown size={18} className="text-gray-400" /> : <ChevronRight size={18} className="text-gray-400" />}
+        {open ? (
+          <ChevronDown size={18} className="text-gray-400" />
+        ) : (
+          <ChevronRight size={18} className="text-gray-400" />
+        )}
       </button>
-      {open && <div className="px-5 pb-5 space-y-3">{children}</div>}
+      {open && <div className="space-y-3 px-5 pb-5">{children}</div>}
     </div>
   );
 }
