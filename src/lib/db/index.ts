@@ -27,7 +27,6 @@ const client =
     connect_timeout: 10, // Allow more time to establish connection
     idle_timeout: 15, // Close idle connections quickly (pgBouncer closes at ~30s)
     max_lifetime: 60, // Shorter lifetime for pooler compatibility
-    socket_timeout: 10, // Socket timeout for read/write operations
     application_name: "kibana_nextjs", // Identify app for pooler monitoring
     ssl: "require", // Always require SSL for Supabase
     transform: postgres.camel, // Auto-convert snake_case to camelCase
