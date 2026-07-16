@@ -119,8 +119,8 @@ export function CartView() {
             }
 
             // Display name and image
-            let displayName = variant ? getProductDisplayName(product, variant) : product.name;
-            let displayImage = variant ? getShopDisplayImage(product, variant) : product.image;
+            const displayName = variant ? getProductDisplayName(product, variant) : product.name;
+            const displayImage = variant ? getShopDisplayImage(product, variant) : product.image;
 
             return (
               <li
