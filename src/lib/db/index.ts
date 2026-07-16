@@ -29,7 +29,6 @@ const client =
     max_lifetime: 60, // Shorter lifetime for pooler compatibility
     ssl: "require", // Always require SSL for Supabase
     transform: postgres.camel, // Auto-convert snake_case to camelCase
-    onerror: (err) => console.error("❌ Database error:", err.message),
   });
 
 if (process.env.NODE_ENV !== "production") globalThis.__kibana_pg = client;
