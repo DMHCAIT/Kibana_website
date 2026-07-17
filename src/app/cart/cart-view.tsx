@@ -124,7 +124,7 @@ export function CartView() {
 
             return (
               <li
-                key={`${product.id}-${selectedColorSlug || "default"}`}
+                key={variantId} // Use variantId as key - this uniquely identifies each variant (same pattern as wishlist)
                 className="flex gap-3 p-3 sm:gap-4 sm:p-4"
               >
                 <Link
@@ -142,12 +142,14 @@ export function CartView() {
 
                 <div className="flex flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">
-                    <Link
-                      href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
-                      className="line-clamp-2 text-sm font-medium hover:underline"
-                    >
-                      {displayName}
-                    </Link>
+                    <div>
+                      <Link
+                        href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
+                        className="line-clamp-2 text-sm font-medium hover:underline"
+                      >
+                        {displayName}
+                      </Link>
+                    </div>
                     <button
                       aria-label="Remove"
                       onClick={() => {

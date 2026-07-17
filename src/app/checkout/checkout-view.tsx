@@ -297,9 +297,14 @@ export function CheckoutView() {
       user: { name: user.name, email: user.email, id: user.id },
       items: items.map((i) => {
         // Get the display name using variant color
+        // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
         const variant = i.selectedColorSlug
           ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
           : i.product.colorVariants?.[0];
+
+        // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
+        const finalColorSlug = i.selectedColorSlug || variant?.slug;
+
         const displayName = getProductDisplayName(i.product, variant);
         const displayImage = variant
           ? getShopDisplayImage(i.product, variant)
@@ -312,7 +317,7 @@ export function CheckoutView() {
           quantity: i.quantity,
           image: displayImage,
           color: variant?.color,
-          colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
+          colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
         };
       }),
       total,
@@ -388,9 +393,14 @@ export function CheckoutView() {
         id,
         user: { name: user.name, email: user.email, id: user.id },
         items: items.map((i) => {
+          // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
           const variant = i.selectedColorSlug
             ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
             : i.product.colorVariants?.[0];
+
+          // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
+          const finalColorSlug = i.selectedColorSlug || variant?.slug;
+
           const displayName = getProductDisplayName(i.product, variant);
 
           return {
@@ -400,7 +410,7 @@ export function CheckoutView() {
             quantity: i.quantity,
             image: variant?.image || i.product.image,
             color: variant?.color,
-            colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
+            colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
           };
         }),
         total,
@@ -436,12 +446,15 @@ export function CheckoutView() {
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
             const displayName = getProductDisplayName(i.product, variant);
+            const displayImage = variant
+              ? getShopDisplayImage(i.product, variant)
+              : i.product.displayImage || i.product.image;
 
             return {
               name: displayName,
               price: i.product.price,
               quantity: i.quantity,
-              image: variant?.image || i.product.image,
+              image: displayImage,
             };
           }),
           total,
@@ -477,9 +490,14 @@ export function CheckoutView() {
         id,
         user: { name: user.name, email: user.email, id: user.id },
         items: items.map((i) => {
+          // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
           const variant = i.selectedColorSlug
             ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
             : i.product.colorVariants?.[0];
+
+          // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
+          const finalColorSlug = i.selectedColorSlug || variant?.slug;
+
           const displayName = getProductDisplayName(i.product, variant);
 
           return {
@@ -489,7 +507,7 @@ export function CheckoutView() {
             quantity: i.quantity,
             image: variant?.image || i.product.image,
             color: variant?.color,
-            colorSlug: i.selectedColorSlug, // NEW: Store exact color slug for variant tracking
+            colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
           };
         }),
         total,
@@ -525,12 +543,15 @@ export function CheckoutView() {
               ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
               : i.product.colorVariants?.[0];
             const displayName = getProductDisplayName(i.product, variant);
+            const displayImage = variant
+              ? getShopDisplayImage(i.product, variant)
+              : i.product.displayImage || i.product.image;
 
             return {
               name: displayName,
               price: i.product.price,
               quantity: i.quantity,
-              image: variant?.image || i.product.image,
+              image: displayImage,
             };
           }),
           total,
@@ -609,7 +630,7 @@ export function CheckoutView() {
                   </div>
                 </div>
                 <ul className="divide-y divide-border">
-                  {items.map(({ product, quantity, selectedColorSlug }) => {
+                  {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
                     const variant = selectedColorSlug
                       ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
                       : product.colorVariants?.[0];
@@ -620,7 +641,7 @@ export function CheckoutView() {
 
                     return (
                       <li
-                        key={`${product.id}-${selectedColorSlug}`}
+                        key={variantId} // Use variantId as key - this uniquely identifies each variant (same pattern as wishlist and cart)
                         className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-slate-50/50"
                       >
                         <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
@@ -926,7 +947,7 @@ export function CheckoutView() {
             {step >= 1 && (
               <>
                 <ul className="mb-4 space-y-3 border-b border-slate-200 pb-4">
-                  {items.map(({ product, quantity, selectedColorSlug }) => {
+                  {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
                     const variant = selectedColorSlug
                       ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
                       : product.colorVariants?.[0];
@@ -934,10 +955,13 @@ export function CheckoutView() {
                     const displayImage = variant
                       ? getShopDisplayImage(product, variant)
                       : product.displayImage || product.image;
+                    const variantColorName =
+                      variant?.color ||
+                      (selectedColorSlug ? selectedColorSlug.replace("-", " ") : "");
 
                     return (
                       <li
-                        key={`${product.id}-${selectedColorSlug}`}
+                        key={variantId} // Use variantId as key - this uniquely identifies each variant (same pattern as wishlist and cart)
                         className="flex items-start gap-3 text-xs"
                       >
                         <div className="relative h-12 w-10 flex-shrink-0 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
@@ -950,7 +974,12 @@ export function CheckoutView() {
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium text-slate-900">{displayName}</p>
+                          <p className="truncate font-medium text-slate-900">{product.name}</p>
+                          {variantColorName && (
+                            <p className="mt-0.5 truncate text-slate-600">
+                              <span className="font-semibold capitalize">{variantColorName}</span>
+                            </p>
+                          )}
                           <p className="mt-1 text-slate-500">Qty: {quantity}</p>
                         </div>
                         <p className="shrink-0 text-right font-bold text-slate-900">

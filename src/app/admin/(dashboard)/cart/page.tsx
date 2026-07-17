@@ -23,71 +23,70 @@ export default async function AdminCartPage() {
   const totalItemsInCarts = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex h-full flex-col bg-white">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-gray-50 p-6 flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-6">
         <div className="flex items-center gap-4">
-          <Link
-            href="/admin"
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
+          <Link href="/admin" className="rounded-lg p-2 transition-colors hover:bg-gray-200">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Customer Cart Items</h1>
-            <p className="text-sm text-gray-600 mt-1">Real-time tracking of items in customer shopping carts</p>
+            <p className="mt-1 text-sm text-gray-600">
+              Real-time tracking of items in customer shopping carts
+            </p>
           </div>
         </div>
-        <ShoppingCart className="w-8 h-8 text-gray-400" />
+        <ShoppingCart className="h-8 w-8 text-gray-400" />
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 p-6 bg-gray-50 border-b border-gray-200">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
+      <div className="grid grid-cols-4 gap-4 border-b border-gray-200 bg-gray-50 p-6">
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="text-sm text-gray-600">Total Cart Value</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{formatINR(totalValue)}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">{formatINR(totalValue)}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="text-sm text-gray-600">Customers with Items</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{uniqueCustomers}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">{uniqueCustomers}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="text-sm text-gray-600">Total Unique Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{uniqueProducts}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">{uniqueProducts}</p>
         </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="text-sm text-gray-600">Total Items Count</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{totalItemsInCarts}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">{totalItemsInCarts}</p>
         </div>
       </div>
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
         {cartItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <ShoppingCart className="w-12 h-12 mb-4 opacity-50" />
+          <div className="flex h-full flex-col items-center justify-center text-gray-500">
+            <ShoppingCart className="mb-4 h-12 w-12 opacity-50" />
             <p>No items in customer carts</p>
           </div>
         ) : (
           <table className="w-full">
-            <thead className="sticky top-0 bg-gray-100 border-b border-gray-200">
+            <thead className="sticky top-0 border-b border-gray-200 bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Customer
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Quantity
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Unit Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Total
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700">
                   Added
                 </th>
               </tr>
@@ -96,8 +95,8 @@ export default async function AdminCartPage() {
               {cartItems.map((item) => {
                 const itemTotal = item.productPrice * item.quantity;
                 return (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <tr key={item.id} className="transition-colors hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex flex-col">
                         <p className="text-sm font-medium text-gray-900">{item.customerName}</p>
                         <p className="text-xs text-gray-600">{item.customerEmail}</p>
@@ -106,10 +105,10 @@ export default async function AdminCartPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center gap-3">
                         {item.productImage && (
-                          <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
+                          <div className="relative h-12 w-12 overflow-hidden rounded border border-gray-200 bg-gray-100">
                             <Image
                               src={item.productImage}
                               alt={item.productName}
@@ -119,23 +118,22 @@ export default async function AdminCartPage() {
                           </div>
                         )}
                         <div className="flex flex-col">
-                          <p className="text-sm font-medium text-gray-900">{item.productName}</p>
-                          {item.color && (
-                            <p className="text-xs text-gray-600">Color: {item.color}</p>
-                          )}
+                          <p className="text-sm font-medium text-gray-900">
+                            {item.color ? `${item.productName} - ${item.color}` : item.productName}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-900 font-semibold">{item.quantity}</p>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <p className="text-sm font-semibold text-gray-900">{item.quantity}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <p className="text-sm text-gray-900">{formatINR(item.productPrice)}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <p className="text-sm font-semibold text-gray-900">{formatINR(itemTotal)}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <p className="text-sm text-gray-600">
                         {formatDistanceToNow(new Date(item.addedAt), { addSuffix: true })}
                       </p>

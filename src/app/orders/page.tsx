@@ -261,9 +261,13 @@ export default function OrdersPage() {
                           </span>
                         </div>
                         <p className="truncate text-sm font-medium leading-snug">
-                          {order.items.length === 1
-                            ? order.items[0].name
-                            : order.items[0].name + " +" + (order.items.length - 1) + " more"}
+                          {order.items[0]
+                            ? order.items[0].name +
+                              (order.items[0].color || order.items[0].colorSlug
+                                ? ` · ${order.items[0].color || order.items[0].colorSlug?.replace("-", " ") || ""}`
+                                : "") +
+                              (order.items.length > 1 ? ` +${order.items.length - 1} more` : "")
+                            : "Order"}
                         </p>
                         <div className="mt-1 flex items-center gap-2">
                           <p className="text-xs font-semibold">{formatINR(order.total)}</p>
@@ -286,33 +290,46 @@ export default function OrdersPage() {
                             Items Ordered
                           </p>
                           <ul className="space-y-2.5">
-                            {order.items.map((item, i) => (
-                              <li
-                                key={i}
-                                className="flex items-center gap-3 rounded-lg border border-border/50 bg-white p-2.5"
-                              >
-                                <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded bg-muted">
-                                  {
-                                    <Image
-                                      src={getOrderItemImage(item)}
-                                      alt={item.name}
-                                      fill
-                                      sizes="40px"
-                                      className="object-cover"
-                                    />
-                                  }
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="truncate text-sm font-medium">{item.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Qty: {item.quantity}
+                            {order.items.map((item, i) => {
+                              const variantColorName =
+                                item.color ||
+                                (item.colorSlug ? item.colorSlug.replace("-", " ") : "");
+
+                              return (
+                                <li
+                                  key={i}
+                                  className="flex items-center gap-3 rounded-lg border border-border/50 bg-white p-2.5"
+                                >
+                                  <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded bg-muted">
+                                    {
+                                      <Image
+                                        src={getOrderItemImage(item)}
+                                        alt={item.name}
+                                        fill
+                                        sizes="40px"
+                                        className="object-cover"
+                                      />
+                                    }
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-medium">{item.name}</p>
+                                    {variantColorName && (
+                                      <p className="mt-0.5 text-xs text-muted-foreground">
+                                        <span className="font-semibold capitalize">
+                                          {variantColorName}
+                                        </span>
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground">
+                                      Qty: {item.quantity}
+                                    </p>
+                                  </div>
+                                  <p className="shrink-0 text-sm font-semibold">
+                                    {formatINR(item.price * item.quantity)}
                                   </p>
-                                </div>
-                                <p className="shrink-0 text-sm font-semibold">
-                                  {formatINR(item.price * item.quantity)}
-                                </p>
-                              </li>
-                            ))}
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
 

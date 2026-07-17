@@ -349,8 +349,9 @@ export function OrdersClient({ initialOrders }: Props) {
                   <div key={i} className="flex items-start gap-2 text-sm">
                     <span className="font-medium text-gray-900">{item.quantity}x</span>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{item.name}</p>
-                      {item.color && <p className="text-xs text-gray-500">{item.color}</p>}
+                      <p className="font-medium text-gray-900">
+                        {item.color ? `${item.name} - ${item.color}` : item.name}
+                      </p>
                       <p className="text-xs text-gray-600">{formatINR(item.price)} each</p>
                     </div>
                   </div>
