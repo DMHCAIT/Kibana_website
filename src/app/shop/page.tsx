@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { getProducts, getCategories } from "@/lib/server-data";
-import { productHasShoulderKeyword } from "@/lib/product-filters";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { getShopDisplayImage } from "@/lib/product-images";
@@ -89,9 +88,8 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   }
   if (selectedCategories.length > 0) {
     filtered = filtered.filter((p) => {
-      const matchesSelectedCategory = selectedCategories.some((slug) =>
-        slug === "shoulder-bag" ? productHasShoulderKeyword(p) : p.category === slug,
-      );
+      // ⚡ Fixed: Check category directly instead of keyword matching
+      const matchesSelectedCategory = selectedCategories.some((slug) => p.category === slug);
       return matchesSelectedCategory;
     });
   }
