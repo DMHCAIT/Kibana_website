@@ -122,6 +122,7 @@ export function CheckoutView() {
   const [errors, setErrors] = useState<Partial<Address>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isFirstTimeCustomer, setIsFirstTimeCustomer] = useState(false);
 
   // Load saved address on mount
   useEffect(() => {
@@ -129,6 +130,18 @@ export function CheckoutView() {
     const saved = loadSavedAddress();
     if (saved.fullName) setAddress(saved);
   }, []);
+
+  // ⚡ Check if user is first-time customer for 10% discount
+  useEffect(() => {
+    if (user?.id && user?.email) {
+      fetch(
+        `/api/admin/check-first-order?userId=${user.id}&userEmail=${encodeURIComponent(user.email)}`,
+      )
+        .then((res) => res.json())
+        .then((data) => setIsFirstTimeCustomer(data.isFirstTime ?? false))
+        .catch(() => setIsFirstTimeCustomer(false));
+    }
+  }, [user?.id, user?.email]);
 
   // Track checkout initiation when user reaches payment step
   useEffect(() => {
@@ -145,10 +158,12 @@ export function CheckoutView() {
       const codCharges = payment === "cod" ? 100 : 0;
       const upiDiscount = payment === "upi" ? -100 : 0;
       const cardDiscount = payment === "card" ? -100 : 0;
-      const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount;
+      const firstOrderDiscount = isFirstTimeCustomer ? -Math.round(subtotal * 0.1) : 0;
+      const total =
+        subtotalWithShipping + codCharges + upiDiscount + cardDiscount + firstOrderDiscount;
       trackCheckout(items, total, user?.id);
     }
-  }, [step, items, payment, user?.id]);
+  }, [step, items, payment, user?.id, isFirstTimeCustomer]);
 
   const subtotal = items.reduce((acc, i) => {
     const variant = i.selectedColorSlug
@@ -163,8 +178,10 @@ export function CheckoutView() {
   const codCharges = payment === "cod" ? 100 : 0;
   const upiDiscount = payment === "upi" ? -100 : 0;
   const cardDiscount = payment === "card" ? -100 : 0;
+  // ⚡ First-order discount: 10% off on subtotal
+  const firstOrderDiscount = isFirstTimeCustomer ? -Math.round(subtotal * 0.1) : 0;
 
-  const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount;
+  const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount + firstOrderDiscount;
 
   // ── Wait for cart to load ────────────────────────────────────────────────
   if (!mounted || isLoading) {
@@ -1038,6 +1055,12 @@ export function CheckoutView() {
                 <div className="flex items-center justify-between text-sm">
                   <dt className="text-muted-foreground">Card Discount</dt>
                   <dd className="font-medium text-emerald-600">{formatINR(cardDiscount)}</dd>
+                </div>
+              )}
+              {firstOrderDiscount < 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <dt className="text-muted-foreground">🎉 First Order Discount (10%)</dt>
+                  <dd className="font-medium text-emerald-600">{formatINR(firstOrderDiscount)}</dd>
                 </div>
               )}
             </div>

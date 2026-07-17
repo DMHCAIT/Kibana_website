@@ -625,6 +625,28 @@ export async function deleteOrder(id: string): Promise<void> {
   dataCache.delete("orders");
 }
 
+/** ⚡ Check if user has previous orders (for first-order discount) */
+export async function isFirstTimeCustomer(userId: string, userEmail: string): Promise<boolean> {
+  if (!hasDatabase) return true;
+
+  try {
+    const orders = await getOrders();
+    // Check if user has any completed/paid orders (not just pending)
+    const hasCompletedOrder = orders.some(
+      (o) =>
+        (o.user?.id === userId || o.user?.email === userEmail) &&
+        (o.status === "delivered" ||
+          o.status === "shipped" ||
+          o.status === "processing" ||
+          o.paymentStatus === "paid"),
+    );
+
+    return !hasCompletedOrder;
+  } catch {
+    return true;
+  }
+}
+
 // ── Cart Items ────────────────────────────────────────────────────────────────
 
 export type AdminCartItem = {
