@@ -66,6 +66,17 @@ export function ProductCard({
         hex: undefined,
       }));
 
+  // Extract color slug from href if it exists (e.g., "/shop/product?color=mint-green")
+  const colorSlugFromHref = (() => {
+    if (!href) return undefined;
+    try {
+      const url = new URL(href, "http://localhost"); // Use relative URL parsing
+      return url.searchParams.get("color") || undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!user) {
@@ -176,7 +187,7 @@ export function ProductCard({
             size="sm"
             variant="outline"
             className="mt-1 h-7 w-full text-[10px] sm:h-8 sm:text-xs"
-            onClick={() => add(product)}
+            onClick={() => add(product, 1, colorSlugFromHref)}
           >
             <ShoppingBag className="h-3 w-3" />
             Add to Cart
