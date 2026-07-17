@@ -138,6 +138,8 @@ export const userCart = pgTable("user_cart", {
   quantity: integer("quantity").notNull().default(1),
   variantId: text("variant_id"), // UNIQUE: productId + "-" + colorSlug (e.g., "p1-tan")
   color: text("color"), // LEGACY: kept for backward compat, will migrate to variantId
+  productName: text("product_name"), // NEW: Complete product name with color (e.g., "Vistara Geometric Vegan Leather Tote Bag - [Mocha]")
+  productImage: text("product_image"), // NEW: Variant-specific image URL
   addedAt: timestamp("added_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

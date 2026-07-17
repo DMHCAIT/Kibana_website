@@ -119,7 +119,10 @@ export default async function AdminCartPage() {
                         )}
                         <div className="flex flex-col">
                           <p className="text-sm font-medium text-gray-900">
-                            {item.color ? `${item.productName} - ${item.color}` : item.productName}
+                            {item.productName}
+                            {item.color && !item.productName.includes(item.color) && (
+                              <> · {item.color}</>
+                            )}
                           </p>
                         </div>
                       </div>

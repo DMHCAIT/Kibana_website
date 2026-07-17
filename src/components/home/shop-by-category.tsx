@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categories as staticCategories } from "@/lib/data";
 import { SectionHeading } from "./section-heading";
 
 // STATIC CATEGORY CONFIGURATION - DO NOT CHANGE
@@ -13,7 +12,7 @@ const STATIC_CATEGORIES = [
   { slug: "wallet", name: "Wallet", image: "/mv/cat-6.jpeg" },
 ];
 
-export function ShopByCategory({ categories }: { categories?: any }) {
+export function ShopByCategory() {
   return (
     <section className="w-full bg-[#f5f0e8]">
       <div className="container py-2 md:py-6">

@@ -32,7 +32,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { productId, quantity = 1, color, variantId } = await req.json();
+    const {
+      productId,
+      quantity = 1,
+      color,
+      variantId,
+      productName,
+      productImage,
+    } = await req.json();
 
     console.log(
       "📦 API CART POST RECEIVED:",
@@ -42,6 +49,8 @@ export async function POST(req: Request) {
           quantity,
           colorReceived: color,
           variantIdReceived: variantId,
+          productNameReceived: productName,
+          productImageReceived: productImage,
         },
         null,
         2,
@@ -111,6 +120,8 @@ export async function POST(req: Request) {
       quantity,
       color: color || null,
       variantId: variantId || null,
+      productName: productName || null,
+      productImage: productImage || null,
     });
 
     console.log(
@@ -121,6 +132,8 @@ export async function POST(req: Request) {
           quantity,
           colorSaved: color || "null",
           variantIdSaved: variantId || "null",
+          productNameSaved: productName || "null",
+          productImageSaved: productImage || "null",
         },
         null,
         2,

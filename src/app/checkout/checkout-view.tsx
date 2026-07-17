@@ -14,7 +14,7 @@ import {
   ArrowLeft,
   Loader2,
 } from "lucide-react";
-import { useCart } from "@/store/cart-store";
+import { useCart, generateVariantId } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { formatINR, getProductDisplayName } from "@/lib/utils";
@@ -335,8 +335,27 @@ export function CheckoutView() {
       });
       if (!res.ok) throw new Error("Failed to place order");
 
-      // Track Purchase event for Meta Pixel & Conversions API
-      trackPurchase(id, items, total, user.id, paymentLabel, user.email);
+      // Build item details for analytics tracking with complete variant information
+      const itemDetails = items.map((i) => {
+        const variant = i.selectedColorSlug
+          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
+          : i.product.colorVariants?.[0];
+
+        const variantId = i.variantId || generateVariantId(i.product.id, i.selectedColorSlug);
+        const displayName = getProductDisplayName(i.product, variant);
+        const displayImage = variant
+          ? getShopDisplayImage(i.product, variant)
+          : i.product.displayImage || i.product.image;
+
+        return {
+          variantId,
+          productName: displayName,
+          productImage: displayImage,
+        };
+      });
+
+      // Track Purchase event for Meta Pixel & Conversions API with complete variant details
+      trackPurchase(id, items, total, user.id, paymentLabel, user.email, itemDetails);
 
       // Send order confirmation email (async, don't wait for it)
       fetch("/api/orders/send-confirmation", {

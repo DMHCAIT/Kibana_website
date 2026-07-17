@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     let eventData;
     try {
       eventData = await request.json();
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, message: "Invalid JSON in request body" },
         { status: 200 },
@@ -44,6 +44,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { eventName, data, timestamp } = eventData;
+
+    // ⚠️ Client-side only events (GA4 + Meta Pixel)
+    // Meta Conversions API does NOT accept these events
+    const clientSideOnlyEvents = ["PageView", "ViewContent", "ViewItemList"];
+    if (clientSideOnlyEvents.includes(eventName)) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: `${eventName} tracked client-side (GA4 + Meta Pixel)`,
+          note: `${eventName} is not sent to Meta Conversions API`,
+        },
+        { status: 200 },
+      );
+    }
 
     // Validate required environment variables
     if (!META_ACCESS_TOKEN) {
@@ -103,30 +117,20 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields for Purchase events
     if (eventName === "Purchase") {
-      if (!customData.value) {
-        return NextResponse.json(
-          { success: false, error: "Purchase event requires 'value' field" },
-          { status: 400 },
-        );
+      const valueNum = typeof customData.value === "number" ? customData.value : 0;
+      if (!valueNum || valueNum <= 0) {
+        console.warn("⚠️ Purchase event missing/invalid 'value' field:", customData.value);
+        // Don't return 400, log and continue - purchase may still be tracked elsewhere
       }
       if (!customData.currency) {
-        return NextResponse.json(
-          { success: false, error: "Purchase event requires 'currency' field" },
-          { status: 400 },
-        );
+        console.warn("⚠️ Purchase event missing 'currency' field");
       }
       if (!customData.content_type) {
-        return NextResponse.json(
-          { success: false, error: "Purchase event requires 'content_type' field" },
-          { status: 400 },
-        );
+        console.warn("⚠️ Purchase event missing 'content_type' field");
       }
       const contentIdsStr = String(customData.content_ids || "").trim();
       if (!contentIdsStr) {
-        return NextResponse.json(
-          { success: false, error: "Purchase event requires 'content_ids' field" },
-          { status: 400 },
-        );
+        console.warn("⚠️ Purchase event missing 'content_ids' field");
       }
     }
 
@@ -165,20 +169,33 @@ export async function POST(request: NextRequest) {
     const result = await response.json();
 
     if (!response.ok) {
+      // Log the error but return 200 to client - analytics should not break the app
+      console.warn("⚠️ Meta Conversions API error:", {
+        eventName,
+        status: response.status,
+        error: result.error?.message || "Unknown error from Meta API",
+        errorType: result.error?.type,
+        errorCode: result.error?.code,
+      });
+
+      // Return 200 with success: false for graceful degradation
       return NextResponse.json(
         {
           success: false,
+          message: "Analytics event tracked locally but Meta API returned an error",
           error: result.error?.message || "Unknown error from Meta API",
-          errorType: result.error?.type,
-          errorCode: result.error?.code,
-          details: result,
         },
-        { status: response.status },
+        { status: 200 },
       );
     }
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+    // Log error but return 200 - analytics should not break the app
+    console.error("❌ Conversion API error:", error);
+    return NextResponse.json(
+      { success: false, message: "Analytics tracked locally (server error)" },
+      { status: 200 },
+    );
   }
 }

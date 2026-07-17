@@ -14,7 +14,8 @@ import { ShopHeader } from "@/components/shop/shop-header";
 import { TrackProductView } from "@/components/analytics/track-product-view";
 import type { Product } from "@/types/product";
 
-export const revalidate = 0; // Disable caching for dynamic content
+// ⚡ Enable ISR: revalidate every 30 seconds for product pages (fast updates)
+export const revalidate = 30;
 
 export async function generateMetadata({
   params,

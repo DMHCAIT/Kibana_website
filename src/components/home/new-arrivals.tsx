@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Heart } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { useWishlist } from "@/store/wishlist-store";
@@ -96,10 +97,11 @@ export function NewArrivals({ products }: { products: Product[] }) {
               className="group relative flex flex-col items-center gap-1.5"
             >
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded bg-gray-100">
-                <img
+                <Image
                   src={item.image}
                   alt={item.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
                 {/* Wishlist Button - Heart Icon Only */}

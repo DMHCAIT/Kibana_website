@@ -15,6 +15,10 @@ type Ga4Item = {
   item_brand: string;
   price: number;
   quantity: number;
+  item_variant?: string;
+  variant_id?: string; // Unique variant identifier (productId-colorSlug)
+  product_name?: string; // Complete product name with color (as stored in DB)
+  product_image?: string; // Variant-specific image URL
 };
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -30,8 +34,16 @@ function pushGtmEvent(payload: Record<string, unknown>) {
   window.dataLayer.push(payload);
 }
 
-function toGa4Item(product: Product, quantity = 1, variantPrice?: number): Ga4Item {
-  return {
+function toGa4Item(
+  product: Product,
+  quantity = 1,
+  variantPrice?: number,
+  variantColor?: string,
+  variantId?: string,
+  productName?: string,
+  productImage?: string,
+): Ga4Item {
+  const item: Ga4Item = {
     item_id: product.id,
     item_name: product.name,
     item_category: product.category,
@@ -39,6 +51,28 @@ function toGa4Item(product: Product, quantity = 1, variantPrice?: number): Ga4It
     price: variantPrice ?? product.price,
     quantity,
   };
+
+  // Add color variant if provided
+  if (variantColor) {
+    item.item_variant = variantColor;
+  }
+
+  // Add variant ID (unique identifier like "productId-colorSlug")
+  if (variantId) {
+    item.variant_id = variantId;
+  }
+
+  // Add complete product name with color (as stored in database)
+  if (productName) {
+    item.product_name = productName;
+  }
+
+  // Add variant-specific image URL
+  if (productImage) {
+    item.product_image = productImage;
+  }
+
+  return item;
 }
 
 // Direct GA4 tracking via gtag() — ensures events reach GA4 even if GTM is misconfigured
@@ -66,7 +100,7 @@ const META_STANDARD_EVENTS = [
 ] as const;
 
 function validateEventName(eventName: string): boolean {
-  return META_STANDARD_EVENTS.includes(eventName as any);
+  return META_STANDARD_EVENTS.includes(eventName as (typeof META_STANDARD_EVENTS)[number]);
 }
 
 function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
@@ -175,19 +209,21 @@ export function trackSelectCategory(category: string) {
 }
 
 /** 5. VIEW CONTENT EVENT - Fired when user views product details */
-export function trackViewContent(product: Product, variantPrice?: number) {
+export function trackViewContent(product: Product, variantPrice?: number, variantColor?: string) {
   const price = variantPrice ?? product.price;
+  const displayName = variantColor ? `${product.name} - ${variantColor}` : product.name;
+
   pushGtmEvent({
     event: "view_item",
     ecommerce: {
       currency: "INR",
       value: price,
-      items: [toGa4Item(product, 1, price)],
+      items: [toGa4Item(product, 1, price, variantColor)],
     },
     timestamp: new Date().toISOString(),
   });
   trackMetaEvent("ViewContent", {
-    content_name: product.name,
+    content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
@@ -197,7 +233,7 @@ export function trackViewContent(product: Product, variantPrice?: number) {
 
   // Server-side tracking for guaranteed delivery
   trackConversionAPI("ViewContent", {
-    content_name: product.name,
+    content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
@@ -297,15 +333,26 @@ export function trackAddToCart(
   userId?: string,
   userEmail?: string,
   variantPrice?: number,
+  variantColor?: string,
+  variantId?: string,
+  productName?: string,
+  productImage?: string,
 ) {
   const price = variantPrice ?? product.price;
   const totalValue = price * quantity;
+
+  // Use complete product name if provided (as stored in DB), otherwise construct it
+  const displayName =
+    productName || (variantColor ? `${product.name} - ${variantColor}` : product.name);
+
   pushGtmEvent({
     event: "add_to_cart",
     ecommerce: {
       currency: "INR",
       value: totalValue,
-      items: [toGa4Item(product, quantity, price)],
+      items: [
+        toGa4Item(product, quantity, price, variantColor, variantId, productName, productImage),
+      ],
     },
     user_id: userId,
     timestamp: new Date().toISOString(),
@@ -313,19 +360,23 @@ export function trackAddToCart(
 
   // Direct GA4 tracking
   trackGa4Event("add_to_cart", {
-    items: [toGa4Item(product, quantity, price)],
+    items: [
+      toGa4Item(product, quantity, price, variantColor, variantId, productName, productImage),
+    ],
     currency: "INR",
     value: totalValue,
   });
 
   trackMetaEvent("AddToCart", {
-    content_name: product.name,
+    content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
     content_category: product.category,
     quantity: quantity,
     value: totalValue,
     currency: "INR",
+    variant_id: variantId,
+    product_image: productImage,
   });
 
   // Server-side tracking for guaranteed delivery
@@ -336,7 +387,9 @@ export function trackAddToCart(
     currency: "INR",
     content_type: "product",
     content_ids: [product.id].join(","),
-    content_name: product.name,
+    content_name: displayName,
+    variant_id: variantId,
+    product_image: productImage,
   });
 }
 
@@ -346,13 +399,14 @@ export function trackCheckout(
   total: number,
   userId?: string,
 ) {
-  // Calculate GA4 items using variant prices if available
+  // Calculate GA4 items using variant prices and colors if available
   const ga4Items = items.map((item) => {
     const variant = item.selectedColorSlug
       ? item.product.colorVariants?.find((v) => v.slug === item.selectedColorSlug)
       : undefined;
     const variantPrice = variant?.price ?? item.product.price;
-    return toGa4Item(item.product, item.quantity, variantPrice);
+    const variantColor = variant?.color;
+    return toGa4Item(item.product, item.quantity, variantPrice, variantColor);
   });
   pushGtmEvent({
     event: "begin_checkout",
@@ -399,14 +453,31 @@ export function trackPurchase(
   userId?: string,
   paymentMethod?: string,
   userEmail?: string,
+  itemDetails?: Array<{ variantId?: string; productName?: string; productImage?: string }>,
 ) {
-  // Calculate GA4 items using variant prices if available
-  const ga4Items = items.map((item) => {
+  // Calculate GA4 items using variant prices, colors, and complete product information if available
+  const ga4Items = items.map((item, index) => {
     const variant = item.selectedColorSlug
       ? item.product.colorVariants?.find((v) => v.slug === item.selectedColorSlug)
       : undefined;
     const variantPrice = variant?.price ?? item.product.price;
-    return toGa4Item(item.product, item.quantity, variantPrice);
+    const variantColor = variant?.color;
+
+    // Use provided item details if available (most accurate - exact state when added)
+    const detail = itemDetails?.[index];
+    const variantId = detail?.variantId;
+    const productName = detail?.productName;
+    const productImage = detail?.productImage;
+
+    return toGa4Item(
+      item.product,
+      item.quantity,
+      variantPrice,
+      variantColor,
+      variantId,
+      productName,
+      productImage,
+    );
   });
 
   // GA4/GTM Event
@@ -433,11 +504,28 @@ export function trackPurchase(
     payment_method: paymentMethod || "unknown",
   });
 
-  // Meta Pixel Purchase Event with ALL required fields per Meta spec
+  // Build content details with variant information and stored product names
+  const contentDetails = items
+    .map((item, index) => {
+      const detail = itemDetails?.[index];
+      // Use stored product name if available (most accurate), otherwise calculate
+      if (detail?.productName) {
+        return detail.productName;
+      }
+
+      const variant = item.selectedColorSlug
+        ? item.product.colorVariants?.find((v) => v.slug === item.selectedColorSlug)
+        : undefined;
+      const variantColor = variant?.color || "Default";
+      return `${item.product.name} - ${variantColor}`;
+    })
+    .join(", ");
+
+  // Meta Pixel Purchase Event with variant details
   const metaPurchaseData = {
     content_type: "product",
     content_ids: items.map((i) => i.product.id),
-    content_name: `Order ${orderId}`,
+    content_name: contentDetails || `Order ${orderId}`,
     num_items: items.length,
     value: total,
     currency: "INR",
@@ -447,7 +535,7 @@ export function trackPurchase(
   trackMetaEvent("Purchase", metaPurchaseData);
 
   // SERVER-SIDE CONVERSIONS API for guaranteed delivery
-  // This ensures Meta receives the conversion even if client-side tracking is blocked
+  // Include variant details in content_name for tracking
   trackConversionAPI("Purchase", {
     user_id: userId,
     email: userEmail,
@@ -457,7 +545,7 @@ export function trackPurchase(
     num_items: items.length,
     content_type: "product",
     content_ids: items.map((i) => i.product.id).join(","),
-    content_name: `Order ${orderId}`,
+    content_name: contentDetails || `Order ${orderId}`,
     payment_method: paymentMethod || "unknown",
   });
 }
@@ -559,4 +647,20 @@ export function trackViewPage(pageName: string, pageType: string) {
     content_name: pageName,
     content_type: pageType,
   });
+}
+
+/** PAGE VIEW API - Track automatic page views to server */
+export async function trackPageViewAPI(pathname: string, pageName?: string) {
+  // NOTE: PageView is NOT sent to Meta Conversions API
+  // Meta API only accepts conversion events (Purchase, AddToCart, etc.)
+  // PageView is tracked client-side via GA4 gtag() and Meta fbq() instead
+
+  // This function is kept for future use or custom analytics
+  // Currently disabled to avoid Meta API errors
+  try {
+    // Removed server-side PageView tracking - use client-side GA4/Meta only
+    console.debug(`📊 Page viewed: ${pageName || pathname}`);
+  } catch (error) {
+    console.debug("Page view tracking (client-side):", error);
+  }
 }

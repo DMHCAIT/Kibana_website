@@ -11,6 +11,7 @@ import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthAutoPopup } from "@/components/auth/auth-auto-popup";
+import { GlobalPageViewTracker } from "@/components/analytics/global-page-view-tracker";
 
 const canela = localFont({
   src: [
@@ -147,10 +148,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* Meta Pixel Script */}
         {META_PIXEL_ID ? (
           <>
-            <Script
-              id="meta-pixel"
-              strategy="afterInteractive"
-            >
+            <Script id="meta-pixel" strategy="afterInteractive">
               {`
                 !function(f,b,e,v,n,t,s)
                 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -176,6 +174,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </>
         ) : null}
         <Providers>
+          <GlobalPageViewTracker />
           <Header />
           <AuthModal />
           <AuthAutoPopup />

@@ -121,7 +121,8 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
 
     // Track AddToCart event for Meta Pixel & Conversions API
     const variantPrice = variantToAdd?.price ?? product.price;
-    trackAddToCart(product, qty, user.id, user.email, variantPrice);
+    const variantColor = variantToAdd?.color;
+    trackAddToCart(product, qty, user.id, user.email, variantPrice, variantColor);
 
     // Save the variant that was added for the notification
     setAddedVariant(variantToAdd);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { getProducts, saveProduct, invalidateCache } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
@@ -19,10 +20,26 @@ export async function POST(req: Request) {
   if (!body.id || !body.slug || !body.name) {
     return NextResponse.json({ error: "id, slug, name required" }, { status: 400 });
   }
-  await saveProduct(body);
-  // ✅ Invalidate cache so website shows fresh data immediately
-  invalidateCache("products");
-  invalidateCache(`product-${body.id}`);
-  invalidateCache(`product-slug-${body.slug}`);
-  return NextResponse.json({ success: true });
+
+  try {
+    await saveProduct(body);
+
+    // ✅ Invalidate cache so website shows fresh data immediately
+    invalidateCache("products");
+    invalidateCache(`product-${body.id}`);
+    invalidateCache(`product-slug-${body.slug}`);
+
+    // ✅ Revalidate all product-related pages
+    revalidatePath("/shop/[slug]", "page");
+    revalidatePath("/shop", "page");
+    revalidatePath("/", "page");
+
+    return NextResponse.json({ success: true, message: "Product created and website revalidated" });
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create product" },
+      { status: 500 },
+    );
+  }
 }

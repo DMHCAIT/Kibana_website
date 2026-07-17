@@ -1,11 +1,12 @@
-export const dynamic = "force-dynamic";
-
 import dynamicImport from "next/dynamic";
+
+// ⚡ Enable ISR: revalidate every 60 seconds instead of on every request
+export const revalidate = 60;
 import { HeroBanner } from "@/components/home/hero-banner";
 import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
 import { TrackPageView } from "@/components/analytics/track-page-view";
-import { getProducts, getSiteConfig, getCategories } from "@/lib/server-data";
+import { getProducts, getSiteConfig } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
 const SectionSkeleton = () => <div className="h-48 w-full animate-pulse bg-muted/40 md:h-64" />;
@@ -67,18 +68,14 @@ function sectionProducts(
 }
 
 export default async function HomePage() {
-  const [products, config, categories] = await Promise.all([
-    getProducts(),
-    getSiteConfig(),
-    getCategories(),
-  ]);
+  const [products, config] = await Promise.all([getProducts(), getSiteConfig()]);
   const pinned = config?.sectionProducts ?? {};
   const sections = config.sections.filter((s) => s.visible).sort((a, b) => a.order - b.order);
 
   const SECTION_COMPONENTS: Record<string, (products: Product[]) => React.ReactNode> = {
     "new-arrivals": (_) => <NewArrivals products={products} />,
     "best-sellers": (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
-    "shop-by-category": (_) => <ShopByCategory categories={categories} />,
+    "shop-by-category": (_) => <ShopByCategory />,
     "most-trending": (_) => <MostTrending products={products} />,
     "about-us": (_) => <AboutUs />,
     "style-in-motion": (p) => <StyleInMotion products={p} />,
@@ -95,9 +92,9 @@ export default async function HomePage() {
         const render = SECTION_COMPONENTS[s.id];
         if (!render) return null;
         // For new-arrivals and most-trending, components manage their own products
-        const sectionProds = 
-          s.id === "new-arrivals" || s.id === "most-trending" 
-            ? products 
+        const sectionProds =
+          s.id === "new-arrivals" || s.id === "most-trending"
+            ? products
             : sectionProducts(products, s.id, pinned);
         const bg = i % 2 === 0 ? "bg-white" : "bg-[#fdf8f3]";
         const wrapperClass = s.id === "new-arrivals" ? "" : bg;

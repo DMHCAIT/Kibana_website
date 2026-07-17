@@ -5,6 +5,7 @@ import type { Product } from "@/types/product";
 import { useAuth } from "@/store/auth-store";
 import { useProductCache } from "@/store/product-cache";
 import { trackAddToCart } from "@/lib/analytics";
+import { getProductDisplayName } from "@/lib/utils";
 
 export type CartItem = {
   product: Product;
@@ -110,10 +111,31 @@ export const useCart = create<CartState>()((set, get) => ({
     );
 
     set({ items: next });
-    trackAddToCart(product, quantity);
+
+    // Track analytics with complete variant information
+    const variant = product.colorVariants?.find((v) => v.slug === finalColorSlug);
+    const variantPrice = variant?.price ?? product.price;
+    const variantColor = variant?.color;
+
+    // Get complete product name with color and variant image for storage and tracking
+    const displayName = getProductDisplayName(product, variant);
+    const displayImage = variant?.image || product.image;
+
+    // Track add to cart with complete variant details (variantId, productName, productImage)
+    trackAddToCart(
+      product,
+      quantity,
+      undefined, // userId - will be added by auth store if available
+      undefined, // userEmail - will be added by auth store if available
+      variantPrice,
+      variantColor,
+      variantId, // NEW: Unique variant identifier (productId-colorSlug)
+      displayName, // NEW: Complete product display name with color (as stored in DB)
+      displayImage, // NEW: Variant-specific image URL
+    );
 
     // SYNC WITH SERVER in background (fire and forget)
-    // Send both color slug and variantId for redundancy
+    // Send both color slug and variantId for redundancy, plus complete name and image
     fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -122,6 +144,8 @@ export const useCart = create<CartState>()((set, get) => ({
         quantity,
         color: finalColorSlug,
         variantId: variantId,
+        productName: displayName,
+        productImage: displayImage,
       }),
     }).catch((error) => {
       console.error("Failed to sync cart to server:", error);

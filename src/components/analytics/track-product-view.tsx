@@ -17,7 +17,8 @@ export function TrackProductView({
   useEffect(() => {
     if (hasTracked.current) return;
     const variantPrice = variant?.price ?? product.price;
-    trackViewContent(product, variantPrice);
+    const variantColor = variant?.color;
+    trackViewContent(product, variantPrice, variantColor);
     hasTracked.current = true;
   }, [product, variant]);
 

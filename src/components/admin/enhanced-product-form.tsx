@@ -298,9 +298,13 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
         throw new Error(d.error ?? "Save failed");
       }
 
+      const result = await res.json();
+      console.log("✅ Save response:", result);
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
+      console.error("❌ Save error:", err);
       showToast("error", err instanceof Error ? err.message : "Save failed");
     }
   }
@@ -518,24 +522,32 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
             Main Product Image *
           </label>
           {form.image && (
-            <div className="relative mb-3 h-40 w-40 overflow-hidden rounded-lg border border-gray-200">
+            <div className="group relative mb-3 h-40 w-40 overflow-hidden rounded-lg border border-gray-200">
               <ResponsiveImage src={form.image} alt="Main" fill className="object-cover" priority />
               <button
                 type="button"
                 onClick={() => {
                   deleteStorageFile(form.image);
                   update("image", "");
+                  showToast("success", "Image removed");
                 }}
-                className="absolute right-1 top-1 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                className="absolute right-2 top-2 rounded-full bg-red-600 p-1 text-white opacity-0 transition-opacity hover:bg-red-700 group-hover:opacity-100"
+                title="Remove image"
               >
                 <X size={16} />
               </button>
             </div>
           )}
-          <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-gray-400">
-            <div className="flex flex-col items-center gap-2 text-gray-600">
-              <ImageIcon size={24} />
-              <span className="text-sm font-medium">Click to upload main image</span>
+          <label
+            className={`block cursor-pointer rounded-lg border-2 border-dashed transition-colors ${form.image ? "border-gray-200 hover:border-gray-300" : "border-gray-300 hover:border-blue-400"}`}
+          >
+            <div className={`flex flex-col items-center gap-2 p-4 ${form.image ? "py-2" : ""}`}>
+              <ImageIcon size={24} className={form.image ? "text-gray-400" : "text-gray-600"} />
+              <span
+                className={`text-sm font-medium ${form.image ? "text-gray-500" : "text-gray-600"}`}
+              >
+                {form.image ? "Change image" : "Click to upload main image"}
+              </span>
               <span className="text-xs text-gray-500">(This shows on product listing)</span>
             </div>
             <input
@@ -547,6 +559,12 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
               className="hidden"
             />
           </label>
+          {uploading === "image" && (
+            <div className="mt-2 flex items-center gap-2 text-blue-600">
+              <Loader2 size={16} className="animate-spin" />
+              <span className="text-sm">Uploading image...</span>
+            </div>
+          )}
         </div>
 
         {/* Gallery Images */}
@@ -561,15 +579,19 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                 <ResponsiveImage src={img} alt={`Gallery ${i}`} fill className="object-cover" />
                 <button
                   type="button"
-                  onClick={() => removeGalleryImage(i)}
+                  onClick={() => {
+                    removeGalleryImage(i);
+                    showToast("success", "Image removed");
+                  }}
                   className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  title="Remove image"
                 >
                   <Trash2 size={16} className="text-white" />
                 </button>
               </div>
             ))}
           </div>
-          <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-gray-400">
+          <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors hover:border-blue-400">
             <div className="flex flex-col items-center gap-2 text-gray-600">
               <ImageIcon size={24} />
               <span className="text-sm font-medium">Click to add gallery images</span>
@@ -587,6 +609,12 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
               className="hidden"
             />
           </label>
+          {uploading === "gallery" && (
+            <div className="mt-2 flex items-center gap-2 text-blue-600">
+              <Loader2 size={16} className="animate-spin" />
+              <span className="text-sm">Uploading images...</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -659,7 +687,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                       Variant Image
                     </label>
                     {variant.image && (
-                      <div className="relative mb-3 h-24 w-24 overflow-hidden rounded-lg border border-gray-200">
+                      <div className="group relative mb-3 h-24 w-24 overflow-hidden rounded-lg border border-gray-200">
                         <ResponsiveImage
                           src={variant.image}
                           alt={variant.color}
@@ -672,19 +700,22 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                             const updated = [...form.colorVariants];
                             updated[index] = { ...updated[index], image: "" };
                             update("colorVariants", updated);
+                            showToast("success", "Variant image removed");
+                            autoSave();
                           }}
-                          className="absolute right-1 top-1 rounded-full bg-red-600 p-0.5 text-white"
+                          className="absolute right-1 top-1 rounded-full bg-red-600 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          title="Remove image"
                         >
                           <X size={12} />
                         </button>
                       </div>
                     )}
-                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-3 transition-colors hover:border-gray-400">
+                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-3 transition-colors hover:border-blue-400">
                       <div className="flex items-center justify-center text-gray-600">
                         <ImageIcon size={18} />
                       </div>
                       <span className="text-center text-xs text-gray-600">
-                        Upload variant image
+                        {variant.image ? "Change variant image" : "Upload variant image"}
                       </span>
                       <input
                         type="file"
@@ -694,6 +725,12 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                         className="hidden"
                       />
                     </label>
+                    {uploading === `variant-image-${index}` && (
+                      <div className="mt-2 flex items-center gap-2 text-blue-600">
+                        <Loader2 size={14} className="animate-spin" />
+                        <span className="text-xs">Uploading...</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Variant Gallery */}
@@ -705,7 +742,7 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                       {variant.gallery?.map((img, i) => (
                         <div
                           key={i}
-                          className="group relative h-20 w-20 rounded border border-gray-200"
+                          className="group relative h-20 w-20 overflow-hidden rounded border border-gray-200"
                         >
                           <ResponsiveImage
                             src={img}
@@ -715,15 +752,19 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                           />
                           <button
                             type="button"
-                            onClick={() => removeVariantGalleryImage(index, i)}
+                            onClick={() => {
+                              removeVariantGalleryImage(index, i);
+                              showToast("success", "Image removed");
+                            }}
                             className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                            title="Remove image"
                           >
                             <Trash2 size={14} className="text-white" />
                           </button>
                         </div>
                       ))}
                     </div>
-                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-2 transition-colors hover:border-gray-400">
+                    <label className="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-2 transition-colors hover:border-blue-400">
                       <div className="flex items-center justify-center text-gray-600">
                         <Plus size={16} />
                       </div>
@@ -737,6 +778,12 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
                         className="hidden"
                       />
                     </label>
+                    {uploading === `variant-gallery-${index}` && (
+                      <div className="mt-2 flex items-center gap-2 text-blue-600">
+                        <Loader2 size={14} className="animate-spin" />
+                        <span className="text-xs">Uploading images...</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Product Title */}

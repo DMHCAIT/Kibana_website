@@ -55,11 +55,12 @@ function withTimeout<T>(promise: Promise<T>, ms = 2000): Promise<T | null> {
 function rowToProduct(row: typeof productsTable.$inferSelect): Product {
   const colorVariants = (row.colorVariants as Product["colorVariants"]) ?? [];
   const colors = (row.colors as string[]) ?? [];
-  
+
   // Auto-generate colors from colorVariants if colors is empty
-  const finalColors = colors && colors.length > 0 
-    ? colors 
-    : colorVariants.map(v => v.hex || v.color).filter(Boolean);
+  const finalColors =
+    colors && colors.length > 0
+      ? colors
+      : colorVariants.map((v) => v.hex || v.color).filter(Boolean);
 
   return {
     id: row.id,
@@ -86,12 +87,12 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // Check cache first (30 second TTL - reduced from 60 for faster updates on out-of-stock changes)
+  // ⚡ Check cache first (60 second TTL - increased since we have ISR)
   const cached = getCached("products");
   if (cached) return cached as Product[];
 
   if (!hasDatabase) {
-    setCached("products", localProducts, 30000);
+    setCached("products", localProducts, 60000);
     return localProducts;
   }
 
@@ -99,50 +100,50 @@ export async function getProducts(): Promise<Product[]> {
     db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
   const result = rows && rows.length > 0 ? rows.map(rowToProduct) : localProducts;
-  setCached("products", result, 30000); // Cache for 30 seconds (instead of 60)
+  setCached("products", result, 60000); // Cache for 60 seconds (ISR handles revalidation)
   return result;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
-  // Check individual product cache first (30 second TTL)
+  // ⚡ Check individual product cache first (60 second TTL - ISR handles revalidation)
   const cached = getCached(`product-${id}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 30000);
+    setCached(`product-${id}`, product, 60000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 30000); // Cache for 30 seconds
+    setCached(`product-${id}`, product, 60000); // Cache for 60 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 30000);
+    setCached(`product-${id}`, product, 60000);
     return product;
   }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  // Check individual product cache first (30 second TTL)
+  // ⚡ Check individual product cache first (60 second TTL - ISR handles revalidation)
   const cached = getCached(`product-slug-${slug}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 30000);
+    setCached(`product-slug-${slug}`, product, 60000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 30000); // Cache for 30 seconds
+    setCached(`product-slug-${slug}`, product, 60000); // Cache for 60 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 30000);
+    setCached(`product-slug-${slug}`, product, 60000);
     return product;
   }
 }
@@ -210,11 +211,21 @@ function rowToCategory(row: typeof categoriesTable.$inferSelect): AdminCategory 
 }
 
 export async function getCategories(): Promise<AdminCategory[]> {
-  if (!hasDatabase) return localCategories as AdminCategory[];
+  // ⚡ Cache categories (they change rarely, cache for 5 minutes)
+  const cached = getCached("categories");
+  if (cached) return cached as AdminCategory[];
+
+  if (!hasDatabase) {
+    setCached("categories", localCategories as AdminCategory[], 300000);
+    return localCategories as AdminCategory[];
+  }
   const rows = await withTimeout(
     db.select().from(categoriesTable).orderBy(asc(categoriesTable.sortOrder)),
   );
-  return rows && rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
+  const result =
+    rows && rows.length ? rows.map(rowToCategory) : (localCategories as AdminCategory[]);
+  setCached("categories", result, 300000); // Cache for 5 minutes
+  return result;
 }
 
 export async function saveCategory(cat: AdminCategory): Promise<void> {
@@ -657,6 +668,9 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
           productName: productsTable.name,
           productPrice: productsTable.price,
           productImage: productsTable.image,
+          storedProductName: userCartTable.productName,
+          storedProductImage: userCartTable.productImage,
+          colorVariants: productsTable.colorVariants,
         })
         .from(userCartTable)
         .innerJoin(usersTable, eq(userCartTable.userId, usersTable.id))
@@ -669,20 +683,63 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
       return [];
     }
 
-    const result = rows.map((row) => ({
-      id: row.id,
-      userId: row.userId,
-      productId: row.productId,
-      quantity: row.quantity,
-      color: row.color ?? undefined,
-      addedAt: (row.addedAt as Date).toISOString(),
-      customerName: row.customerName,
-      customerEmail: row.customerEmail ?? undefined,
-      customerPhone: row.customerPhone ?? undefined,
-      productName: row.productName,
-      productPrice: row.productPrice,
-      productImage: row.productImage,
-    }));
+    const result = rows.map((row) => {
+      // Priority 1: Use stored product name & image (most accurate - exact state when added to cart)
+      let displayImage = row.storedProductImage || row.productImage;
+      let displayProductName = row.storedProductName || row.productName;
+      let displayColor = row.color;
+
+      // Fallback: If stored name/image not available, try to match variant from database
+      // This handles legacy cart items that were added before we started storing the name
+      if (
+        !row.storedProductName &&
+        row.color &&
+        row.colorVariants &&
+        Array.isArray(row.colorVariants)
+      ) {
+        const variants = row.colorVariants as Array<{
+          color?: string;
+          slug?: string;
+          productTitle?: string;
+          image?: string;
+        }>;
+
+        // Match variant by color name (case-insensitive)
+        const matchedVariant = variants.find(
+          (v) => v.color && v.color.toLowerCase() === (row.color?.toLowerCase() ?? ""),
+        );
+
+        if (matchedVariant) {
+          // Use variant's image if available
+          if (matchedVariant.image) {
+            displayImage = matchedVariant.image;
+          }
+          // Use variant's full product title if available
+          if (matchedVariant.productTitle) {
+            displayProductName = matchedVariant.productTitle;
+          }
+          // Use variant's color if available
+          if (matchedVariant.color) {
+            displayColor = matchedVariant.color;
+          }
+        }
+      }
+
+      return {
+        id: row.id,
+        userId: row.userId,
+        productId: row.productId,
+        quantity: row.quantity,
+        color: displayColor ?? undefined,
+        addedAt: (row.addedAt as Date).toISOString(),
+        customerName: row.customerName,
+        customerEmail: row.customerEmail ?? undefined,
+        customerPhone: row.customerPhone ?? undefined,
+        productName: displayProductName,
+        productPrice: row.productPrice,
+        productImage: displayImage,
+      };
+    });
 
     setCached("cartItems", result, 30000); // Cache for 30 seconds
     return result;
