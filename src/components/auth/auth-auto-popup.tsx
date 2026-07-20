@@ -23,7 +23,12 @@ export function AuthAutoPopup() {
     const dismissed = sessionStorage.getItem("kibana-auth-dismissed");
     if (dismissed) return;
 
-    openAuthModal();
+    // Show auth modal after 10 seconds
+    const timer = setTimeout(() => {
+      openAuthModal();
+    }, 10000);
+
+    return () => clearTimeout(timer);
   }, [_hasHydrated, user, openAuthModal, pathname]);
 
   return null;
