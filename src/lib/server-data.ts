@@ -605,6 +605,11 @@ export async function saveOrder(order: AdminOrder): Promise<void> {
     trackingId: order.trackingId ?? null,
     placedAt: new Date(order.placedAt),
   };
+
+  if (!hasDatabase) {
+    return; // Skip DB save in local mode
+  }
+
   await db.insert(ordersTable).values(row).onConflictDoUpdate({ target: ordersTable.id, set: row });
 
   // Invalidate cache

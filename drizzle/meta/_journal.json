@@ -22,6 +22,13 @@
       "when": 1784280434422,
       "tag": "0002_famous_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784525756934,
+      "tag": "0003_dapper_anthem",
+      "breakpoints": true
     }
   ]
 }

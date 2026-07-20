@@ -359,6 +359,18 @@ export function OrdersClient({ initialOrders }: Props) {
               </div>
             </div>
 
+            {/* Delivery Address */}
+            {selectedOrderData.shippingAddress && (
+              <div className="border-t border-gray-200 pt-4">
+                <label className="mb-2 block text-xs uppercase tracking-wider text-gray-500">
+                  Delivery Address
+                </label>
+                <p className="whitespace-pre-wrap text-sm text-gray-900">
+                  {selectedOrderData.shippingAddress}
+                </p>
+              </div>
+            )}
+
             {/* Status & Actions */}
             <div className="space-y-3 border-t border-gray-200 pt-4">
               <div>
