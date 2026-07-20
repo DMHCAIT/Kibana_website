@@ -636,17 +636,11 @@ export async function isFirstTimeCustomer(userId: string, userEmail: string): Pr
 
   try {
     const orders = await getOrders();
-    // Check if user has any completed/paid orders (not just pending)
-    const hasCompletedOrder = orders.some(
-      (o) =>
-        (o.user?.id === userId || o.user?.email === userEmail) &&
-        (o.status === "delivered" ||
-          o.status === "shipped" ||
-          o.status === "processing" ||
-          o.paymentStatus === "paid"),
-    );
+    // Check if user has ANY orders (regardless of status - pending, cancelled, delivered, etc.)
+    // Once they place their first order, the discount should not appear on future orders
+    const hasAnyOrder = orders.some((o) => o.user?.id === userId || o.user?.email === userEmail);
 
-    return !hasCompletedOrder;
+    return !hasAnyOrder;
   } catch {
     return true;
   }
