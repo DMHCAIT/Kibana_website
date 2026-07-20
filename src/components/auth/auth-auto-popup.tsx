@@ -7,10 +7,10 @@ import { useAuth } from "@/store/auth-store";
 /**
  * Triggers the auth modal automatically when the page loads,
  * if the user is not already logged in.
- * Once dismissed (X pressed), it won't re-open in the same session.
+ * Shows for 10 seconds then auto-closes.
  */
 export function AuthAutoPopup() {
-  const { user, _hasHydrated, openAuthModal } = useAuth();
+  const { user, _hasHydrated, openAuthModal, closeAuthModal } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -24,12 +24,19 @@ export function AuthAutoPopup() {
     if (dismissed) return;
 
     // Show auth modal after 10 seconds
-    const timer = setTimeout(() => {
+    const openTimer = setTimeout(() => {
       openAuthModal();
+
+      // Auto-close modal after 10 seconds
+      const closeTimer = setTimeout(() => {
+        closeAuthModal();
+      }, 10000);
+
+      return () => clearTimeout(closeTimer);
     }, 10000);
 
-    return () => clearTimeout(timer);
-  }, [_hasHydrated, user, openAuthModal, pathname]);
+    return () => clearTimeout(openTimer);
+  }, [_hasHydrated, user, openAuthModal, closeAuthModal, pathname]);
 
   return null;
 }
