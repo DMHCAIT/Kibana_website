@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const { eventName, data, timestamp } = eventData;
 
     // ⚠️ Client-side only events (GA4 + Meta Pixel)
-    // Meta Conversions API does NOT accept these events
-    const clientSideOnlyEvents = ["PageView", "ViewContent", "ViewItemList"];
+    // PageView and ViewItemList are not sent server-side, but ViewContent IS sent for API coverage
+    const clientSideOnlyEvents = ["PageView", "ViewItemList"];
     if (clientSideOnlyEvents.includes(eventName)) {
       return NextResponse.json(
         {

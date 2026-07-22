@@ -259,7 +259,7 @@ export function trackPageView(pagePath: string, pageTitle: string) {
     page_title: pageTitle,
     timestamp: new Date().toISOString(),
   });
-  trackMetaEvent("PageView", { page_path: pagePath, page_title: pageTitle });
+  trackMetaEvent("PageView", {});
 }
 
 /** 4. SELECT CATEGORY EVENT - Fired when user filters product category */
@@ -273,15 +273,13 @@ export function trackSelectCategory(category: string) {
   });
   trackMetaEvent("ViewContent", {
     content_name: `Category: ${category}`,
-    content_type: "category",
-    content_category: category,
+    content_type: "product_group",
   });
 
-  // Server-side tracking for guaranteed delivery
+  // Server-side tracking for improved Meta API coverage
   trackConversionAPI("ViewContent", {
     content_name: `Category: ${category}`,
-    content_type: "category",
-    content_category: category,
+    content_type: "product_group",
   });
 }
 
@@ -303,17 +301,15 @@ export function trackViewContent(product: Product, variantPrice?: number, varian
     content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
-    content_category: product.category,
     value: price,
     currency: "INR",
   });
 
-  // Server-side tracking for guaranteed delivery
+  // Server-side tracking for improved Meta API coverage
   trackConversionAPI("ViewContent", {
     content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
-    content_category: product.category,
     value: price,
     currency: "INR",
   });
@@ -331,15 +327,13 @@ export function trackProductListingView(category?: string, productCount?: number
   });
   trackMetaEvent("ViewContent", {
     content_name: `Product Listing${category ? ": " + category : ""}`,
-    content_type: "product_list",
-    content_category: category,
+    content_type: "product_group",
   });
 
-  // Server-side tracking for guaranteed delivery
+  // Server-side tracking for improved Meta API coverage
   trackConversionAPI("ViewContent", {
     content_name: `Product Listing${category ? ": " + category : ""}`,
-    content_type: "product_list",
-    content_category: category,
+    content_type: "product_group",
   });
 }
 
@@ -353,15 +347,13 @@ export function trackMyAccount(userId: string) {
   });
   trackMetaEvent("ViewContent", {
     content_name: "My Account",
-    content_type: "account",
-    user_id: userId,
+    content_type: "page",
   });
 
-  // Server-side tracking for guaranteed delivery
+  // Server-side tracking for improved Meta API coverage
   trackConversionAPI("ViewContent", {
-    user_id: userId,
     content_name: "My Account",
-    content_type: "account",
+    content_type: "page",
   });
 }
 
@@ -448,12 +440,9 @@ export function trackAddToCart(
     content_name: displayName,
     content_type: "product",
     content_ids: [product.id],
-    content_category: product.category,
     quantity: quantity,
     value: totalValue,
     currency: "INR",
-    variant_id: variantId,
-    product_image: productImage,
   });
 
   // Server-side tracking for guaranteed delivery
@@ -504,7 +493,7 @@ export function trackCheckout(
   });
 
   trackMetaEvent("InitiateCheckout", {
-    content_type: "checkout",
+    content_type: "product_group",
     content_ids: items.map((i) => i.product.id),
     num_items: items.length,
     value: total,
@@ -714,8 +703,6 @@ export function trackSearch(query: string, resultsCount?: number) {
 
   trackMetaEvent("Search", {
     search_string: query,
-    content_name: `Product Search: ${query}`,
-    content_type: "search",
   });
 
   // Server-side tracking for guaranteed delivery
@@ -738,11 +725,8 @@ export function trackViewPage(pageName: string, pageType: string) {
     content_type: pageType,
   });
 
-  // Server-side tracking for guaranteed delivery
-  trackConversionAPI("ViewContent", {
-    content_name: pageName,
-    content_type: pageType,
-  });
+  // ViewContent is tracked client-side only via Meta Pixel
+  // Meta Conversions API does not accept ViewContent events
 }
 
 /** PAGE VIEW API - Track automatic page views to server */
