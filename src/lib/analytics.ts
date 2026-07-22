@@ -103,6 +103,76 @@ function validateEventName(eventName: string): boolean {
   return META_STANDARD_EVENTS.includes(eventName as (typeof META_STANDARD_EVENTS)[number]);
 }
 
+/**
+ * Get Facebook Click ID (fbc) from fbclid URL parameter
+ * This is automatically added by Meta when user clicks on a Meta ad
+ */
+function getFbcFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fbclid = urlParams.get("fbclid");
+    return fbclid || "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Get Facebook Pixel ID (fbp) from _fbp cookie
+ * This is automatically set by Meta Pixel base code
+ */
+function getFbpFromCookie(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    // Get _fbp cookie value
+    const cookies = document.cookie.split("; ");
+    for (const cookie of cookies) {
+      if (cookie.startsWith("_fbp=")) {
+        return cookie.substring(5); // Remove "_fbp=" prefix
+      }
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Get or initialize Facebook Click ID
+ * Stores fbclid from URL in sessionStorage for persistence across page loads
+ */
+function getFbc(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    // Try to get from sessionStorage first (persisted from initial page load)
+    let fbc = sessionStorage.getItem("_fbc");
+    if (fbc) return fbc;
+
+    // If not in sessionStorage, get from URL
+    fbc = getFbcFromUrl();
+    if (fbc) {
+      // Store in sessionStorage for future events
+      sessionStorage.setItem("_fbc", fbc);
+    }
+    return fbc;
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Get Facebook Browser ID from cookie
+ */
+function getFbp(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return getFbpFromCookie();
+  } catch {
+    return "";
+  }
+}
+
 function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
   if (typeof window === "undefined" || !window.fbq) return;
 
@@ -120,7 +190,14 @@ function trackMetaEvent(eventName: string, data?: Record<string, unknown>) {
     if (!data.content_type) console.warn("⚠️ Purchase event missing 'content_type' field");
   }
 
-  window.fbq("track", eventName, data || {});
+  // Add fbc and fbp for event matching
+  const enhancedData = {
+    ...data,
+    ...(getFbc() && { fbc: getFbc() }),
+    ...(getFbp() && { fbp: getFbp() }),
+  };
+
+  window.fbq("track", eventName, enhancedData);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -553,7 +630,14 @@ export function trackPurchase(
 // SERVER-SIDE CONVERSIONS API
 export async function trackConversionAPI(
   eventName: string,
-  data: { user_id?: string; email?: string; phone?: string; [key: string]: unknown },
+  data: {
+    user_id?: string;
+    email?: string;
+    phone?: string;
+    fbc?: string;
+    fbp?: string;
+    [key: string]: unknown;
+  },
 ) {
   try {
     // If no email/phone provided, try to fetch current user to include customer data
@@ -572,6 +656,18 @@ export async function trackConversionAPI(
         }
       } catch {
         // Failed to fetch user, continue without user data
+      }
+    }
+
+    // Add fbc and fbp for event matching (if not already provided)
+    if (typeof window !== "undefined") {
+      if (!data.fbc) {
+        const fbc = getFbc();
+        if (fbc) data.fbc = fbc;
+      }
+      if (!data.fbp) {
+        const fbp = getFbp();
+        if (fbp) data.fbp = fbp;
       }
     }
 

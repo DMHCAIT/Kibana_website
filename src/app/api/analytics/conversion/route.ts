@@ -101,6 +101,15 @@ export async function POST(request: NextRequest) {
       hashedUserData.zp = await hashSHA256(data.zipCode);
     }
 
+    // Add fbc (Facebook Click ID) and fbp (Facebook Pixel ID) for event matching
+    // These are critical for linking server-side events to client-side and ad clicks
+    if (data.fbc) {
+      hashedUserData.fbc = String(data.fbc);
+    }
+    if (data.fbp) {
+      hashedUserData.fbp = String(data.fbp);
+    }
+
     // Build custom data
     const customData: Record<string, unknown> = {};
     if (data.value !== undefined && data.value !== null) {
