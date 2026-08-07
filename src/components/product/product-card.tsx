@@ -128,7 +128,7 @@ export function ProductCard({
         {/* Out of Stock banner */}
         {!variantInStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <span className="rounded bg-red-600 px-4 py-2 text-xs font-bold tracking-wide text-white sm:text-sm">
+            <span className="rounded bg-black px-4 py-2 text-xs font-bold tracking-wide text-white sm:text-sm">
               OUT OF STOCK
             </span>
           </div>

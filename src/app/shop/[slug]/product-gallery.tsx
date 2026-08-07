@@ -13,7 +13,12 @@ type Props = {
 
 const SWIPE_THRESHOLD = 48;
 
-export function ProductGallery({ images, productName, discountPct: pct, variantInStock = true }: Props) {
+export function ProductGallery({
+  images,
+  productName,
+  discountPct: pct,
+  variantInStock = true,
+}: Props) {
   const [active, setActive] = useState(0);
   const allImages = images.length > 0 ? images : ["/extracted/img-060.jpg"];
 
@@ -116,8 +121,10 @@ export function ProductGallery({ images, productName, discountPct: pct, variantI
               </Badge>
             )}
             {!variantInStock && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className="bg-red-600 text-white font-bold text-sm sm:text-base px-4 py-2 tracking-wide">OUT OF STOCK</span>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <span className="bg-black px-4 py-2 text-sm font-bold tracking-wide text-white sm:text-base">
+                  OUT OF STOCK
+                </span>
               </div>
             )}
           </div>
@@ -182,8 +189,10 @@ export function ProductGallery({ images, productName, discountPct: pct, variantI
         <div className="min-w-0 flex-1 rounded-lg bg-[#f5f1ed] p-6">
           <div {...desktopSwipeProps}>
             {!variantInStock && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
-                <span className="bg-red-600 text-white font-bold text-lg px-6 py-3 tracking-wide">OUT OF STOCK</span>
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+                <span className="bg-black px-6 py-3 text-lg font-bold tracking-wide text-white">
+                  OUT OF STOCK
+                </span>
               </div>
             )}
             <Image

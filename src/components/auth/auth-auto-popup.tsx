@@ -7,7 +7,7 @@ import { useAuth } from "@/store/auth-store";
 /**
  * Triggers the auth modal automatically when the page loads,
  * if the user is not already logged in.
- * Shows for 10 seconds then auto-closes.
+ * Shows for 3 seconds then auto-closes.
  */
 export function AuthAutoPopup() {
   const { user, _hasHydrated, openAuthModal, closeAuthModal } = useAuth();
@@ -26,10 +26,10 @@ export function AuthAutoPopup() {
     // Show auth modal immediately
     openAuthModal();
 
-    // Auto-close modal after 10 seconds
+    // Auto-close modal after 3 seconds
     const closeTimer = setTimeout(() => {
       closeAuthModal();
-    }, 10000);
+    }, 3000);
 
     return () => clearTimeout(closeTimer);
   }, [_hasHydrated, user, openAuthModal, closeAuthModal, pathname]);
