@@ -197,6 +197,51 @@ export async function reorderProducts(orderedIds: string[]): Promise<void> {
   );
 }
 
+// ⚡ PERFORMANCE: Query products by category (filters on database, not in-memory)
+// This avoids loading all products just to filter by category in RelatedProducts
+export async function getProductsByCategory(
+  category: string,
+  excludeId?: string,
+): Promise<Product[]> {
+  const cacheKey = `products-category-${category}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached as Product[];
+
+  if (!hasDatabase) {
+    const products = localProducts.filter(
+      (p) => p.category === category && (!excludeId || p.id !== excludeId),
+    );
+    setCached(cacheKey, products, 60000);
+    return products;
+  }
+
+  try {
+    const rows = await withTimeout(
+      db
+        .select()
+        .from(productsTable)
+        .where(eq(productsTable.category, category))
+        .orderBy(asc(productsTable.sortOrder)),
+    );
+
+    const products =
+      rows && rows.length
+        ? rows.map(rowToProduct).filter((p) => !excludeId || p.id !== excludeId)
+        : localProducts.filter(
+            (p) => p.category === category && (!excludeId || p.id !== excludeId),
+          );
+
+    setCached(cacheKey, products, 60000);
+    return products;
+  } catch {
+    const products = localProducts.filter(
+      (p) => p.category === category && (!excludeId || p.id !== excludeId),
+    );
+    setCached(cacheKey, products, 60000);
+    return products;
+  }
+}
+
 // ── Categories ───────────────────────────────────────────────────────────────
 
 export type AdminCategory = { slug: string; name: string; image: string; order: number };
@@ -573,6 +618,7 @@ export async function getOrders(): Promise<AdminOrder[]> {
   if (cached) return cached as AdminOrder[];
 
   if (!hasDatabase) {
+    console.warn("⚠️  No database configured, returning empty orders");
     setCached("orders", [], 30000);
     return [];
   }
@@ -580,13 +626,19 @@ export async function getOrders(): Promise<AdminOrder[]> {
   try {
     const rows = await withTimeout(db.select().from(ordersTable));
     if (!rows) {
+      console.warn("⚠️  Orders query returned null (likely timeout)");
       setCached("orders", [], 30000);
       return [];
     }
+    console.log(`✅ Fetched ${rows.length} orders from database`);
     const result = rows.map(rowToOrder);
     setCached("orders", result, 30000); // Cache for 30 seconds
     return result;
-  } catch {
+  } catch (error) {
+    console.error(
+      "❌ Error fetching orders:",
+      error instanceof Error ? error.message : String(error),
+    );
     setCached("orders", [], 30000);
     return [];
   }

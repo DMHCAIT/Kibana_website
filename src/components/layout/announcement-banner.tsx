@@ -1,6 +1,7 @@
 const DEFAULT_PHRASES = [
-  "FREE RETURNS ON ALL ORDERS",
-  "100% PREMIUM VEGAN LEATHER — CRUELTY FREE",
+  "INDEPENDENCE DAY SALE",
+  "UPTO 60% OFF ON SELECTED STYLES",
+  "100% PREMIUM VEGAN LEATHER",
   "HAND-FINISHED. EVERY PIECE. EVERY TIME.",
   "FREE SHIPPING ON ORDERS ABOVE ₹999",
 ];
@@ -14,7 +15,7 @@ export function AnnouncementBanner({ text }: { text?: string }) {
     : DEFAULT_PHRASES;
 
   return (
-    <div className="w-full overflow-hidden bg-black py-2 text-white">
+    <div className="w-full overflow-hidden py-2 text-white" style={{ backgroundColor: "#2d5016" }}>
       <div className="flex animate-marquee whitespace-nowrap">
         {[...Array(3)].map((_, i) => (
           <span key={i} className="flex shrink-0 items-center gap-0">
@@ -27,7 +28,7 @@ export function AnnouncementBanner({ text }: { text?: string }) {
                 >
                   {phrase}
                 </span>
-                <span className="text-[#c9a96e]">◆</span>
+                <span className="text-[#ff8c00]">◆</span>
               </span>
             ))}
           </span>

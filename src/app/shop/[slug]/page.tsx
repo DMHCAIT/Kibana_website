@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Check, Star } from "lucide-react";
-import { getProductBySlug, getProducts } from "@/lib/server-data";
+import { getProductBySlug, getProductsByCategory } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
 import { ProductCarousel } from "@/components/product/product-carousel";
@@ -14,8 +14,10 @@ import { ShopHeader } from "@/components/shop/shop-header";
 import { TrackProductView } from "@/components/analytics/track-product-view";
 import type { Product } from "@/types/product";
 
-// ⚡ Enable ISR: revalidate every 30 seconds for product pages (fast updates)
-export const revalidate = 30;
+// ⚡ ISR: Revalidate every 5 minutes (product details change infrequently)
+// Previously 30s caused too many rebuilds and cold-start delays.
+// 300s (5 minutes) is acceptable since product catalog updates aren't real-time.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -67,8 +69,10 @@ async function RelatedProducts({
   productId: string;
   currentProduct?: Product;
 }) {
-  const products = await getProducts();
-  const related = products.filter((p) => p.category === category && p.id !== productId);
+  // ⚡ PERFORMANCE: Use getProductsByCategory instead of getProducts
+  // This queries only products in this category (not all products)
+  // Then filters in-memory, reducing memory and network traffic
+  const related = await getProductsByCategory(category, productId);
 
   // If no related products, show current product's color variants (if it's the only one in category)
   let productsToShow = related;

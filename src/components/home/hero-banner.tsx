@@ -7,16 +7,10 @@ import { useRouter } from "next/navigation";
 // Hero banner images — mobile and desktop versions per slide
 const heroSlides = [
   {
-    mobile: "/mv/hero1.jpg.jpeg",
-    desktop: "/mv/women-hero-desktop.jpg.jpeg",
-    alt: "Women collection",
-    href: "/shop?slugs=valera-dome&title=Valera%20Dome",
-  },
-  {
-    mobile: "/mv/hero2.jpg.jpeg",
-    desktop: "/mv/men-hero-desktop.jpg.jpeg",
-    alt: "Men collection",
-    href: "/shop?cat=laptop-bag&slugs=business-laptop-briefcase&title=Laptop%20Bag%20Collection",
+    mobile: "/mv/mobile-banner-independence day.jpg",
+    desktop: "/mv/hero-banner.jpg",
+    alt: "Independence Day Collection",
+    href: "/shop",
   },
 ];
 
@@ -108,80 +102,108 @@ export function HeroBanner() {
   return (
     <section className="relative w-full bg-kibana-cream">
       {/* ── MOBILE — matches 1122×1402 image ratio ── */}
-      <div
-        {...slideProps}
-        className={`${slideProps.className} block cursor-pointer md:hidden`}
-        style={{ aspectRatio: "1122/1402" }}
-        onClick={handleBannerClick}
-      >
-        {prevImage !== null && (
-          <Image
-            key={`prev-mob-${prevImage}`}
-            src={heroSlides[prevImage].mobile}
-            alt=""
-            {...imageProps}
-            style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
-          />
-        )}
-        <Image
-          key={`curr-mob-${currentImage}`}
-          src={heroSlides[currentImage].mobile}
-          alt={heroSlides[currentImage].alt}
-          priority
-          {...imageProps}
-          style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
-        />
-        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-3">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={(e) => {
-                e.stopPropagation();
-                goTo(index);
-              }}
-              className={`h-2 w-2 cursor-pointer transition-all ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
-              aria-label={`View image ${index + 1}`}
+      <div className="block md:hidden">
+        <div
+          {...slideProps}
+          className={`${slideProps.className} cursor-pointer`}
+          style={{ aspectRatio: "1122/1402" }}
+          onClick={handleBannerClick}
+        >
+          {prevImage !== null && (
+            <Image
+              key={`prev-mob-${prevImage}`}
+              src={heroSlides[prevImage].mobile}
+              alt=""
+              {...imageProps}
+              style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
             />
-          ))}
+          )}
+          <Image
+            key={`curr-mob-${currentImage}`}
+            src={heroSlides[currentImage].mobile}
+            alt={heroSlides[currentImage].alt}
+            priority
+            {...imageProps}
+            style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
+          />
+          {/* Shop Now Button */}
+          <div
+            className="absolute z-20"
+            style={{ top: "68%", left: "18%", transform: "translateX(-50%)" }}
+          >
+            <button
+              onClick={handleBannerClick}
+              className="xs:px-4 xs:py-1.5 xs:text-sm whitespace-nowrap rounded-lg bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-orange-600 sm:px-5 sm:py-2 sm:text-base md:px-6"
+            >
+              Shop Now
+            </button>
+          </div>
+          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-3">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goTo(index);
+                }}
+                className={`h-2 w-2 cursor-pointer transition-all ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
+                aria-label={`View image ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ── DESKTOP / TABLET — matches 2172×724 image ratio ── */}
-      <div
-        {...slideProps}
-        className={`${slideProps.className} hidden cursor-pointer md:block`}
-        style={{ aspectRatio: "2172/724" }}
-        onClick={handleBannerClick}
-      >
-        {prevImage !== null && (
-          <Image
-            key={`prev-desk-${prevImage}`}
-            src={heroSlides[prevImage].desktop}
-            alt=""
-            {...imageProps}
-            style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
-          />
-        )}
-        <Image
-          key={`curr-desk-${currentImage}`}
-          src={heroSlides[currentImage].desktop}
-          alt={heroSlides[currentImage].alt}
-          priority
-          {...imageProps}
-          style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
-        />
-        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-6 sm:gap-3">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={(e) => {
-                e.stopPropagation();
-                goTo(index);
-              }}
-              className={`h-1.5 w-1.5 cursor-pointer transition-all sm:h-2 sm:w-2 ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
-              aria-label={`View image ${index + 1}`}
+      <div className="hidden md:block">
+        <div
+          {...slideProps}
+          className={`${slideProps.className} cursor-pointer`}
+          style={{ aspectRatio: "2172/724" }}
+          onClick={handleBannerClick}
+        >
+          {prevImage !== null && (
+            <Image
+              key={`prev-desk-${prevImage}`}
+              src={heroSlides[prevImage].desktop}
+              alt=""
+              {...imageProps}
+              style={{ opacity: fading ? 0 : 1, transition: "opacity 0.6s ease-in-out" }}
             />
-          ))}
+          )}
+          <Image
+            key={`curr-desk-${currentImage}`}
+            src={heroSlides[currentImage].desktop}
+            alt={heroSlides[currentImage].alt}
+            priority
+            {...imageProps}
+            style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
+          />
+          {/* Shop Now Button */}
+          <div
+            className="absolute z-20"
+            style={{ top: "86%", left: "12%", transform: "translateX(-50%)" }}
+          >
+            <button
+              onClick={handleBannerClick}
+              className="whitespace-nowrap rounded-lg bg-orange-500 px-3 py-0.5 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-orange-600 sm:px-4 sm:py-1 sm:text-xs md:px-5 md:py-1.5 md:text-sm lg:px-6 lg:py-2 lg:text-base xl:px-8"
+            >
+              Shop Now
+            </button>
+          </div>
+          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-6 sm:gap-3">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goTo(index);
+                }}
+                className={`h-1.5 w-1.5 cursor-pointer transition-all sm:h-2 sm:w-2 ${index === currentImage ? "bg-kibana-ink/80" : "bg-kibana-ink/30"}`}
+                aria-label={`View image ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

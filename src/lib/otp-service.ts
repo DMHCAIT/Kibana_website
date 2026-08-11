@@ -1,13 +1,31 @@
 import postgres from "postgres";
+import { withRetry, dbCircuitBreaker } from "./db-retry";
 
-// Use the same PostgreSQL connection as the main database
-const databaseUrl = process.env.DATABASE_URL?.trim();
-const sql = databaseUrl
-  ? postgres(databaseUrl, {
-      ssl: "require",
-      max: 1, // Use pooler connection
-    })
-  : null;
+// ⚡ PERFORMANCE FIX: Use the shared database connection pool
+// This avoids creating a separate connection pool with max: 1,
+// which was causing 300+ms delays on cold starts.
+declare global {
+  // eslint-disable-next-line no-var
+  var __kibana_pg: ReturnType<typeof postgres> | undefined;
+}
+
+function getSqlRaw(): ReturnType<typeof postgres> | null {
+  if (!globalThis.__kibana_pg) {
+    // Fallback: create a connection if global not available
+    // (should rarely happen in production)
+    console.warn("⚠️  Global PostgreSQL connection not initialized. Creating fallback connection.");
+    const databaseUrl = process.env.DATABASE_URL?.trim();
+    return databaseUrl
+      ? postgres(databaseUrl, {
+          ssl: "require",
+          max: 5,
+          connect_timeout: 10,
+        })
+      : null;
+  }
+  return globalThis.__kibana_pg;
+}
+
 const isDev = process.env.NODE_ENV === "development";
 
 type InMemoryOtp = {
@@ -18,6 +36,7 @@ type InMemoryOtp = {
 const inMemoryOtpStore = new Map<string, InMemoryOtp>();
 
 function getSqlClient() {
+  const sql = getSqlRaw();
   if (!sql) {
     throw new Error("DATABASE_URL is not configured");
   }
@@ -37,24 +56,31 @@ export async function storeOtp(email: string, otp: string, expiresInMinutes = 10
   expiresAt.setMinutes(expiresAt.getMinutes() + expiresInMinutes);
 
   try {
-    const db = getSqlClient();
-    console.log(`📝 Storing OTP for ${cleanEmail}, expires at ${expiresAt.toISOString()}`);
+    await dbCircuitBreaker.execute(async () => {
+      return withRetry(
+        async () => {
+          const db = getSqlClient();
+          console.log(`📝 Storing OTP for ${cleanEmail}, expires at ${expiresAt.toISOString()}`);
 
-    // Delete any existing OTP for this email first
-    const deleteResult = await db`
-      DELETE FROM otp_sessions 
-      WHERE phone = ${cleanEmail}
-    `;
-    console.log(`📝 Deleted ${deleteResult.count || 0} old OTP records for ${cleanEmail}`);
+          // Delete any existing OTP for this email first
+          const deleteResult = await db`
+          DELETE FROM otp_sessions 
+          WHERE phone = ${cleanEmail}
+        `;
+          console.log(`📝 Deleted ${deleteResult.count || 0} old OTP records for ${cleanEmail}`);
 
-    // Store OTP in database
-    const insertResult = await db`
-      INSERT INTO otp_sessions (phone, otp, dev_otp, expires_at, created_at)
-      VALUES (${cleanEmail}, ${otp}, ${otp}, ${expiresAt.toISOString()}, NOW())
-    `;
-    console.log(
-      `✓ OTP stored successfully in database for ${cleanEmail}. Rows inserted: ${insertResult.count || 1}`,
-    );
+          // Store OTP in database
+          const insertResult = await db`
+          INSERT INTO otp_sessions (phone, otp, dev_otp, expires_at, created_at)
+          VALUES (${cleanEmail}, ${otp}, ${otp}, ${expiresAt.toISOString()}, NOW())
+        `;
+          console.log(
+            `✓ OTP stored successfully in database for ${cleanEmail}. Rows inserted: ${insertResult.count || 1}`,
+          );
+        },
+        { maxAttempts: 3, initialDelayMs: 100 },
+      );
+    });
   } catch (error) {
     console.error("✗ Error storing OTP:", error);
     console.error(`   Email: ${cleanEmail}`);
@@ -74,35 +100,44 @@ export async function getOtp(email: string): Promise<string | null> {
   const cleanEmail = email.toLowerCase().trim();
 
   try {
-    const db = getSqlClient();
+    const result = await dbCircuitBreaker.execute(async () => {
+      return withRetry(
+        async () => {
+          const db = getSqlClient();
 
-    // Query database for valid OTP
-    const result = await db`
-      SELECT otp, dev_otp, expires_at 
-      FROM otp_sessions 
-      WHERE phone = ${cleanEmail}
-      LIMIT 1
-    `;
+          // Query database for valid OTP
+          const records = await db`
+          SELECT otp, dev_otp, expires_at 
+          FROM otp_sessions 
+          WHERE phone = ${cleanEmail}
+          LIMIT 1
+        `;
 
-    if (result.length === 0) {
-      return null;
-    }
+          if (records.length === 0) {
+            return null;
+          }
 
-    const data = result[0];
-    const resolvedOtp = data.otp || data.dev_otp;
+          const data = records[0];
+          const resolvedOtp = data.otp || data.dev_otp;
 
-    // Check if expired
-    const expiresAt = new Date(data.expires_at);
-    const now = new Date();
-    if (now > expiresAt) {
-      // Delete expired OTP asynchronously
-      db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch(() => {
-        // Ignore errors
-      });
-      return null;
-    }
+          // Check if expired
+          const expiresAt = new Date(data.expires_at);
+          const now = new Date();
+          if (now > expiresAt) {
+            // Delete expired OTP asynchronously
+            db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch(() => {
+              // Ignore errors
+            });
+            return null;
+          }
 
-    return resolvedOtp;
+          return resolvedOtp;
+        },
+        { maxAttempts: 3, initialDelayMs: 100 },
+      );
+    });
+
+    return result;
   } catch (error) {
     console.error("✗ Error getting OTP:", error);
     if (!isDev) return null;
@@ -121,7 +156,7 @@ export async function verifyOtp(email: string, otp: string): Promise<boolean> {
   const cleanEmail = email.toLowerCase().trim();
   const cleanOtp = otp.trim();
 
-  console.log(`� Verifying OTP for ${cleanEmail}`);
+  console.log(`✓ Verifying OTP for ${cleanEmail}`);
 
   const stored = await getOtp(cleanEmail);
 
@@ -129,7 +164,7 @@ export async function verifyOtp(email: string, otp: string): Promise<boolean> {
     console.log(`✅ OTP verified for ${cleanEmail}`);
     // Delete OTP asynchronously after successful verification (don't block response)
     const db = getSqlClient();
-    db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch(error => {
+    db`DELETE FROM otp_sessions WHERE phone = ${cleanEmail}`.catch((error: unknown) => {
       console.error("✗ Error deleting OTP after verification:", error);
     });
     return true;
