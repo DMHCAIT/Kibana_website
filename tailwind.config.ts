@@ -19,6 +19,12 @@ const config: Config = {
         "2xl": "1600px",
       },
     },
+    screens: {
+      xs: "0px",
+      sm: "500px",
+      md: "1216px",
+      lg: "1440px",
+    },
     extend: {
       colors: {
         background: "hsl(var(--background))",

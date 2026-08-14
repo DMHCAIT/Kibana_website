@@ -93,12 +93,13 @@ export function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background">
-      <div className="container relative flex h-14 items-center gap-3 py-2 md:h-16 md:py-4 lg:h-20">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background">
+      <div className="container relative flex h-14 items-center gap-3 py-2 sm:h-16 sm:gap-4 sm:py-3 md:h-20 md:gap-5 md:py-4 lg:h-20 lg:gap-5 lg:py-4">
+        {/* Menu button — hidden on large screens */}
         <button
           aria-label="Open menu"
           onClick={() => setOpen(true)}
-          className="-ml-2 p-2 md:hidden"
+          className="-ml-2 p-2 lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -109,68 +110,50 @@ export function Header() {
           aria-label="Kibana home"
           className="absolute left-1/2 flex flex-shrink-0 -translate-x-1/2 items-center justify-center md:relative md:left-auto md:translate-x-0"
         >
-          <span className="font-logo text-lg font-normal tracking-[0.25em] text-foreground md:text-xl lg:text-2xl">
+          <span className="font-logo text-base font-normal tracking-[0.25em] text-foreground sm:text-lg md:text-2xl lg:text-2xl">
             KIBANA
           </span>
         </Link>
 
-        <nav className="ml-10 hidden items-center gap-5 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] md:flex lg:ml-16 lg:gap-6">
+        {/* Desktop navigation — visible from large screens */}
+        <nav className="ml-2 hidden items-center gap-2 whitespace-nowrap text-xs font-medium uppercase tracking-[0.1em] md:flex md:gap-5">
           {desktopNav.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className="text-foreground/95 transition-colors hover:text-foreground"
+              className="text-foreground/80 transition-colors hover:text-foreground"
             >
               {n.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto hidden w-full md:flex md:max-w-xs lg:max-w-sm">
-          <form onSubmit={handleSearch} className="relative w-full">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        {/* Desktop search bar — only on extra large screens */}
+        <div className="ml-auto hidden flex-shrink-0 lg:flex lg:max-w-sm">
+          <form onSubmit={handleSearch} className="relative w-full min-w-0">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 flex-shrink-0 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search for bags, wallets…"
-              className="bg-muted/50 pl-9"
+              className="w-full truncate bg-muted/40 pl-9 pr-3 text-sm placeholder:text-muted-foreground/60"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
         </div>
 
-        <div className={cn("flex items-center gap-1 md:gap-2", "ml-auto md:ml-3")}>
-          {/* Search icon — mobile only */}
-          <button
-            aria-label="Search"
-            onClick={() => setShowMobileSearch((v) => !v)}
-            className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center transition-colors hover:bg-accent/20 md:hidden"
-          >
-            {showMobileSearch ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
-          </button>
-
-          {/* Mobile cart */}
-          <Link
-            href="/cart"
-            aria-label="Cart"
-            className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center hover:bg-accent/20 md:hidden"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {count}
-              </span>
-            )}
-          </Link>
-
-          {/* Account — desktop */}
-          <div className="relative hidden md:block">
+        {/* Right side icons */}
+        <div
+          className={cn("flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-3", "ml-auto lg:ml-0")}
+        >
+          {/* Account — visible from medium screens (sm and above) */}
+          <div className="relative hidden sm:block">
             {user ? (
               <button
                 aria-label="Account menu"
                 onClick={() => setShowUserMenu((v) => !v)}
-                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20"
+                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/10"
               >
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-semibold text-white">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
               </button>
@@ -178,7 +161,7 @@ export function Header() {
               <button
                 aria-label="Login"
                 onClick={() => openAuthModal()}
-                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20"
+                className="relative inline-flex h-10 w-10 items-center justify-center transition-colors hover:bg-accent/10"
               >
                 <User className="h-5 w-5" />
               </button>
@@ -186,7 +169,7 @@ export function Header() {
             {showUserMenu && user && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                <div className="absolute right-0 top-full z-50 mt-1 w-52 border border-border bg-white shadow-lg">
+                <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-lg border border-border bg-white shadow-lg">
                   <div className="border-b border-border px-4 py-3">
                     <p className="truncate text-sm font-semibold">{user.name}</p>
                     <p className="truncate text-xs text-muted-foreground">{user.email}</p>
@@ -222,7 +205,7 @@ export function Header() {
             )}
           </div>
 
-          {/* Wishlist — desktop only */}
+          {/* Wishlist — visible from medium screens (sm and above) */}
           <Link
             href={user ? "/wishlist" : "#"}
             aria-label="Wishlist"
@@ -232,20 +215,20 @@ export function Header() {
                 openAuthModal();
               }
             }}
-            className="relative hidden h-10 w-10 items-center justify-center transition-colors hover:bg-accent/20 md:inline-flex"
+            className="relative hidden h-10 w-10 items-center justify-center transition-colors hover:bg-accent/10 sm:inline-flex"
           >
             <Heart className="h-5 w-5" />
           </Link>
 
-          {/* Cart */}
+          {/* Desktop Cart — visible from medium screens (sm and above) */}
           <Link
             href="/cart"
             aria-label="Cart"
-            className="relative hidden h-10 w-10 items-center justify-center hover:bg-accent/20 md:inline-flex"
+            className="relative hidden h-10 w-10 items-center justify-center transition-colors hover:bg-accent/10 sm:inline-flex"
           >
             <ShoppingBag className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
                 {count}
               </span>
             )}
@@ -253,16 +236,16 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile search bar — slides in below header */}
-      {showMobileSearch && (
-        <div className="border-b border-border bg-background md:hidden">
+      {/* Mobile search bar — hidden */}
+      {false && (
+        <div className="border-b border-border/40 bg-background lg:hidden">
           <div className="container py-2.5">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 autoFocus
                 placeholder="Search for bags, wallets…"
-                className="h-9 bg-muted/60 pl-9"
+                className="h-9 w-full bg-muted/40 pl-9 pr-3 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -274,7 +257,7 @@ export function Header() {
       {/* Mobile drawer */}
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/40 md:hidden"
+          className="fixed inset-0 z-50 bg-foreground/40 lg:hidden"
           onClick={() => setOpen(false)}
         >
           <aside
