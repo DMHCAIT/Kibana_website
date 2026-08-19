@@ -139,9 +139,9 @@ export async function POST(request: Request) {
       userId = existing[0].id;
       userData = {
         id: existing[0].id,
-        email: existing[0].email,
+        email: existing[0].email!,
         name: existing[0].name || name,
-        phone: existing[0].phone,
+        phone: existing[0].phone || undefined,
       };
     } else {
       // Create new user

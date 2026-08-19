@@ -25,8 +25,8 @@ const TREND_CARD_LINKS: Record<string, string> = {
 };
 
 const TREND_CARD_NAMES: Record<string, string> = {
-  p1: "Shoulder Bag",
-  p7: "Owryn Laptop Bag",
+  p1: "Cordia Shoulder bag ",
+  p7: "Owryn Backpack",
 };
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {

@@ -35,7 +35,7 @@ const NEW_ARRIVALS_ITEMS = [
     slug: "crescent-sling-bag",
     name: "Crescent Sling Bag",
     image: "/mv/new-4.jpg",
-    colorSlug: "milky-blue",
+    colorSlug: "turquoise-blue",
   },
 ];
 
