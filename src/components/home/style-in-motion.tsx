@@ -10,25 +10,25 @@ const FALLBACK_TILES: { alt: string; label: string; href: string; video?: string
   {
     alt: "Sandesh Laptop Bag",
     label: "Sandesh Laptop Bag",
-    href: "/shop/sandesh-laptop-bag",
+    href: "/shop/sandesh-laptop-bag?color=tan",
     video: "/videos/compressed/Sandesh%20Laptop%20bag.mp4",
   },
   {
     alt: "Vistara Tote Bag",
     label: "Vistara Tote Bag",
-    href: "/shop/vistara-tote-bag",
+    href: "/shop/vistara-tote-bag?color=tan",
     video: "/videos/compressed/VISTARA%20TOTE%20BAG.mp4",
   },
   {
     alt: "Prizma Sling Bag",
     label: "Prizma Sling Bag",
-    href: "/shop/prizma-sling-bag",
+    href: "/shop/prizma-sling-bag?color=tan",
     video: "/videos/compressed/PRIZMA%20SLING.mp4",
   },
   {
     alt: "Vistara Bag Pack",
     label: "Vistara Bag Pack",
-    href: "/shop/vistapack",
+    href: "/shop/vistapack?color=tan",
     video: "/videos/compressed/HALO%20MINI%20Optimized.mp4",
   },
 ];
@@ -139,7 +139,7 @@ export function StyleInMotion({ products = [] }: { products?: Product[] }) {
             {
               alt: product.name,
               label: product.name,
-              href: `/shop/${product.slug}`,
+              href: `/shop/${product.slug}?color=tan`,
               video: VIDEO_BY_SLUG[slug],
             },
           ];
