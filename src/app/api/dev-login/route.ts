@@ -33,7 +33,7 @@ export async function GET() {
       .where(eq(usersTable.email, TEST_EMAIL))
       .limit(1);
 
-    let user = users[0];
+    const user = users[0];
 
     // If not in DB, create locally
     if (!user) {
