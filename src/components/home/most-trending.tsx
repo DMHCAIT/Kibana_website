@@ -17,10 +17,16 @@ const TREND_CARD_IMAGES: Record<string, string> = {
 };
 
 const TREND_CARD_LINKS: Record<string, string> = {
+  p1: "/shop/cordia-bag?color=tan",
   p2: "/shop/prizma-sling-bag?color=teal-blue",
   p7: "/shop/orwyn-backpack?color=tan",
   p9: "/shop/valera-dome?color=forest-green",
   p10: "/shop/cordia-bag?color=lime-yellow",
+};
+
+const TREND_CARD_NAMES: Record<string, string> = {
+  p1: "Shoulder Bag",
+  p7: "Owryn Laptop Bag",
 };
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
@@ -73,7 +79,7 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
                 {/* Overlay at bottom with product name */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/60 to-transparent px-3 pb-4 pt-12 sm:px-4">
                   <p className="line-clamp-2 text-center text-xs font-semibold uppercase leading-snug tracking-[0.15em] text-white sm:text-sm">
-                    {p.name}
+                    {TREND_CARD_NAMES[p.id] ?? p.name}
                   </p>
                 </div>
               </Link>
