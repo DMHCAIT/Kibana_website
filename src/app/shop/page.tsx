@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 
 type SearchParams = {
   cat?: string;
+  category?: string;
   q?: string;
   sort?: string;
   slugs?: string;
@@ -66,7 +67,15 @@ function toVariantListingItems(product: Product): ProductListItem[] {
 }
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const { cat, q, sort = "featured", slugs, title } = await searchParams;
+  const {
+    cat: rawCat,
+    category: rawCategory,
+    q,
+    sort = "featured",
+    slugs,
+    title,
+  } = await searchParams;
+  const cat = rawCat || rawCategory;
   const products = await getProducts();
   const categories = await getCategories();
   const selectedCategories = cat

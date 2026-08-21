@@ -451,7 +451,7 @@
     ],
     "category": "clutch",
     "gender": "women",
-    "colors": ["#B8D4E0", "#98D8C8", "#C9A77B", "#40E0D0", "#722F37"],
+    "colors": ["#B8D4E0", "#98D8C8", "#C9A77B", "#04B4C1", "#572342"],
     "colorVariants": [
       {
         "color": "#B8D4E0",
@@ -501,8 +501,8 @@
         ]
       },
       {
-        "color": "#40E0D0",
-        "hex": "#40E0D0",
+        "color": "#04B4C1",
+        "hex": "#04B4C1",
         "slug": "turquoise-blue",
         "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Turquoise Blue]",
         "stockQty": 50,
@@ -517,8 +517,8 @@
         ]
       },
       {
-        "color": "#722F37",
-        "hex": "#722F37",
+        "color": "#572342",
+        "hex": "#572342",
         "slug": "wine",
         "productTitle": "Lekha Envelope Vegan Leather Zip Around Women's Wallet - [Wine]",
         "stockQty": 50,
@@ -569,7 +569,7 @@
     ],
     "category": "wallet",
     "gender": "women",
-    "colors": ["#98D8C8", "#B8D4E0", "#C9A77B", "#40E0D0"],
+    "colors": ["#98D8C8", "#B8D4E0", "#C9A77B", "#04B4C1"],
     "colorVariants": [
       {
         "color": "#98D8C8",
@@ -619,8 +619,8 @@
         ]
       },
       {
-        "color": "#40E0D0",
-        "hex": "#40E0D0",
+        "color": "#04B4C1",
+        "hex": "#04B4C1",
         "slug": "turquoise-blue",
         "productTitle": "Classic Vegan Leather Zip Around Wallet - [Teal Blue]",
         "stockQty": 2,
@@ -672,7 +672,7 @@
     "category": "tote-bag",
     "gender": "women",
     "isTrending": true,
-    "colors": ["#8B6456", "#722F37"],
+    "colors": ["#8B6456", "#572342"],
     "colorVariants": [
       {
         "color": "#8B6456",
@@ -691,8 +691,8 @@
         ]
       },
       {
-        "color": "#722F37",
-        "hex": "#722F37",
+        "color": "#572342",
+        "hex": "#572342",
         "slug": "wine",
         "productTitle": "Aurelia Fan Silhouette Structured Tote Bag - [Wine]",
         "stockQty": 10,
@@ -799,7 +799,7 @@
     "category": "sling-bag",
     "gender": "women",
     "isTrending": true,
-    "colors": ["#1A1A1A", "#3C7A5A", "#B8D4E0", "#4169E1"],
+    "colors": ["#1A1A1A", "#234733", "#B8D4E0", "#4169E1"],
     "colorVariants": [
       {
         "color": "#1A1A1A",
@@ -817,8 +817,8 @@
         ]
       },
       {
-        "color": "#3C7A5A",
-        "hex": "#3C7A5A",
+        "color": "#234733",
+        "hex": "#234733",
         "slug": "forest-green",
         "productTitle": "Valera Dome Vegan Leather Crossbody Sling Bag - Forest Green",
         "stockQty": 10,
@@ -1000,7 +1000,7 @@
     "gender": "women",
     "isTrending": true,
     "isNew": true,
-    "colors": ["#1A1A1A", "#3C7A5A", "#C9A77B", "#40E0D0", "#722F37"],
+    "colors": ["#1A1A1A", "#234733", "#C9A77B", "#04B4C1", "#572342"],
     "colorVariants": [
       {
         "color": "#1A1A1A",
@@ -1018,8 +1018,8 @@
         ]
       },
       {
-        "color": "#3C7A5A",
-        "hex": "#3C7A5A",
+        "color": "#234733",
+        "hex": "#234733",
         "slug": "forest-green",
         "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Forest Green",
         "stockQty": 10,
@@ -1048,8 +1048,8 @@
         ]
       },
       {
-        "color": "#40E0D0",
-        "hex": "#40E0D0",
+        "color": "#04B4C1",
+        "hex": "#04B4C1",
         "slug": "turquoise-blue",
         "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Turquoise Blue",
         "stockQty": 10,
@@ -1063,8 +1063,8 @@
         ]
       },
       {
-        "color": "#722F37",
-        "hex": "#722F37",
+        "color": "#572342",
+        "hex": "#572342",
         "slug": "wine",
         "productTitle": "Halo Mini Chain Sling Bag in Vegan Leather - Wine",
         "stockQty": 10,
@@ -1184,7 +1184,7 @@
     "category": "sling-bag",
     "gender": "women",
     "isNew": true,
-    "colors": ["#B8D4E0", "#40E0D0", "#722F37"],
+    "colors": ["#B8D4E0", "#04B4C1", "#572342"],
     "colorVariants": [
       {
         "color": "#B8D4E0",
@@ -1202,8 +1202,8 @@
         ]
       },
       {
-        "color": "#40E0D0",
-        "hex": "#40E0D0",
+        "color": "#04B4C1",
+        "hex": "#04B4C1",
         "slug": "turquoise-blue",
         "productTitle": "Crescent Vegan Leather Crossbody Sling with Chain Strap - Turquoise Blue",
         "stockQty": 10,
@@ -1217,8 +1217,8 @@
         ]
       },
       {
-        "color": "#722F37",
-        "hex": "#722F37",
+        "color": "#572342",
+        "hex": "#572342",
         "slug": "wine",
         "productTitle": "Crescent Vegan Leather Crossbody Sling with Chain Strap - Wine",
         "stockQty": 10,

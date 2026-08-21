@@ -33,10 +33,10 @@ export function ProductCarousel({ items }: Props) {
   useEffect(() => {
     // Check scroll on mount and when items change
     checkScroll();
-    
+
     // Also check after a short delay to account for image loading
     const timer = setTimeout(checkScroll, 500);
-    
+
     return () => clearTimeout(timer);
   }, [items]);
 
@@ -56,7 +56,7 @@ export function ProductCarousel({ items }: Props) {
       <div
         ref={scrollContainerRef}
         onScroll={checkScroll}
-        className="overflow-x-auto scrollbar-hide"
+        className="scrollbar-hide overflow-x-auto"
         style={{
           scrollBehavior: "smooth",
           display: "flex",
@@ -65,14 +65,7 @@ export function ProductCarousel({ items }: Props) {
         }}
       >
         {items.map((item, index) => (
-          <div
-            key={item.key}
-            style={{
-              flex: "0 0 calc(25% - 0.75rem)",
-              minWidth: "250px",
-            }}
-            className="hidden sm:block"
-          >
+          <div key={item.key} className="w-[165px] shrink-0 sm:w-[220px] md:w-[250px]">
             <ProductCard
               product={item.product}
               href={item.href}
@@ -90,10 +83,10 @@ export function ProductCarousel({ items }: Props) {
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 -translate-x-4 sm:-translate-x-6 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all"
+          className="absolute left-0 top-1/2 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-lg transition-all hover:bg-white sm:-translate-x-6"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
       )}
 
@@ -101,10 +94,10 @@ export function ProductCarousel({ items }: Props) {
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 translate-x-4 sm:translate-x-6 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all"
+          className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-4 rounded-full bg-white/80 p-2 shadow-lg transition-all hover:bg-white sm:translate-x-6"
           aria-label="Scroll right"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       )}
 

@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 // Hero banner images — mobile and desktop versions per slide
 const heroSlides = [
   {
-    mobile: "/mv/mobile-banner-independence day.jpg",
-    desktop: "/mv/hero-banner.jpg",
-    alt: "Independence Day Collection",
+    mobile: "/rakhi/rakhi banner for kibana website M.jpeg",
+    desktop: "/rakhi/rakhi banner for kuibana website D.jpeg",
+    alt: "Rakhi Collection",
     href: "/shop",
   },
 ];
@@ -127,15 +127,12 @@ export function HeroBanner() {
             style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
           />
           {/* Shop Now Button */}
-          <div
-            className="absolute z-20"
-            style={{ top: "68%", left: "18%", transform: "translateX(-50%)" }}
-          >
+          <div className="absolute z-20" style={{ top: "40.5%", left: "10.5%" }}>
             <button
               onClick={handleBannerClick}
-              className="xs:px-4 xs:py-1.5 xs:text-sm whitespace-nowrap rounded-lg bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-orange-600 sm:px-5 sm:py-2 sm:text-base md:px-6"
+              className="whitespace-nowrap rounded-[4px] bg-[#C99B3B] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#221808] shadow-md transition-all hover:scale-105 hover:bg-[#B88A2A] active:scale-95 sm:px-5 sm:py-2 sm:text-xs"
             >
-              Shop Now
+              SHOP NOW
             </button>
           </div>
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-3">
@@ -180,15 +177,12 @@ export function HeroBanner() {
             style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
           />
           {/* Shop Now Button */}
-          <div
-            className="absolute z-20"
-            style={{ top: "86%", left: "12%", transform: "translateX(-50%)" }}
-          >
+          <div className="absolute z-20" style={{ top: "72.5%", left: "12.5%" }}>
             <button
               onClick={handleBannerClick}
-              className="whitespace-nowrap rounded-lg bg-orange-500 px-3 py-0.5 text-xs font-semibold text-white shadow-lg transition-colors hover:bg-orange-600 sm:px-4 sm:py-1 sm:text-xs md:px-5 md:py-1.5 md:text-sm lg:px-6 lg:py-2 lg:text-base xl:px-8"
+              className="xl:px-7 xl:py-3 xl:text-base whitespace-nowrap rounded-[4px] bg-[#C99B3B] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#221808] shadow-md transition-all hover:scale-105 hover:bg-[#B88A2A] active:scale-95 md:px-5 md:py-2 md:text-xs lg:px-6 lg:py-2.5 lg:text-sm"
             >
-              Shop Now
+              SHOP NOW
             </button>
           </div>
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-6 sm:gap-3">

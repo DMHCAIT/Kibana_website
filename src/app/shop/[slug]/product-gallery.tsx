@@ -92,11 +92,11 @@ export function ProductGallery({
           onTouchMove: handleTouchMove,
           onTouchEnd: handleTouchEnd,
           className:
-            "relative mx-auto aspect-[8/11] w-full max-w-[512px] touch-pan-y overflow-hidden rounded-lg bg-white select-none",
+            "relative aspect-[8/11] w-[300px] sm:w-[360px] md:w-[400px] lg:w-[460px] max-w-full touch-pan-y overflow-hidden rounded-lg bg-white select-none",
         }
       : {
           className:
-            "relative mx-auto aspect-[8/11] w-full max-w-[512px] overflow-hidden rounded-lg bg-white",
+            "relative aspect-[8/11] w-[300px] sm:w-[360px] md:w-[400px] lg:w-[460px] max-w-full overflow-hidden rounded-lg bg-white",
         };
 
   return (
@@ -157,8 +157,8 @@ export function ProductGallery({
         )}
       </div>
 
-      {/* ── Desktop: vertical thumbs on left → main image on right ── */}
-      <div className="hidden w-full flex-row gap-6 md:flex">
+      {/* ── Desktop: vertical thumbs on left → main image on right (left aligned) ── */}
+      <div className="hidden w-full flex-row gap-3 sm:gap-4 md:flex">
         {/* Vertical thumb strip — scrollable, no arrows */}
         {allImages.length > 1 && (
           <div
@@ -185,8 +185,8 @@ export function ProductGallery({
           </div>
         )}
 
-        {/* Main image — fluid up to 512px wide so it never overflows on tablets */}
-        <div className="min-w-0 flex-1 rounded-lg bg-[#f5f1ed] p-6">
+        {/* Main image — snug container to prevent trailing whitespace */}
+        <div className="w-fit min-w-0 shrink-0 rounded-lg bg-[#f5f1ed] p-3 sm:p-4">
           <div {...desktopSwipeProps}>
             {!variantInStock && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">

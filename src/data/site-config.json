@@ -68,7 +68,7 @@
     "fontHeading": "playfair",
     "fontBody": "inter"
   },
-  "announcementBar": "INDEPENDENCE DAY SALE · UPTO 60% OFF ON SELECTED STYLES · 100% PREMIUM VEGAN LEATHER · HAND-FINISHED. EVERY PIECE. EVERY TIME. · FREE SHIPPING ON ORDERS ABOVE ₹999",
+  "announcementBar": "RAKHI SALE · UPTO 60% OFF ON SELECTED STYLES · 100% PREMIUM VEGAN LEATHER · THIS RAKHI GIFT HER SOMETHING SHE'LL CARRY EVERYDAY. · FREE SHIPPING ON ORDERS ABOVE ₹999",
   "sectionContent": {
     "bestSellers": {
       "leftImage": "/mv/best-seller-B.jpg.jpeg",
@@ -89,10 +89,22 @@
       "content": "Kibana Life was born from a simple idea: luxury shouldn't come at the cost of the planet. Our vegan leather bags are handcrafted by skilled artisans, combining timeless design with modern ethics. Every stitch, every clasp, every detail is thoughtfully considered to give you a bag that lasts.",
       "heroImage": "/extracted/img-010.jpg",
       "stats": [
-        { "number": "10K+", "label": "Happy Customers" },
-        { "number": "50+", "label": "Unique Designs" },
-        { "number": "100%", "label": "Vegan Leather" },
-        { "number": "2Y", "label": "Warranty" }
+        {
+          "number": "10K+",
+          "label": "Happy Customers"
+        },
+        {
+          "number": "50+",
+          "label": "Unique Designs"
+        },
+        {
+          "number": "100%",
+          "label": "Vegan Leather"
+        },
+        {
+          "number": "2Y",
+          "label": "Warranty"
+        }
       ]
     },
     "contact": {

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Truck, Calendar, RotateCcw } from "lucide-react";
 import { getProductBySlug, getProductsByCategory } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
@@ -265,9 +265,9 @@ export default async function ProductDetailPage({
     <>
       <TrackProductView product={product} variant={activeVariant} />
       <section className="container py-1 pb-16 sm:py-4 sm:pb-20 md:py-8 md:pb-8">
-        <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-8 sm:px-4 md:px-8 lg:grid-cols-[minmax(0,620px)_1fr] lg:gap-12">
+        <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-6 sm:px-4 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8 md:px-8 lg:gap-12">
           {/* Gallery Column with Header */}
-          <div className="w-full min-w-0">
+          <div className="w-full min-w-0 md:w-auto">
             <ShopHeader heading={categoryLabel} showSort={false} />
             <ProductGallery
               images={allImages}
@@ -278,8 +278,8 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Details */}
-          <div className="w-full min-w-0 pt-1 sm:pt-2 md:pt-0">
-            <h1 className="mt-1 break-words font-display text-lg leading-tight sm:text-2xl md:text-4xl">
+          <div className="w-full min-w-0 pt-3 sm:pt-6 md:pt-11">
+            <h1 className="break-words font-display text-lg leading-tight sm:text-2xl md:text-4xl">
               {activeProductTitle}
             </h1>
 
@@ -330,9 +330,27 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            <p className="mt-2 text-xs leading-relaxed text-foreground/75 sm:mt-3 sm:text-sm">
-              {activeDescription}
-            </p>
+            {/* Value Proposition SVG Badges */}
+            <div className="mt-3 grid grid-cols-3 gap-2 border-y border-border/60 py-2.5 sm:mt-4 sm:gap-3 sm:py-3">
+              <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:justify-start sm:gap-2 sm:text-left">
+                <Truck className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
+                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
+                  Free Shipping
+                </span>
+              </div>
+              <div className="flex flex-col items-center justify-center gap-1.5 border-x border-border/60 px-1 text-center sm:flex-row sm:justify-start sm:gap-2 sm:px-2 sm:text-left">
+                <Calendar className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
+                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
+                  5-7 Days Delivery
+                </span>
+              </div>
+              <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:justify-start sm:gap-2 sm:text-left">
+                <RotateCcw className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
+                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
+                  Easy Returns
+                </span>
+              </div>
+            </div>
 
             {product.colors.length > 0 && (
               <div className="mt-3 sm:mt-4">
@@ -366,95 +384,118 @@ export default async function ProductDetailPage({
             <div className="mt-4 sm:mt-5">
               <AddToCartButton product={product} activeVariantSlug={activeVariant?.slug} />
             </div>
+          </div>
+        </div>
 
-            {/* Delivery & Share */}
-            <div className="mt-4 space-y-3 border-t border-border pt-3 sm:mt-5 sm:space-y-4 sm:pt-4">
-              <DeliveryCheck />
-              <div>
-                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
-                  Share Product
-                </h3>
-                <WhatsAppShare
-                  product={product}
-                  price={product.price}
-                  colorSlug={activeVariant?.slug}
-                />
-              </div>
+        {/* Full-width Secondary Details (Delivery, Share, Features, Specs & Shipping Accordions) */}
+        <div className="mx-auto mt-6 w-full max-w-6xl px-3 sm:mt-8 sm:px-4 md:px-8">
+          {/* Delivery & Share */}
+          <div className="space-y-3 border-t border-border pt-4 sm:space-y-4 sm:pt-6">
+            <DeliveryCheck />
+            <div>
+              <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
+                Share Product
+              </h3>
+              <WhatsAppShare
+                product={product}
+                price={product.price}
+                colorSlug={activeVariant?.slug}
+              />
             </div>
+          </div>
 
-            {/* Key Features */}
-            {activeFeatures.length > 0 && (
-              <div className="mt-4 border-t border-border pt-3 sm:mt-5 sm:pt-4">
-                <h3 className="mb-2 text-xs font-semibold sm:mb-3 sm:text-sm">Key Features</h3>
-                <ul className="grid grid-cols-1 gap-y-1.5 sm:gap-y-2">
-                  {activeFeatures.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <Check className="mt-0.5 h-3 w-3 shrink-0 text-kibana-camel sm:h-3.5 sm:w-3.5" />
-                      <span className="text-[10px] leading-snug text-kibana-ink/70 sm:text-xs">
-                        {f}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Accordions */}
-            <div className="mt-4 divide-y divide-border border-t border-border sm:mt-5">
-              <details className="group py-3 sm:py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold sm:text-sm">
-                  Product Details
-                  <svg
-                    className="h-3.5 w-3.5 transition-transform group-open:rotate-180 sm:h-4 sm:w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </summary>
-                <div className="mt-1 divide-y divide-border">
-                  {Object.entries(activeSpecs).map(([label, value]) => (
-                    <div key={label} className="flex items-start gap-2 py-2 sm:gap-3 sm:py-2.5">
-                      <span className="w-20 shrink-0 text-[10px] font-medium text-kibana-camel sm:w-28 sm:text-xs">
-                        {label}
-                      </span>
-                      <span className="text-[10px] text-foreground/75 sm:text-xs">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </details>
-              <details className="group py-3 sm:py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold sm:text-sm">
-                  Shipping &amp; Returns
-                  <svg
-                    className="h-3.5 w-3.5 transition-transform group-open:rotate-180 sm:h-4 sm:w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </summary>
-                <div className="mt-2 space-y-1.5 border border-border p-2 sm:mt-3 sm:space-y-2.5 sm:p-4">
-                  {[
-                    "Free shipping on all orders above ₹999",
-                    "Easy returns within 7 days of delivery",
-                    "Products must be unused and in original packaging",
-                  ].map((line) => (
-                    <p
-                      key={line}
-                      className="flex items-start gap-2 text-[10px] leading-snug text-kibana-ink/70 sm:text-xs"
-                    >
-                      <span className="mt-0.5 shrink-0 text-kibana-tan">•</span>
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              </details>
+          {/* Key Features */}
+          {activeFeatures.length > 0 && (
+            <div className="mt-6 border-t border-border pt-4 sm:mt-8 sm:pt-6">
+              <h3 className="mb-2 text-xs font-semibold sm:mb-3 sm:text-sm md:text-base">
+                Key Features
+              </h3>
+              <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-3">
+                {activeFeatures.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-kibana-camel" />
+                    <span className="text-xs leading-snug text-kibana-ink/70 sm:text-sm">{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
+          )}
+
+          {/* Accordions */}
+          <div className="mt-6 divide-y divide-border border-t border-border sm:mt-8">
+            {/* Description Accordion */}
+            <details className="group py-3 sm:py-4" open>
+              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                Description
+                <svg
+                  className="h-4 w-4 transition-transform group-open:rotate-180"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+              <p className="mt-2 text-xs font-light leading-relaxed text-stone-600 sm:mt-3 sm:text-sm">
+                {activeDescription}
+              </p>
+            </details>
+
+            <details className="group py-3 sm:py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                Product Details
+                <svg
+                  className="h-4 w-4 transition-transform group-open:rotate-180"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+              <div className="mt-2 divide-y divide-border">
+                {Object.entries(activeSpecs).map(([label, value]) => (
+                  <div key={label} className="flex items-start gap-4 py-2 sm:py-2.5">
+                    <span className="w-28 shrink-0 text-xs font-medium text-kibana-camel sm:w-36">
+                      {label}
+                    </span>
+                    <span className="text-xs font-light text-stone-600 sm:text-sm">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
+
+            <details className="group py-3 sm:py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                Shipping &amp; Returns
+                <svg
+                  className="h-4 w-4 transition-transform group-open:rotate-180"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+              <div className="mt-2 space-y-2 border border-border p-3 sm:mt-3 sm:space-y-2.5 sm:p-4">
+                {[
+                  "Free shipping on all orders above ₹999",
+                  "Easy returns within 7 days of delivery",
+                  "Products must be unused and in original packaging",
+                ].map((line) => (
+                  <p
+                    key={line}
+                    className="flex items-start gap-2 text-xs font-light leading-snug text-stone-600 sm:text-sm"
+                  >
+                    <span className="mt-0.5 shrink-0 text-kibana-tan">•</span>
+                    {line}
+                  </p>
+                ))}
+              </div>
+            </details>
           </div>
         </div>
       </section>
