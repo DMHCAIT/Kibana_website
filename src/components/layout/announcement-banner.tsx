@@ -26,7 +26,7 @@ export function AnnouncementBanner({ text }: { text?: string }) {
               <span key={j} className="flex items-center">
                 <span
                   className={`px-6 text-[11px] uppercase tracking-widest ${
-                    phrase.includes("100% PREMIUM VEGAN LEATHER") ? "font-light" : "font-medium"
+                    phrase.includes("100% PREMIUM VEGAN LEATHER") ? "font-medium" : "font-medium"
                   }`}
                 >
                   {phrase}
