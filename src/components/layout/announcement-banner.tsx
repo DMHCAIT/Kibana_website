@@ -1,10 +1,4 @@
-const DEFAULT_PHRASES = [
-  "RAKHI SALE",
-  "UPTO 60% OFF ON SELECTED STYLES",
-  "100% PREMIUM VEGAN LEATHER",
-  "THIS RAKHI GIFT HER SOMETHING SHE'LL CARRY EVERYDAY.",
-  "FREE SHIPPING ON ORDERS ABOVE ₹999",
-];
+const DEFAULT_PHRASES = ["100% PREMIUM VEGAN LEATHER", "FREE SHIPPING ON ORDERS ABOVE ₹999"];
 
 export function AnnouncementBanner({ text }: { text?: string }) {
   const phrases = text
