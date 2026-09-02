@@ -8,7 +8,6 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Trash2,
   Search,
   ChevronUp,
   ChevronDown,
@@ -116,24 +115,6 @@ export function OrdersClient({ initialOrders }: Props) {
       }
     } catch (err) {
       console.error("Failed to update order status", err);
-    }
-  }
-
-  async function deleteOrder(orderId: string) {
-    if (!confirm("Are you sure you want to delete this order?")) return;
-
-    try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        setOrders((prev) => prev.filter((o) => o.id !== orderId));
-        setSelectedOrder(null);
-      }
-    } catch (err) {
-      console.error("Failed to delete order", err);
     }
   }
 
@@ -405,15 +386,6 @@ export function OrdersClient({ initialOrders }: Props) {
                   <span>{formatINR(selectedOrderData.total)}</span>
                 </div>
               </div>
-
-              {/* Delete */}
-              <button
-                onClick={() => deleteOrder(selectedOrderData.id)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-200"
-              >
-                <Trash2 size={16} />
-                Delete Order
-              </button>
             </div>
           </div>
         )}
