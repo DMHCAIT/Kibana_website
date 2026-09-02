@@ -7,10 +7,15 @@ import { useRouter } from "next/navigation";
 // Hero banner images — mobile and desktop versions per slide
 const heroSlides = [
   {
-    mobile: "/rakhi/rakhi banner for kibana website M.jpeg",
-    desktop: "/rakhi/rakhi banner for kuibana website D.jpeg",
-    alt: "Rakhi Collection",
+    mobile: "mv/hero1.jpg.jpeg",
+    desktop: "mv/women-hero-desktop.jpg.jpeg",
+    alt: "Women's Collection",
     href: "/shop",
+  },
+  {
+    mobile: "mv/hero2.jpg.jpeg",
+    desktop: "mv/men-hero-desktop.jpg.jpeg",
+    alt: "Rakhi Collection",
   },
 ];
 
@@ -126,15 +131,6 @@ export function HeroBanner() {
             {...imageProps}
             style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
           />
-          {/* Shop Now Button */}
-          <div className="absolute z-20" style={{ top: "40.5%", left: "10.5%" }}>
-            <button
-              onClick={handleBannerClick}
-              className="whitespace-nowrap rounded-[4px] bg-[#C99B3B] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#221808] shadow-md transition-all hover:scale-105 hover:bg-[#B88A2A] active:scale-95 sm:px-5 sm:py-2 sm:text-xs"
-            >
-              SHOP NOW
-            </button>
-          </div>
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-3">
             {heroSlides.map((_, index) => (
               <button
@@ -176,15 +172,6 @@ export function HeroBanner() {
             {...imageProps}
             style={{ opacity: 1, transition: "opacity 0.6s ease-in-out" }}
           />
-          {/* Shop Now Button */}
-          <div className="absolute z-20" style={{ top: "72.5%", left: "12.5%" }}>
-            <button
-              onClick={handleBannerClick}
-              className="xl:px-7 xl:py-3 xl:text-base whitespace-nowrap rounded-[4px] bg-[#C99B3B] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#221808] shadow-md transition-all hover:scale-105 hover:bg-[#B88A2A] active:scale-95 md:px-5 md:py-2 md:text-xs lg:px-6 lg:py-2.5 lg:text-sm"
-            >
-              SHOP NOW
-            </button>
-          </div>
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 sm:bottom-6 sm:gap-3">
             {heroSlides.map((_, index) => (
               <button

@@ -17,7 +17,7 @@ export function AnnouncementBanner({ text }: { text?: string }) {
   return (
     <div
       className="w-full overflow-hidden py-2 text-[#fadca0]"
-      style={{ backgroundColor: "#b83530" }}
+      style={{ backgroundColor: "#080808" }}
     >
       <div className="flex animate-marquee whitespace-nowrap">
         {[...Array(3)].map((_, i) => (

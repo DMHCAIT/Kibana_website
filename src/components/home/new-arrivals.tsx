@@ -88,7 +88,7 @@ export function NewArrivals({ products }: { products: Product[] }) {
 
   return (
     <>
-      <RakhiCollection />
+      {/* <RakhiCollection /> */}
       <section className="w-full bg-[#f5f0e8]">
         <div className="container py-3 md:py-7">
           <SectionHeading title="Shop by New Arrivals" className="pt-2 md:pt-3" />
