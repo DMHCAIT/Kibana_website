@@ -15,7 +15,8 @@ const heroSlides = [
   {
     mobile: "mv/hero2.jpg.jpeg",
     desktop: "mv/men-hero-desktop.jpg.jpeg",
-    alt: "Rakhi Collection",
+    alt: "Men's Collection",
+    href: "/shop",
   },
 ];
 
