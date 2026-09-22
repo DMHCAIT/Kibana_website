@@ -87,12 +87,12 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  // ⚡ Check cache first (60 second TTL - increased since we have ISR)
+  // ⚡ Check cache first (5 second TTL for fresh prices/discounts/stock - shop page has revalidate=0)
   const cached = getCached("products");
   if (cached) return cached as Product[];
 
   if (!hasDatabase) {
-    setCached("products", localProducts, 60000);
+    setCached("products", localProducts, 5000);
     return localProducts;
   }
 
@@ -100,50 +100,50 @@ export async function getProducts(): Promise<Product[]> {
     db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
   const result = rows && rows.length > 0 ? rows.map(rowToProduct) : localProducts;
-  setCached("products", result, 60000); // Cache for 60 seconds (ISR handles revalidation)
+  setCached("products", result, 5000); // Cache for 5 seconds (shop page needs fresh prices/discounts/stock)
   return result;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
-  // ⚡ Check individual product cache first (60 second TTL - ISR handles revalidation)
+  // ⚡ Check individual product cache first (5 second TTL for fresh prices/stock)
   const cached = getCached(`product-${id}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000);
+    setCached(`product-${id}`, product, 5000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000); // Cache for 60 seconds
+    setCached(`product-${id}`, product, 5000); // Cache for 5 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 60000);
+    setCached(`product-${id}`, product, 5000);
     return product;
   }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  // ⚡ Check individual product cache first (60 second TTL - ISR handles revalidation)
+  // ⚡ Check individual product cache first (5 second TTL for fresh prices/stock)
   const cached = getCached(`product-slug-${slug}`);
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000);
+    setCached(`product-slug-${slug}`, product, 5000);
     return product;
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
     const product = row ? rowToProduct(row) : localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000); // Cache for 60 seconds
+    setCached(`product-slug-${slug}`, product, 5000); // Cache for 5 seconds
     return product;
   } catch {
     const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 60000);
+    setCached(`product-slug-${slug}`, product, 5000);
     return product;
   }
 }
@@ -211,7 +211,7 @@ export async function getProductsByCategory(
     const products = localProducts.filter(
       (p) => p.category === category && (!excludeId || p.id !== excludeId),
     );
-    setCached(cacheKey, products, 60000);
+    setCached(cacheKey, products, 5000);
     return products;
   }
 
@@ -231,13 +231,13 @@ export async function getProductsByCategory(
             (p) => p.category === category && (!excludeId || p.id !== excludeId),
           );
 
-    setCached(cacheKey, products, 60000);
+    setCached(cacheKey, products, 5000);
     return products;
   } catch {
     const products = localProducts.filter(
       (p) => p.category === category && (!excludeId || p.id !== excludeId),
     );
-    setCached(cacheKey, products, 60000);
+    setCached(cacheKey, products, 5000);
     return products;
   }
 }
