@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useProductCache } from "@/store/product-cache";
 import {
   X,
   Plus,
@@ -300,6 +301,9 @@ export function EnhancedProductForm({ product, categories, isNew = false }: Prop
 
       const result = await res.json();
       console.log("✅ Save response:", result);
+
+      // ✅ Invalidate client-side product cache so frontend fetches fresh data
+      useProductCache.getState().invalidate();
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

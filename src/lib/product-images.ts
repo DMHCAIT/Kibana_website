@@ -27,6 +27,34 @@ export function getShopDisplayImage(
   product: Product,
   variant: Product["colorVariants"][number],
 ): string {
+  // ✅ FIXED: Use database images first, only apply hardcoded rules for specific products
+  // This ensures admin-uploaded images are displayed, while preserving intentional design overrides
+
+  // Default fallback: use variant image or product image from database
+  const dbImage = variant.image || product.image;
+
+  // For products without special image handling needs, use database image directly
+  if (
+    product.slug !== "prizma-sling-bag" &&
+    product.slug !== "valera-dome" &&
+    product.slug !== "cordia-bag" &&
+    product.slug !== "halo-mini" &&
+    product.slug !== "crescent-sling-bag" &&
+    product.slug !== "business-laptop-briefcase" &&
+    product.slug !== "lekha-wallet" &&
+    product.slug !== "zippy-wallet" &&
+    product.slug !== "vistara-tote-bag" &&
+    product.slug !== "large-aurelia-fan-tote" &&
+    product.slug !== "mini-aurelia-fan-tote" &&
+    product.slug !== "sandesh-laptop-bag" &&
+    product.slug !== "vistapack"
+  ) {
+    // Use database image with gallery fallback
+    return dbImage || variant.gallery?.[0] || product.gallery?.[0] || "/extracted/img-060.jpg";
+  }
+
+  // ✅ Hardcoded image rules for products that need specific design showcase images
+  // These are intentional overrides for marketing/design purposes
   if (product.slug === "prizma-sling-bag") {
     if (variant.slug === "teal-blue") {
       return (
@@ -137,7 +165,8 @@ export function getShopDisplayImage(
     }
     // Fallback to specific images per color
     const aureliaImageByColor: Record<string, string> = {
-      mocha: "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp",
+      mocha:
+        "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Mocha/02-04-2026--paulina06474_result.webp",
       wine: "/kibana_product_images/2%20collection/Large%20Aurelia%20fan%20tote/Wine/02-04-2026--paulina06342_result.webp",
     };
     const aureliaImage = aureliaImageByColor[variant.slug];
@@ -173,7 +202,7 @@ export function getShopDisplayImage(
       variant.slug === "tan"
         ? "6"
         : variant.slug === "milky-blue"
-          ? "1"
+          ? "4"
           : variant.slug === "mint-green"
             ? "6"
             : variant.slug === "teal-blue"
@@ -190,6 +219,7 @@ export function getShopDisplayImage(
     );
   }
 
+  // Final fallback for unlisted products
   return pickDefaultProductImage(
     variant.image || product.image,
     variant.gallery ?? product.gallery,

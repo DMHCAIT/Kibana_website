@@ -156,98 +156,15 @@ export default async function ProductDetailPage({
   const galleryImages = activeVariant?.gallery?.length
     ? activeVariant.gallery
     : (product.gallery ?? []);
-  const valeraImageByColor: Record<string, string> = {
-    black: "06",
-    "forest-green": "02",
-    "milky-blue": "01",
-    "royal-blue": "06",
-  };
-  const cordiaImageByColor: Record<string, string> = {
-    black: "01",
-    "light-purple": "06",
-    "lime-yellow": "06",
-  };
-  const crescentImageByColor: Record<string, string> = {
-    "milky-blue": "01",
-    "turquoise-blue": "06",
-    wine: "05",
-  };
-  const primaryImage =
-    product.slug === "valera-dome" && activeVariant?.slug
-      ? (activeVariant.image?.replace(
-          /Image\d+\.webp$/i,
-          `Image${valeraImageByColor[activeVariant.slug] ?? "01"}.webp`,
-        ) ??
-        activeVariant.image ??
-        product.image)
-      : product.slug === "cordia-bag" && activeVariant?.slug
-        ? (activeVariant.image?.replace(
-            /Image\d+\.webp$/i,
-            `Image${cordiaImageByColor[activeVariant.slug] ?? "01"}.webp`,
-          ) ??
-          activeVariant.image ??
-          product.image)
-        : product.slug === "halo-mini" && activeVariant?.slug === "turquoise-blue"
-          ? (activeVariant.image?.replace(/Image\d+\.webp$/i, "Image02.webp") ??
-            activeVariant.image ??
-            product.image)
-          : product.slug === "crescent-sling-bag" && activeVariant?.slug
-            ? (activeVariant.image?.replace(
-                /Image\d+\.webp$/i,
-                `Image${crescentImageByColor[activeVariant.slug] ?? "01"}.webp`,
-              ) ??
-              activeVariant.image ??
-              product.image)
-            : product.slug === "business-laptop-briefcase" && activeVariant?.slug
-              ? (activeVariant.image?.replace(
-                  /\/\d+\.webp$/i,
-                  `/${activeVariant.slug === "black" ? "7" : activeVariant.slug === "tan" ? "4" : "1"}.webp`,
-                ) ??
-                activeVariant.image ??
-                product.image)
-              : product.slug === "sandesh-laptop-bag" && activeVariant?.slug === "tan"
-                ? (activeVariant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
-                  galleryImages[5] ??
-                  activeVariant.image ??
-                  product.image)
-                : product.slug === "sandesh-laptop-bag" && activeVariant?.slug === "teal-blue"
-                  ? (activeVariant.image?.replace(/\/\d+\.webp$/i, "/7.webp") ??
-                    galleryImages[5] ??
-                    activeVariant.image ??
-                    product.image)
-                  : product.slug === "vistapack"
-                    ? (activeVariant?.image?.replace(
-                        /\/\d+\.webp$/i,
-                        `/${activeVariant?.slug === "tan" ? "6" : activeVariant?.slug === "milky-blue" ? "4" : activeVariant?.slug === "mint-green" || activeVariant?.slug === "teal-blue" ? "2" : "5"}.webp`,
-                      ) ??
-                      galleryImages[3] ??
-                      activeVariant?.image ??
-                      product.image)
-                    : product.slug === "lekha-wallet"
-                      ? (activeVariant.image?.replace(
-                          /\/\d+\.webp$/i,
-                          activeVariant?.slug === "wine" ? "/5.webp" : "/2.webp",
-                        ) ??
-                        galleryImages[0] ??
-                        activeVariant.image ??
-                        product.image)
-                      : product.slug === "zippy-wallet"
-                        ? (activeVariant?.image?.replace(/\/\d+\.webp$/i, "/1.webp") ??
-                          activeVariant?.image ??
-                          product.image)
-                        : product.slug === "prizma-sling-bag"
-                          ? (galleryImages[0] ?? activeVariant?.image ?? product.image)
-                          : pickDefaultProductImage(
-                              activeVariant?.image ?? product.image,
-                              galleryImages,
-                            );
-  const allImages = Array.from(
-    new Set(
-      product.slug === "lekha-wallet"
-        ? [primaryImage, activeVariant?.image, ...galleryImages].filter(Boolean)
-        : [primaryImage, ...galleryImages].filter(Boolean),
-    ),
-  );
+
+  // ✅ FIXED: Use database images by default, only override for specific products
+  // Use getShopDisplayImage for products with intentional image hardcoding
+  // For all other products, use the database image directly
+  const primaryImage = activeVariant
+    ? getShopDisplayImage(product, activeVariant) // Uses hardcoded rules for specific products
+    : pickDefaultProductImage(product.image, galleryImages);
+
+  const allImages = Array.from(new Set([primaryImage, ...galleryImages].filter(Boolean)));
 
   // Per-color content overrides (fall back to product-level if not set per-color)
   const activeDescription = activeVariant?.description || product.description;
@@ -384,118 +301,117 @@ export default async function ProductDetailPage({
             <div className="mt-4 sm:mt-5">
               <AddToCartButton product={product} activeVariantSlug={activeVariant?.slug} />
             </div>
-          </div>
-        </div>
 
-        {/* Full-width Secondary Details (Delivery, Share, Features, Specs & Shipping Accordions) */}
-        <div className="mx-auto mt-6 w-full max-w-6xl px-3 sm:mt-8 sm:px-4 md:px-8">
-          {/* Delivery & Share */}
-          <div className="space-y-3 border-t border-border pt-4 sm:space-y-4 sm:pt-6">
-            <DeliveryCheck />
-            <div>
-              <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
-                Share Product
-              </h3>
-              <WhatsAppShare
-                product={product}
-                price={product.price}
-                colorSlug={activeVariant?.slug}
-              />
-            </div>
-          </div>
-
-          {/* Key Features */}
-          {activeFeatures.length > 0 && (
-            <div className="mt-6 border-t border-border pt-4 sm:mt-8 sm:pt-6">
-              <h3 className="mb-2 text-xs font-semibold sm:mb-3 sm:text-sm md:text-base">
-                Key Features
-              </h3>
-              <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2 sm:gap-x-4 md:grid-cols-3">
-                {activeFeatures.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-kibana-camel" />
-                    <span className="text-xs leading-snug text-kibana-ink/70 sm:text-sm">{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Accordions */}
-          <div className="mt-6 divide-y divide-border border-t border-border sm:mt-8">
-            {/* Description Accordion */}
-            <details className="group py-3 sm:py-4" open>
-              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                Description
-                <svg
-                  className="h-4 w-4 transition-transform group-open:rotate-180"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </summary>
-              <p className="mt-2 text-xs font-light leading-relaxed text-stone-600 sm:mt-3 sm:text-sm">
-                {activeDescription}
-              </p>
-            </details>
-
-            <details className="group py-3 sm:py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                Product Details
-                <svg
-                  className="h-4 w-4 transition-transform group-open:rotate-180"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </summary>
-              <div className="mt-2 divide-y divide-border">
-                {Object.entries(activeSpecs).map(([label, value]) => (
-                  <div key={label} className="flex items-start gap-4 py-2 sm:py-2.5">
-                    <span className="w-28 shrink-0 text-xs font-medium text-kibana-camel sm:w-36">
-                      {label}
-                    </span>
-                    <span className="text-xs font-light text-stone-600 sm:text-sm">{value}</span>
-                  </div>
-                ))}
+            {/* Delivery & Share - Moved below Add to Cart */}
+            <div className="mt-6 space-y-3 border-t border-border pt-4 sm:mt-8 sm:space-y-4 sm:pt-6">
+              <DeliveryCheck />
+              <div>
+                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
+                  Share Product
+                </h3>
+                <WhatsAppShare
+                  product={product}
+                  price={product.price}
+                  colorSlug={activeVariant?.slug}
+                />
               </div>
-            </details>
+            </div>
 
-            <details className="group py-3 sm:py-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                Shipping &amp; Returns
-                <svg
-                  className="h-4 w-4 transition-transform group-open:rotate-180"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </summary>
-              <div className="mt-2 space-y-2 border border-border p-3 sm:mt-3 sm:space-y-2.5 sm:p-4">
-                {[
-                  "Free shipping on all orders above ₹999",
-                  "Easy returns within 7 days of delivery",
-                  "Products must be unused and in original packaging",
-                ].map((line) => (
-                  <p
-                    key={line}
-                    className="flex items-start gap-2 text-xs font-light leading-snug text-stone-600 sm:text-sm"
+            {/* Key Features - Moved below Add to Cart */}
+            {activeFeatures.length > 0 && (
+              <div className="mt-6 border-t border-border pt-4 sm:mt-8 sm:pt-6">
+                <h3 className="mb-2 text-xs font-semibold sm:mb-3 sm:text-sm md:text-base">
+                  Key Features
+                </h3>
+                <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2 sm:gap-x-4">
+                  {activeFeatures.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-kibana-camel" />
+                      <span className="text-xs leading-snug text-kibana-ink/70 sm:text-sm">
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Accordions - Moved below Add to Cart */}
+            <div className="mt-6 divide-y divide-border border-t border-border sm:mt-8">
+              {/* Description Accordion */}
+              <details className="group py-3 sm:py-4" open>
+                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                  Description
+                  <svg
+                    className="h-4 w-4 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
                   >
-                    <span className="mt-0.5 shrink-0 text-kibana-tan">•</span>
-                    {line}
-                  </p>
-                ))}
-              </div>
-            </details>
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </summary>
+                <p className="mt-2 text-xs font-light leading-relaxed text-stone-600 sm:mt-3 sm:text-sm">
+                  {activeDescription}
+                </p>
+              </details>
+
+              <details className="group py-3 sm:py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                  Product Details
+                  <svg
+                    className="h-4 w-4 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </summary>
+                <div className="mt-2 divide-y divide-border">
+                  {Object.entries(activeSpecs).map(([label, value]) => (
+                    <div key={label} className="flex items-start gap-4 py-2 sm:py-2.5">
+                      <span className="w-28 shrink-0 text-xs font-medium text-kibana-camel sm:w-36">
+                        {label}
+                      </span>
+                      <span className="text-xs font-light text-stone-600 sm:text-sm">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+
+              <details className="group py-3 sm:py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
+                  Shipping &amp; Returns
+                  <svg
+                    className="h-4 w-4 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </summary>
+                <div className="mt-2 space-y-2 border border-border p-3 sm:mt-3 sm:space-y-2.5 sm:p-4">
+                  {[
+                    "Free shipping on all orders above ₹999",
+                    "Easy returns within 7 days of delivery",
+                    "Products must be unused and in original packaging",
+                  ].map((line) => (
+                    <p
+                      key={line}
+                      className="flex items-start gap-2 text-xs font-light leading-snug text-stone-600 sm:text-sm"
+                    >
+                      <span className="mt-0.5 shrink-0 text-kibana-tan">•</span>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              </details>
+            </div>
           </div>
         </div>
       </section>

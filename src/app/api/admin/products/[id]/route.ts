@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getProduct, saveProduct, deleteProduct, invalidateCache } from "@/lib/server-data";
+import { invalidateProductsCache } from "@/lib/api/products-cache";
 import { db } from "@/lib/db";
 import { mediaFiles } from "@/lib/db/schema";
 import { like } from "drizzle-orm";
@@ -42,6 +43,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     invalidateCache("products");
     invalidateCache(`product-${id}`);
     invalidateCache(`product-slug-${body.slug}`);
+    invalidateProductsCache(); // Also invalidate API cache
 
     // ✅ Revalidate all product-related pages
     revalidatePath("/shop/[slug]", "page");
@@ -81,5 +83,6 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   const importedInvalidateCache = (await import("@/lib/server-data")).invalidateCache;
   importedInvalidateCache("products");
   importedInvalidateCache(`product-${id}`);
+  invalidateProductsCache(); // Also invalidate API cache
   return NextResponse.json({ success: true });
 }

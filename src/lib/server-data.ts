@@ -99,7 +99,9 @@ export async function getProducts(): Promise<Product[]> {
   const rows = await withTimeout(
     db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
-  const result = rows && rows.length > 0 ? rows.map(rowToProduct) : localProducts;
+  // ✅ FIX: When database is available, ONLY return database products (never fallback to localProducts)
+  // This prevents duplicate data from both sources and ensures data consistency
+  const result = (rows ?? []).map(rowToProduct);
   setCached("products", result, 5000); // Cache for 5 seconds (shop page needs fresh prices/discounts/stock)
   return result;
 }
@@ -116,13 +118,14 @@ export async function getProduct(id: string): Promise<Product | undefined> {
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.id, id));
-    const product = row ? rowToProduct(row) : localProducts.find((p) => p.id === id);
+    // ✅ FIX: Only use database product when database is available
+    const product = row ? rowToProduct(row) : undefined;
     setCached(`product-${id}`, product, 5000); // Cache for 5 seconds
     return product;
   } catch {
-    const product = localProducts.find((p) => p.id === id);
-    setCached(`product-${id}`, product, 5000);
-    return product;
+    // On error with database, return undefined (don't fallback to localProducts)
+    setCached(`product-${id}`, undefined, 5000);
+    return undefined;
   }
 }
 
@@ -138,13 +141,14 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   }
   try {
     const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
-    const product = row ? rowToProduct(row) : localProducts.find((p) => p.slug === slug);
+    // ✅ FIX: Only use database product when database is available
+    const product = row ? rowToProduct(row) : undefined;
     setCached(`product-slug-${slug}`, product, 5000); // Cache for 5 seconds
     return product;
   } catch {
-    const product = localProducts.find((p) => p.slug === slug);
-    setCached(`product-slug-${slug}`, product, 5000);
-    return product;
+    // On error with database, return undefined (don't fallback to localProducts)
+    setCached(`product-slug-${slug}`, undefined, 5000);
+    return undefined;
   }
 }
 
@@ -224,21 +228,15 @@ export async function getProductsByCategory(
         .orderBy(asc(productsTable.sortOrder)),
     );
 
-    const products =
-      rows && rows.length
-        ? rows.map(rowToProduct).filter((p) => !excludeId || p.id !== excludeId)
-        : localProducts.filter(
-            (p) => p.category === category && (!excludeId || p.id !== excludeId),
-          );
+    // ✅ FIX: When database is available, ONLY return database products (never fallback to localProducts)
+    const products = (rows ?? []).map(rowToProduct).filter((p) => !excludeId || p.id !== excludeId);
 
     setCached(cacheKey, products, 5000);
     return products;
   } catch {
-    const products = localProducts.filter(
-      (p) => p.category === category && (!excludeId || p.id !== excludeId),
-    );
-    setCached(cacheKey, products, 5000);
-    return products;
+    // On error, return empty array (don't fallback to localProducts)
+    setCached(cacheKey, [], 5000);
+    return [];
   }
 }
 

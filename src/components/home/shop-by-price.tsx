@@ -1,12 +1,10 @@
-import { products } from "@/lib/data";
+import type { Product } from "@/types/product";
 import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "./section-heading";
 
-export function ShopByPrice() {
+export function ShopByPrice({ products }: { products: Product[] }) {
   // Pick the 3 trending mid-tier items, displayed with Add to Cart (full variant)
-  const items = products
-    .filter((p) => p.isTrending && p.slug !== "siena-tote")
-    .slice(0, 3);
+  const items = products.filter((p) => p.isTrending && p.slug !== "siena-tote").slice(0, 3);
 
   return (
     <section className="container py-2 md:py-6">

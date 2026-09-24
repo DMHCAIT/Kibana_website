@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getProducts, saveProduct, invalidateCache } from "@/lib/server-data";
+import { invalidateProductsCache } from "@/lib/api/products-cache";
 import type { Product } from "@/types/product";
 
 async function auth() {
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
     invalidateCache("products");
     invalidateCache(`product-${body.id}`);
     invalidateCache(`product-slug-${body.slug}`);
+    invalidateProductsCache(); // Also invalidate API cache
 
     // ✅ Revalidate all product-related pages
     revalidatePath("/shop/[slug]", "page");
