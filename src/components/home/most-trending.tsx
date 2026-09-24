@@ -31,7 +31,12 @@ const TREND_CARD_NAMES: Record<string, string> = {
 
 export function MostTrending({ products: propProducts }: { products?: Product[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const trendingProducts = (propProducts ?? staticProducts)
+
+  // Use propProducts if available, otherwise fall back to staticProducts
+  const productsToUse = propProducts && propProducts.length > 0 ? propProducts : staticProducts;
+
+  // Filter for trending products, but if none found in propProducts, use staticProducts trending
+  let trendingProducts = productsToUse
     .filter((p) => p.isTrending && p.id !== "p11")
     .sort((a, b) => {
       const n = (id: string) => parseInt(id.replace(/\D/g, ""), 10) || 0;
@@ -39,6 +44,14 @@ export function MostTrending({ products: propProducts }: { products?: Product[] 
     })
     .slice(0, 6)
     .map((p) => ({ ...p, image: TREND_CARD_IMAGES[p.id] ?? p.image }));
+
+  // Fallback: if no trending products found, use the static trending card IDs
+  if (trendingProducts.length === 0) {
+    const trendIds = Object.keys(TREND_CARD_LINKS).map((k) => k.replace("p", "")); // ["1", "2", "7", "9", "10"]
+    trendingProducts = staticProducts
+      .filter((p) => trendIds.includes(p.id.replace("p", "")))
+      .map((p) => ({ ...p, image: TREND_CARD_IMAGES[p.id] ?? p.image }));
+  }
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
