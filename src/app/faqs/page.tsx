@@ -115,7 +115,7 @@ const categories: Category[] = [
         a: "All Kibana bags are made from 100% premium vegan leather — a high-quality synthetic material that is durable, smooth, and cruelty-free.",
       },
       {
-        q: "What does \"vegan leather\" mean?",
+        q: 'What does "vegan leather" mean?',
         a: "Vegan leather is a synthetic alternative to animal leather. It looks and feels like genuine leather but is entirely free from animal products, making it an ethical and sustainable choice.",
       },
       {
@@ -159,32 +159,30 @@ const categories: Category[] = [
 function FAQItem({ faq }: { faq: FAQ }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-kibana-ink/10">
+    <div className="border-b border-border/30">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-6 py-5 text-left group"
+        className="group flex w-full items-center justify-between gap-6 py-6 text-left"
       >
         <span
           className={cn(
-            "text-sm leading-snug transition-colors duration-200",
-            open
-              ? "text-kibana-camel font-medium"
-              : "text-kibana-ink font-normal group-hover:text-kibana-camel"
+            "text-base font-medium leading-relaxed transition-colors duration-200",
+            open ? "text-accent" : "text-foreground group-hover:text-accent",
           )}
         >
           {faq.q}
         </span>
-        <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-kibana-tan">
-          {open ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-accent">
+          {open ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
         </span>
       </button>
       <div
         className={cn(
           "overflow-hidden transition-all duration-300 ease-in-out",
-          open ? "max-h-72 pb-6" : "max-h-0"
+          open ? "max-h-96 pb-6" : "max-h-0",
         )}
       >
-        <p className="text-[13px] text-kibana-ink/55 leading-[1.8] max-w-2xl">
+        <p className="max-w-2xl text-sm font-light leading-relaxed text-muted-foreground">
           {faq.a}
         </p>
       </div>
@@ -198,51 +196,51 @@ export default function FAQsPage() {
   const activeIndex = categories.findIndex((c) => c.id === activeId);
 
   return (
-    <main className="bg-kibana-cream text-kibana-ink">
+    <main className="bg-background text-foreground">
       <TrackPageView pageName="FAQs" pageType="faqs" />
-      {/* ── Hero ── */}
-      <section className="relative bg-kibana-ink overflow-hidden">
-        <div className="container relative py-8 md:py-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
-            {/* Left — heading */}
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-foreground text-background">
+        <div className="storefront-section-space container relative max-w-[1600px]">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+            {/* Left */}
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-kibana-tan mb-3">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">
                 Help Centre
               </p>
-              <h1 className="font-bold uppercase tracking-[0.15em] text-xl sm:text-2xl md:text-3xl text-kibana-cream leading-snug">
-                Frequently <span className="text-kibana-tan">Asked</span> Questions
+              <h1 className="mb-4 font-display text-4xl font-semibold leading-tight md:text-5xl">
+                Frequently Asked <span className="text-accent">Questions</span>
               </h1>
-              <p className="text-kibana-cream/40 text-xs mt-3 max-w-xs leading-relaxed">
-                Browse by topic or use the tabs below to jump to a section.
+              <p className="max-w-sm text-sm text-background/70">
+                Browse by topic or use the tabs below to find what you need.
               </p>
             </div>
 
-            {/* Right — stats */}
-            <div className="flex gap-4 md:gap-6">
+            {/* Right — Stats */}
+            <div className="grid w-full max-w-md grid-cols-3 gap-2 sm:gap-4 lg:shrink-0 lg:gap-6">
               {[
                 { n: "6", label: "Topics" },
                 { n: "27", label: "Answers" },
-                { n: "24h", label: "Response Time" },
+                { n: "24h", label: "Response" },
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="border border-kibana-cream/10 rounded px-4 py-3 text-center bg-kibana-cream/5 min-w-[70px]"
+                  className="min-w-0 border border-background/20 px-2 py-4 text-center sm:px-4"
                 >
-                  <div className="text-kibana-tan font-bold text-xl md:text-2xl leading-none">{s.n}</div>
-                  <div className="text-kibana-cream/40 text-[8px] uppercase tracking-[0.25em] mt-1">{s.label}</div>
+                  <div className="text-2xl font-semibold leading-none text-accent">{s.n}</div>
+                  <div className="mt-2 break-words text-[10px] font-medium uppercase tracking-wider text-background/60 sm:text-xs sm:tracking-widest">
+                    {s.label}
+                  </div>
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* ── Category tab strip ── */}
-      <section className="bg-kibana-stone border-b border-kibana-ink/8 sticky top-[110px] md:top-16 z-10">
-        <div className="container">
-          <div className="flex overflow-x-auto scrollbar-hide">
+      {/* Category Tabs */}
+      <section className="sticky top-16 z-10 border-b border-border/30 bg-accent/5 lg:top-[78px]">
+        <div className="container max-w-[1600px]">
+          <div className="scrollbar-hide flex overflow-x-auto">
             {categories.map((cat, i) => {
               const isActive = cat.id === activeId;
               return (
@@ -250,18 +248,16 @@ export default function FAQsPage() {
                   key={cat.id}
                   onClick={() => setActiveId(cat.id)}
                   className={cn(
-                    "flex-shrink-0 flex items-center gap-2.5 px-4 md:px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] border-b-2 transition-all duration-150 whitespace-nowrap",
+                    "flex flex-shrink-0 items-center gap-3 whitespace-nowrap border-b-2 px-5 py-4 text-sm font-semibold uppercase tracking-widest transition-all duration-200 md:px-6",
                     isActive
-                      ? "border-kibana-tan text-kibana-ink"
-                      : "border-transparent text-kibana-ink/40 hover:text-kibana-ink/70 hover:border-kibana-tan/30"
+                      ? "border-accent text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <span
                     className={cn(
-                      "w-4 h-4 flex-shrink-0 rounded-full flex items-center justify-center text-[9px] font-bold transition-colors",
-                      isActive
-                        ? "bg-kibana-tan text-kibana-ink"
-                        : "bg-kibana-ink/10 text-kibana-ink/40"
+                      "flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-all",
+                      isActive ? "bg-accent text-background" : "bg-border text-muted-foreground",
                     )}
                   >
                     {i + 1}
@@ -275,41 +271,41 @@ export default function FAQsPage() {
         </div>
       </section>
 
-      {/* ── FAQ content ── */}
-      <section className="container py-10 md:py-14">
-        <div className="max-w-3xl">
-
-          {/* Section header */}
-          <div className="mb-8 md:mb-10">
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-[10px] font-bold text-kibana-tan/60 tabular-nums">
-                {String(activeIndex + 1).padStart(2, "0")} / {String(categories.length).padStart(2, "0")}
+      {/* FAQ Content */}
+      <section className="storefront-section-space container max-w-[1600px]">
+        <div className="max-w-4xl">
+          {/* Section Header */}
+          <div className="mb-12">
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+              <span className="text-sm font-semibold tabular-nums text-accent/70">
+                {String(activeIndex + 1).padStart(2, "0")} /{" "}
+                {String(categories.length).padStart(2, "0")}
               </span>
-              <h2 className="font-bold uppercase tracking-[0.15em] text-sm md:text-base text-kibana-ink">
+              <h2 className="min-w-0 break-words font-display text-2xl font-semibold text-foreground sm:text-3xl">
                 {active.title}
               </h2>
-              <span className="ml-auto text-[10px] text-kibana-ink/35 font-medium tabular-nums">
+              <span className="ml-auto text-sm font-medium tabular-nums text-muted-foreground">
                 {active.faqs.length} {active.faqs.length === 1 ? "question" : "questions"}
               </span>
             </div>
-            {/* Progress bar */}
-            <div className="mt-3 h-[1px] bg-kibana-ink/10 relative overflow-hidden">
+            {/* Progress Bar */}
+            <div className="relative h-px overflow-hidden bg-border">
               <div
-                className="absolute inset-y-0 left-0 bg-kibana-tan transition-all duration-500"
+                className="absolute inset-y-0 left-0 bg-accent transition-all duration-500"
                 style={{ width: `${((activeIndex + 1) / categories.length) * 100}%` }}
               />
             </div>
           </div>
 
-          {/* FAQ accordion */}
+          {/* FAQ Accordion */}
           <div>
             {active.faqs.map((faq) => (
               <FAQItem key={faq.q} faq={faq} />
             ))}
           </div>
 
-          {/* Prev / Next navigation */}
-          <div className="flex items-center justify-between mt-10 pt-6 border-t border-kibana-ink/8">
+          {/* Navigation */}
+          <div className="mt-12 flex items-center justify-between border-t border-border/30 pt-8">
             <button
               onClick={() => {
                 const prev = categories[activeIndex - 1];
@@ -317,10 +313,10 @@ export default function FAQsPage() {
               }}
               disabled={activeIndex === 0}
               className={cn(
-                "text-[10px] font-bold uppercase tracking-[0.2em] transition-colors",
+                "text-sm font-semibold uppercase tracking-widest transition-colors",
                 activeIndex === 0
-                  ? "text-kibana-ink/20 cursor-not-allowed"
-                  : "text-kibana-ink/50 hover:text-kibana-ink"
+                  ? "cursor-not-allowed text-muted-foreground/30"
+                  : "text-muted-foreground hover:text-accent",
               )}
             >
               ← {activeIndex > 0 ? categories[activeIndex - 1].title.split(" ")[0] : "Prev"}
@@ -332,10 +328,10 @@ export default function FAQsPage() {
               }}
               disabled={activeIndex === categories.length - 1}
               className={cn(
-                "text-[10px] font-bold uppercase tracking-[0.2em] transition-colors",
+                "text-sm font-semibold uppercase tracking-widest transition-colors",
                 activeIndex === categories.length - 1
-                  ? "text-kibana-ink/20 cursor-not-allowed"
-                  : "text-kibana-ink/50 hover:text-kibana-ink"
+                  ? "cursor-not-allowed text-muted-foreground/30"
+                  : "text-muted-foreground hover:text-accent",
               )}
             >
               {activeIndex < categories.length - 1
@@ -347,31 +343,31 @@ export default function FAQsPage() {
         </div>
       </section>
 
-      {/* ── Contact strip ── */}
-      <section className="bg-kibana-ink mt-2">
-        <div className="container py-12 md:py-14">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 max-w-4xl">
+      {/* Contact CTA */}
+      <section className="mt-8 bg-foreground text-background">
+        <div className="mx-auto w-full max-w-[1600px] px-3 py-12 sm:px-5 md:px-6 md:py-16 lg:px-8 lg:py-20">
+          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-kibana-tan mb-2">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-accent">
                 Still need help?
               </p>
-              <h2 className="font-bold uppercase tracking-[0.1em] text-lg md:text-xl text-kibana-cream">
+              <h2 className="mb-4 font-display text-3xl font-semibold">
                 Our team is ready to assist
               </h2>
-              <p className="text-kibana-cream/35 text-xs mt-1.5 leading-relaxed max-w-sm">
+              <p className="max-w-sm text-lg font-light leading-relaxed text-background/70">
                 We respond within 24 business hours, Monday to Saturday.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+            <div className="flex flex-shrink-0 flex-col gap-4 sm:flex-row">
               <a
                 href="mailto:support@kibana.in"
-                className="inline-block bg-kibana-tan text-kibana-ink font-bold text-[10px] uppercase tracking-[0.25em] px-8 py-3.5 hover:bg-kibana-camel transition-colors duration-200 text-center"
+                className="inline-flex items-center justify-center bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-widest text-foreground transition-all hover:bg-accent/90"
               >
                 Email Support
               </a>
               <Link
                 href="/shop"
-                className="inline-block border border-kibana-cream/20 text-kibana-cream/70 font-bold text-[10px] uppercase tracking-[0.25em] px-8 py-3.5 hover:border-kibana-cream/50 hover:text-kibana-cream transition-colors duration-200 text-center"
+                className="inline-flex items-center justify-center border-2 border-background/20 px-8 py-3 text-sm font-semibold uppercase tracking-widest text-background transition-all hover:border-background/40"
               >
                 Shop Now
               </Link>
@@ -379,7 +375,6 @@ export default function FAQsPage() {
           </div>
         </div>
       </section>
-
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { pgTable, text, integer, boolean, real, timestamp, jsonb } from "drizzle-orm/pg-core";
+import type { Product } from "@/types/product";
 
 // ── Products ─────────────────────────────────────────────────────────────────
 export const products = pgTable("products", {
@@ -6,6 +7,7 @@ export const products = pgTable("products", {
   slug: text("slug").notNull().unique(),
   name: text("name").notNull().default(""),
   description: text("description").notNull().default(""),
+  shippingReturns: text("shipping_returns"),
   price: integer("price").notNull().default(0),
   compareAtPrice: integer("compare_at_price"),
   image: text("image").notNull().default(""),
@@ -17,7 +19,7 @@ export const products = pgTable("products", {
   isTrending: boolean("is_trending").notNull().default(false),
   inStock: boolean("in_stock").notNull().default(true),
   colors: jsonb("colors").$type<string[]>().notNull().default([]),
-  colorVariants: jsonb("color_variants").$type<unknown[]>().notNull().default([]),
+  colorVariants: jsonb("color_variants").$type<Product["colorVariants"]>().notNull().default([]),
   features: jsonb("features").$type<string[]>().notNull().default([]),
   specs: jsonb("specs").$type<Record<string, string>>().notNull().default({}),
   video: text("video").default(""),

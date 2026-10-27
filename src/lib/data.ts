@@ -11,12 +11,11 @@ export const categories: Category[] = [
   { slug: "clutch", name: "Clutch", image: "/mv/cat-2.jpeg" },
   { slug: "backpack", name: "Backpack", image: "/mv/cat-1.jpeg" },
   { slug: "wallet", name: "Wallet", image: "/mv/cat-6.jpeg" },
+  { slug: "duffle-bag", name: "Duffle", image: "/mv/cat-2.jpeg" },
 ];
 
 export const genderShelves = [
-  { slug: "men", name: "MEN", image: "/extracted/img-080.jpg" },
   { slug: "women", name: "WOMEN", image: "/extracted/img-070.jpg" },
-  { slug: "unisex", name: "UNISEX", image: "/extracted/img-090.jpg" },
 ] as const;
 
 export const trustBadges = [

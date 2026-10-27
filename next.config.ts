@@ -1,12 +1,15 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 // Rebuild trigger: Image cache update
-const nextConfig: NextConfig = {
+const nextConfig = (phase: string): NextConfig => ({
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-build",
   reactStrictMode: true,
   compress: true,
+  serverExternalPackages: ["sharp"],
   images: {
     formats: ["image/avif", "image/webp"],
-    deviceSizes: [375, 640, 768, 1024, 1280, 1536],
+    deviceSizes: [375, 640, 768, 1024, 1280, 1536, 1920, 2048, 2560, 3840],
     imageSizes: [64, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
     remotePatterns: [
@@ -21,6 +24,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
-};
+});
 
 export default nextConfig;

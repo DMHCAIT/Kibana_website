@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingBag, Heart, Check, X, ArrowRight } from "lucide-react";
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
@@ -25,8 +25,13 @@ export function MobileProductCTA({ product }: { product: Product }) {
       return;
     }
     const current = has(product.id);
-    if (current) { removeWishlist(product.id); setInWishlist(false); }
-    else { addWishlist(product.id); setInWishlist(true); }
+    if (current) {
+      removeWishlist(product.id);
+      setInWishlist(false);
+    } else {
+      addWishlist(product.id);
+      setInWishlist(true);
+    }
   }
 
   function handleAddToCart() {
@@ -39,28 +44,47 @@ export function MobileProductCTA({ product }: { product: Product }) {
     <>
       {/* Added to cart notification */}
       {addedNotification && (
-        <div className="sm:hidden fixed top-4 left-4 right-4 z-[70] bg-white border border-border shadow-xl rounded-xl p-3 flex gap-3 items-start animate-in slide-in-from-top-4 duration-300">
-          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center mt-0.5">
+        <div className="fixed left-4 right-4 top-4 z-[70] flex items-start gap-3 rounded-xl border border-border bg-white p-3 shadow-xl duration-300 animate-in slide-in-from-top-4 sm:hidden">
+          <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
             <Check className="h-3.5 w-3.5 text-emerald-700" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">Added to cart!</p>
             <div className="mt-1 flex items-center gap-2">
               <div className="relative h-8 w-7 shrink-0 overflow-hidden rounded bg-muted">
-                <Image src={product.image} alt={product.name} fill sizes="28px" className="object-cover" />
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  sizes="28px"
+                  className="object-cover"
+                />
               </div>
-              <p className="text-xs text-muted-foreground truncate">{product.name} · {formatINR(product.price)}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {product.name} · {formatINR(product.price)}
+              </p>
             </div>
             <div className="mt-2 flex gap-2">
-              <Link href="/cart" className="flex-1 text-center text-xs font-semibold bg-foreground text-background px-3 py-1.5 rounded hover:bg-foreground/90 transition-colors">
+              <Link
+                href="/cart"
+                className="flex-1 rounded bg-foreground px-3 py-1.5 text-center text-xs font-semibold text-background transition-colors hover:bg-foreground/90"
+              >
                 View Cart
               </Link>
-              <Link href="/checkout" className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold bg-kibana-tan text-white px-3 py-1.5 rounded hover:bg-kibana-tan/90 transition-colors">
+              <Link
+                href="/checkout"
+                className="flex flex-1 items-center justify-center gap-1 rounded bg-kibana-tan px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-kibana-tan/90"
+              >
                 Checkout <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
           </div>
-          <button type="button" onClick={() => setAddedNotification(false)} className="text-muted-foreground shrink-0" aria-label="Dismiss">
+          <button
+            type="button"
+            onClick={() => setAddedNotification(false)}
+            className="shrink-0 text-muted-foreground"
+            aria-label="Dismiss"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -68,13 +92,10 @@ export function MobileProductCTA({ product }: { product: Product }) {
 
       {/* Delivery drawer sheet */}
       {showDelivery && (
-        <div className="sm:hidden fixed inset-0 z-50 flex items-end">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowDelivery(false)}
-          />
-          <div className="relative w-full bg-white px-5 pt-5 pb-8 space-y-4 rounded-t-2xl">
-            <div className="flex items-center justify-between mb-1">
+        <div className="fixed inset-0 z-50 flex items-end sm:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowDelivery(false)} />
+          <div className="relative w-full space-y-4 rounded-t-2xl bg-white px-5 pb-8 pt-5">
+            <div className="mb-1 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Delivery Details</h3>
               <button
                 onClick={() => setShowDelivery(false)}
@@ -89,14 +110,16 @@ export function MobileProductCTA({ product }: { product: Product }) {
       )}
 
       {/* Sticky bottom bar — mobile only */}
-      <div className="sm:hidden fixed bottom-[52px] inset-x-0 z-[60] bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+      <div className="fixed inset-x-0 bottom-[52px] z-[60] border-t border-border bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)] sm:hidden">
         {/* Product name + price strip */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border/50">
-          <p className="text-xs font-medium truncate max-w-[55%]">{product.name}</p>
-          <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center justify-between border-b border-border/50 px-4 py-2">
+          <p className="max-w-[55%] truncate text-xs font-medium">{product.name}</p>
+          <div className="flex shrink-0 items-center gap-1.5">
             <span className="text-sm font-bold">{formatINR(product.price)}</span>
             {product.compareAtPrice && (
-              <span className="text-xs text-muted-foreground line-through hidden xs:inline">{formatINR(product.compareAtPrice)}</span>
+              <span className="hidden text-xs text-muted-foreground line-through xs:inline">
+                {formatINR(product.compareAtPrice)}
+              </span>
             )}
           </div>
         </div>
@@ -106,7 +129,7 @@ export function MobileProductCTA({ product }: { product: Product }) {
           {/* Delivery check trigger */}
           <button
             onClick={() => setShowDelivery(true)}
-            className="text-[10px] font-semibold uppercase tracking-[0.08em] text-kibana-camel border border-border px-2.5 py-2.5 mr-2 whitespace-nowrap hover:bg-muted transition-colors shrink-0"
+            className="mr-2 shrink-0 whitespace-nowrap border border-border px-2.5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-kibana-camel transition-colors hover:bg-muted"
           >
             Delivery
           </button>
@@ -114,7 +137,7 @@ export function MobileProductCTA({ product }: { product: Product }) {
           {/* Add to cart */}
           <button
             onClick={handleAddToCart}
-            className="flex-1 flex items-center justify-center gap-2 bg-kibana-ink text-kibana-cream text-xs font-bold uppercase tracking-[0.15em] py-2.5 hover:bg-kibana-ink/80 transition-colors"
+            className="flex flex-1 items-center justify-center gap-2 bg-kibana-ink py-2.5 text-xs font-bold uppercase tracking-[0.15em] text-kibana-cream transition-colors hover:bg-kibana-ink/80"
           >
             <ShoppingBag className="h-4 w-4" />
             Add to Cart
@@ -124,7 +147,7 @@ export function MobileProductCTA({ product }: { product: Product }) {
           <button
             onClick={handleWishlist}
             aria-label="Add to wishlist"
-            className="flex items-center justify-center border border-border w-11 ml-2 hover:bg-muted transition-colors"
+            className="ml-2 flex w-11 items-center justify-center border border-border transition-colors hover:bg-muted"
           >
             <Heart
               className={`h-4 w-4 transition-colors ${inWishlist ? "text-red-500" : "text-muted-foreground"}`}

@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+import { Jost, Montserrat } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { Header } from "@/components/layout/header";
+import { Header } from "@/components/layout/header-new";
 import { getSiteConfig } from "@/lib/server-data";
 import { Footer } from "@/components/layout/footer";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
@@ -11,43 +11,19 @@ import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthAutoPopup } from "@/components/auth/auth-auto-popup";
 import { GlobalPageViewTracker } from "@/components/analytics/global-page-view-tracker";
+import { StorefrontShell } from "@/components/layout/storefront-shell";
 
-const canela = localFont({
-  src: [
-    {
-      path: "../../public/Canela Deck Family/CanelaDeck-Light-Trial.otf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../../public/Canela Deck Family/CanelaDeck-Regular-Trial.otf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/Canela Deck Family/CanelaDeck-Medium-Trial.otf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../public/Canela Deck Family/CanelaDeck-Bold-Trial.otf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-canela",
+const jost = Jost({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-jost",
   display: "swap",
 });
 
-const poppins = localFont({
-  src: [
-    { path: "../../public/poppins/Poppins-Light.ttf", weight: "300", style: "normal" },
-    { path: "../../public/poppins/Poppins-Regular.ttf", weight: "400", style: "normal" },
-    { path: "../../public/poppins/Poppins-Medium.ttf", weight: "500", style: "normal" },
-    { path: "../../public/poppins/Poppins-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "../../public/poppins/Poppins-Bold.ttf", weight: "700", style: "normal" },
-  ],
-  variable: "--font-poppins",
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-montserrat",
   display: "swap",
 });
 
@@ -76,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F6EFE5",
+  themeColor: "#FFFFFF",
   width: "device-width",
   initialScale: 1,
 };
@@ -95,13 +71,13 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Pre-fetch site config during SSR (cached for performance)
-  await withTimeout(
+  const siteConfig = await withTimeout(
     getSiteConfig().catch(() => FALLBACK_CONFIG),
     2000,
     FALLBACK_CONFIG,
   );
   return (
-    <html lang="en" className={`${canela.variable} ${poppins.variable}`}>
+    <html lang="en" className={`${jost.variable} ${montserrat.variable}`}>
       <body className="flex min-h-dvh flex-col">
         {GTM_ID ? (
           <>
@@ -173,14 +149,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </>
         ) : null}
         <Providers>
-          <GlobalPageViewTracker />
-          <Header />
-          <AuthModal />
-          <AuthAutoPopup />
-          <CookiesBanner />
-          <main className="flex-1 pb-16 md:pb-0">{children}</main>
-          <MobileBottomNav />
-          <Footer />
+          <StorefrontShell>
+            <GlobalPageViewTracker />
+            <Header announcement={siteConfig?.announcementBar} />
+            <AuthModal />
+            <AuthAutoPopup />
+            <CookiesBanner />
+            <main className="flex-1 pb-16 md:pb-0">{children}</main>
+            <MobileBottomNav />
+            <Footer />
+          </StorefrontShell>
         </Providers>
       </body>
     </html>

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { ReactNode } from "react";
 import { SortSelect } from "@/app/shop/sort-select";
 
 type Props = {
@@ -6,29 +7,36 @@ type Props = {
   count?: number;
   sort?: string;
   showSort?: boolean;
+  layoutControls?: ReactNode;
 };
 
-export function ShopHeader({ heading, count, sort = "featured", showSort = true }: Props) {
+export function ShopHeader({
+  heading,
+  count,
+  sort = "featured",
+  showSort = true,
+  layoutControls,
+}: Props) {
   return (
-    <div className="mb-2 sm:mb-3 md:mb-4">
-      {/* Title row */}
-      <div className="mb-1 flex items-start justify-between">
-        <h1 className="text-xs font-bold uppercase tracking-[0.15em] sm:text-sm md:text-base md:text-lg">
-          {heading}
-        </h1>
+    <div>
+      <div className="storefront-collection-heading text-center">
+        <h1 className="text-foreground">{heading}</h1>
+      </div>
+      <div className="storefront-collection-toolbar grid grid-cols-[1fr_auto] items-center border-y border-border/60 md:grid-cols-[1fr_auto_1fr]">
+        <div className="order-2 flex justify-end md:order-1 md:justify-start">{layoutControls}</div>
+        {typeof count === "number" && (
+          <p className="hidden text-[12px] uppercase tracking-[0.18em] text-muted-foreground md:order-2 md:block">
+            {count} {count === 1 ? "product" : "products"}
+          </p>
+        )}
         {showSort && (
-          <Suspense fallback={null}>
-            <SortSelect current={sort} />
-          </Suspense>
+          <div className="order-1 md:order-3 md:justify-self-end">
+            <Suspense fallback={null}>
+              <SortSelect current={sort} />
+            </Suspense>
+          </div>
         )}
       </div>
-
-      {/* Product count */}
-      {typeof count === "number" && (
-        <p className="text-[10px] font-medium text-kibana-camel sm:text-xs">
-          {count} {count === 1 ? "product" : "products"}
-        </p>
-      )}
     </div>
   );
 }

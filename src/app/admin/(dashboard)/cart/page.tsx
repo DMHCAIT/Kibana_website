@@ -1,5 +1,5 @@
 import { getCartItems } from "@/lib/server-data";
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ShoppingCart, ArrowLeft } from "lucide-react";

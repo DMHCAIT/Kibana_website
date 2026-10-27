@@ -34,5 +34,5 @@ export function getProductDisplayName(
   // Return the full variant product title which includes the color
   // e.g., "Halo Mini Chain Sling Bag in Vegan Leather - Forest Green"
   // This shows exactly which color variant was added to cart/checkout/orders
-  return variant.productTitle || product.name;
+  return variant.productTitle || `${product.name} - ${variant.color}`;
 }

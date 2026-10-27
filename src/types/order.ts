@@ -13,6 +13,8 @@ export interface Order {
     quantity: number;
     image: string;
     color?: string;
+    colorSlug?: string;
+    variantId?: string;
   }>;
   total: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";

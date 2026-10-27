@@ -14,38 +14,36 @@ export function DeliveryCheck() {
     // Delivery available across all India for any valid 6-digit pincode
     setResult({
       ok: true,
-      msg: `We deliver to ${pincode}! Estimated delivery: 3–5 business days.`,
+      msg: `We deliver to ${pincode}! Delivery within 4 days.`,
     });
   }
 
   return (
     <div>
-      <h3 className="text-xs font-semibold mb-2 uppercase tracking-[0.2em] text-muted-foreground">Delivery Details</h3>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Delivery Details
+      </h3>
       <div className="flex w-full">
         <input
           type="text"
           inputMode="numeric"
           value={pincode}
-          onChange={(e) =>
-            setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))
-          }
+          onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
           placeholder="Enter pincode"
-          className="min-w-0 flex-1 border border-border border-r-0 px-3 py-2 text-xs outline-none focus:border-foreground placeholder:text-muted-foreground bg-background"
+          className="min-w-0 flex-1 border border-r-0 border-border bg-background px-3 py-2 text-xs outline-none placeholder:text-muted-foreground focus:border-foreground"
           maxLength={6}
           onKeyDown={(e) => e.key === "Enter" && check()}
         />
         <button
           type="button"
           onClick={check}
-          className="bg-foreground text-background text-xs font-semibold px-4 py-2 hover:bg-foreground/90 transition-colors"
+          className="bg-foreground px-4 py-2 text-xs font-semibold text-background transition-colors hover:bg-foreground/90"
         >
           CHECK
         </button>
       </div>
       {result && (
-        <p
-          className={`mt-2 text-xs ${result.ok ? "text-emerald-700" : "text-destructive"}`}
-        >
+        <p className={`mt-2 text-xs ${result.ok ? "text-emerald-700" : "text-destructive"}`}>
           {result.msg}
         </p>
       )}

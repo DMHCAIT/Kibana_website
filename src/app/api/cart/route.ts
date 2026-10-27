@@ -4,6 +4,21 @@ import { db } from "@/lib/db";
 import { userCart } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { z } from "zod";
+import { getProduct } from "@/lib/server-data";
+import {
+  orderItemFromCart,
+  productInStock,
+  selectedProductVariant,
+  unavailableProductSelection,
+} from "@/lib/product-presentation";
+
+const CartAdditionSchema = z.object({
+  productId: z.string().min(1),
+  quantity: z.number().int().positive().default(1),
+  color: z.string().optional(),
+  variantId: z.string().optional(),
+});
 
 export async function GET() {
   try {
@@ -32,14 +47,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const {
-      productId,
-      quantity = 1,
-      color,
-      variantId,
-      productName,
-      productImage,
-    } = await req.json();
+    const parsed = CartAdditionSchema.safeParse(await req.json());
+    if (!parsed.success)
+      return NextResponse.json(
+        { error: "Choose a product colour and a positive whole-number quantity." },
+        { status: 400 },
+      );
+    const { productId, quantity } = parsed.data;
+    const product = await getProduct(productId);
+    if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    const variant = selectedProductVariant(product, parsed.data.color, parsed.data.variantId);
+    if (unavailableProductSelection(product, parsed.data.color, parsed.data.variantId)) {
+      return NextResponse.json(
+        { error: "The selected colour is no longer available." },
+        { status: 400 },
+      );
+    }
+    if (!productInStock(product, variant)) {
+      return NextResponse.json({ error: "The selected colour is sold out." }, { status: 400 });
+    }
+    const snapshot = orderItemFromCart({ product, quantity, selectedColorSlug: variant?.slug });
+    const color = snapshot.colorSlug;
+    const variantId = `${productId}-${color || "default"}`;
+    const productName = snapshot.name;
+    const productImage = snapshot.image;
 
     console.log(
       "📦 API CART POST RECEIVED:",

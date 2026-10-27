@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
@@ -11,6 +11,11 @@ import { Separator } from "@/components/ui/separator";
 import { formatINR, getProductDisplayName } from "@/lib/utils";
 import { getShopDisplayImage } from "@/lib/product-images";
 import { trackWishlist } from "@/lib/analytics";
+import {
+  productHref,
+  selectedProductVariant,
+  unavailableProductSelection,
+} from "@/lib/product-presentation";
 
 export function CartView() {
   const router = useRouter();
@@ -18,7 +23,17 @@ export function CartView() {
   const setQuantity = useCart((s) => s.setQuantity);
   const remove = useCart((s) => s.remove);
   const { user, openAuthModal } = useAuth();
-  const subtotal = items.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+  const unavailable = items.some((item) =>
+    unavailableProductSelection(item.product, item.selectedColorSlug, item.variantId),
+  );
+  const subtotal = items.reduce(
+    (acc, i) =>
+      acc +
+      (selectedProductVariant(i.product, i.selectedColorSlug, i.variantId)?.price ??
+        i.product.price) *
+        i.quantity,
+    0,
+  );
   const shipping = 0;
   const total = subtotal + shipping;
 
@@ -47,76 +62,33 @@ export function CartView() {
       <p className="mt-1 text-sm text-muted-foreground">
         {items.length} {items.length === 1 ? "item" : "items"}
       </p>
+      {unavailable && (
+        <p role="alert" className="mt-4 text-sm text-red-700">
+          A selected colour is no longer available. Remove it and choose another colour before
+          checkout.
+        </p>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px]">
         <ul className="bg-card divide-y divide-border rounded-xl border border-border">
           {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
-            console.log(
-              "🛒 CART ITEM DEBUG:",
-              JSON.stringify(
-                {
-                  productId: product.id,
-                  productName: product.name,
-                  selectedColorSlug,
-                  variantId,
-                  productVariantCount: product.colorVariants?.length,
-                  productVariants: product.colorVariants?.map((v) => ({
-                    slug: v.slug,
-                    variantId: v.variantId,
-                    productTitle: v.productTitle,
-                  })),
-                },
-                null,
-                2,
-              ),
-            );
-
-            // PRIMARY: Use selectedColorSlug (most reliable - directly from user selection)
-            // SECONDARY: Try variantId lookup
-            // FALLBACK: Use first variant
-            let variant = null;
-
-            // Try selectedColorSlug FIRST - this is most reliable
-            if (selectedColorSlug && product.colorVariants) {
-              variant = product.colorVariants.find((v) => v.slug === selectedColorSlug);
-              if (variant) {
-                console.log(
-                  "✅ VARIANT FOUND BY SLUG:",
-                  JSON.stringify({
-                    slug: selectedColorSlug,
-                    variantTitle: variant.productTitle,
-                  }),
-                );
-              }
-            }
-
-            // Fall back to variantId lookup if slug didn't work
-            if (!variant && variantId && product.colorVariants) {
-              variant = product.colorVariants.find((v) => v.variantId === variantId);
-              if (variant) {
-                console.log(
-                  "✅ VARIANT FOUND BY VARIANTID:",
-                  JSON.stringify({
-                    variantId,
-                    variantTitle: variant.productTitle,
-                  }),
-                );
-              }
-            }
-
-            // Last resort: Use first variant
-            if (!variant && product.colorVariants?.length) {
-              variant = product.colorVariants[0];
-              console.warn(
-                "⚠️ USING FIRST VARIANT AS FALLBACK:",
-                JSON.stringify({
-                  slug: variant.slug,
-                  variantTitle: variant.productTitle,
-                  selectedColorSlugWas: selectedColorSlug,
-                  variantIdWas: variantId,
-                }),
+            const variant = selectedProductVariant(product, selectedColorSlug, variantId);
+            if (unavailableProductSelection(product, selectedColorSlug, variantId)) {
+              return (
+                <li key={variantId} className="flex items-center justify-between gap-3 p-4">
+                  <p className="text-sm">{product.name}: selected colour unavailable</p>
+                  <button
+                    onClick={() => remove(product.id, selectedColorSlug)}
+                    className="text-sm text-red-700"
+                  >
+                    Remove
+                  </button>
+                </li>
               );
             }
+            const price = variant?.price ?? product.price;
+            const compareAtPrice =
+              variant?.price === undefined ? product.compareAtPrice : variant.compareAtPrice;
 
             // Display name and image
             const displayName = variant ? getProductDisplayName(product, variant) : product.name;
@@ -128,7 +100,7 @@ export function CartView() {
                 className="flex gap-3 p-3 sm:gap-4 sm:p-4"
               >
                 <Link
-                  href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
+                  href={productHref(product, variant ?? undefined)}
                   className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-24"
                 >
                   <Image
@@ -144,7 +116,7 @@ export function CartView() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <Link
-                        href={`/shop/${product.slug}${selectedColorSlug ? `?color=${selectedColorSlug}` : ""}`}
+                        href={productHref(product, variant ?? undefined)}
                         className="line-clamp-2 text-sm font-medium hover:underline"
                       >
                         {displayName}
@@ -189,10 +161,10 @@ export function CartView() {
                     </div>
 
                     <div className="text-right">
-                      <p className="text-sm font-semibold">{formatINR(product.price * quantity)}</p>
-                      {product.compareAtPrice && (
+                      <p className="text-sm font-semibold">{formatINR(price * quantity)}</p>
+                      {compareAtPrice && (
                         <p className="text-xs text-muted-foreground line-through">
-                          {formatINR(product.compareAtPrice * quantity)}
+                          {formatINR(compareAtPrice * quantity)}
                         </p>
                       )}
                     </div>
@@ -223,6 +195,7 @@ export function CartView() {
 
           <Button
             size="lg"
+            disabled={unavailable}
             className="mt-5 w-full"
             onClick={() => {
               if (!user) {

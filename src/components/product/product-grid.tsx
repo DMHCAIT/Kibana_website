@@ -2,7 +2,7 @@ import type { Product } from "@/types/product";
 import { ProductCard } from "./product-card";
 import { cn } from "@/lib/utils";
 
-type ProductGridItem = {
+export type ProductGridItem = {
   key: string; // Unique key for variant, e.g., "prod-id-color-slug"
   product: Product;
   href?: string;
@@ -16,7 +16,7 @@ type Props = {
   products?: Product[];
   items?: ProductGridItem[];
   variant?: "compact" | "full";
-  columns?: "2-4" | "1-2-3";
+  columns?: "2-4" | "1-2-3" | "collection-large" | "collection-standard" | "collection-compact";
   className?: string;
 };
 
@@ -36,6 +36,9 @@ export function ProductGrid({
         "grid gap-2 sm:gap-4 md:gap-5",
         columns === "2-4" && "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
         columns === "1-2-3" && "grid-cols-1 sm:grid-cols-2 md:grid-cols-3",
+        columns === "collection-large" && "grid-cols-1 lg:grid-cols-2",
+        columns === "collection-standard" && "grid-cols-2 lg:grid-cols-3",
+        columns === "collection-compact" && "grid-cols-2 lg:grid-cols-4",
         className,
       )}
     >

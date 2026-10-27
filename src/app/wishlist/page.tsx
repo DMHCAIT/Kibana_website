@@ -25,6 +25,7 @@ export default function WishlistPage() {
   const { user, openAuthModal, _hasHydrated } = useAuth();
   const { items } = useWishlist();
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     const loadWishlistItems = async () => {
@@ -61,7 +62,9 @@ export default function WishlistPage() {
                   variantKey: itemKey,
                   displayImage: getShopDisplayImage(prod, variant),
                   displayName: getProductDisplayName(prod, variant),
-                  href: `/shop/${prod.slug}?color=${variantPart}`,
+                  href: variant.pageSlug
+                    ? `/shop/${variant.pageSlug}`
+                    : `/shop/${prod.slug}?color=${variantPart}`,
                 };
               }
             }
@@ -74,7 +77,13 @@ export default function WishlistPage() {
       setWishlistItems(mappedItems);
     };
 
-    loadWishlistItems();
+    setLoadError("");
+    loadWishlistItems().catch((error: unknown) => {
+      console.error("Failed to load wishlist products:", error);
+      setLoadError(
+        error instanceof Error ? error.message : "Wishlist products could not be loaded.",
+      );
+    });
   }, [items]);
 
   useEffect(() => {
@@ -102,6 +111,19 @@ export default function WishlistPage() {
           </Button>
         </section>
       </>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <section className="container py-12">
+        <p role="alert" className="text-sm text-red-700">
+          {loadError}
+        </p>
+        <Link href="/shop" className="mt-4 inline-block underline">
+          Browse products
+        </Link>
+      </section>
     );
   }
 

@@ -4,5 +4,6 @@
   { "slug": "sling-bag", "name": "Sling Bag", "image": "/mv/cat-4.jpeg", "order": 3 },
   { "slug": "clutch", "name": "Clutch", "image": "/mv/cat-2.jpeg", "order": 4 },
   { "slug": "backpack", "name": "Backpack", "image": "/mv/cat-1.jpeg", "order": 5 },
-  { "slug": "wallet", "name": "Wallet", "image": "/mv/cat-6.jpeg", "order": 6 }
+  { "slug": "wallet", "name": "Wallet", "image": "/mv/cat-6.jpeg", "order": 6 },
+  { "slug": "duffle-bag", "name": "Duffle", "image": "/mv/cat-2.jpeg", "order": 7 }
 ]

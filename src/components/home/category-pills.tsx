@@ -1,6 +1,7 @@
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import { categories } from "@/lib/data";
+import { SHOP_CATEGORIES } from "@/lib/shop-categories";
 
 export function CategoryPills() {
   return (
@@ -9,7 +10,10 @@ export function CategoryPills() {
         {categories.map((category) => (
           <li key={category.slug} className="flex-shrink-0">
             <Link
-              href={`/shop?cat=${category.slug}`}
+              href={
+                SHOP_CATEGORIES.find((item) => item.slug === category.slug)?.href ??
+                `/shop?cat=${category.slug}`
+              }
               className="flex flex-col items-center gap-1.5"
             >
               <span className="relative h-20 w-20 overflow-hidden rounded-lg bg-kibana-cream transition-all hover:shadow-md sm:h-32 sm:w-32 md:h-44 md:w-44 lg:h-48 lg:w-48">

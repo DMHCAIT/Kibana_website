@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Check, Star, Truck, Calendar, RotateCcw } from "lucide-react";
+import { Calendar, Check, ChevronDown, FileText, RotateCcw, Star, Truck } from "lucide-react";
+import Image from "@/components/ui/image";
 import { getProductBySlug, getProductsByCategory } from "@/lib/server-data";
 import { discountPct, formatINR, cn } from "@/lib/utils";
 import { pickDefaultProductImage, getShopDisplayImage } from "@/lib/product-images";
@@ -9,14 +11,11 @@ import { ProductCarousel } from "@/components/product/product-carousel";
 import { AddToCartButton } from "./add-to-cart";
 import { ProductGallery } from "./product-gallery";
 import { DeliveryCheck } from "./delivery-check";
-import { WhatsAppShare } from "./whatsapp-share";
-import { ShopHeader } from "@/components/shop/shop-header";
+import { EstimatedDelivery } from "./estimated-delivery";
 import { TrackProductView } from "@/components/analytics/track-product-view";
 import type { Product } from "@/types/product";
+import { productHref, productInStock, DEFAULT_SHIPPING_RETURNS } from "@/lib/product-presentation";
 
-// ⚡ ISR: Revalidate every 5 minutes (product details change infrequently)
-// Previously 30s caused too many rebuilds and cold-start delays.
-// 300s (5 minutes) is acceptable since product catalog updates aren't real-time.
 export const revalidate = 300;
 
 export async function generateMetadata({
@@ -26,39 +25,31 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-
   if (!product) {
     return {
       title: "Product Not Found | Kibana",
       description: "The requested product does not exist.",
     };
   }
-
+  const variant =
+    product.colorVariants.find((item) => item.pageSlug === slug) ?? product.colorVariants[0];
+  const canonical = productHref(
+    product,
+    product.colorVariants.find((item) => item.pageSlug === slug),
+  );
   return {
-    title: `${product.name} | Kibana`,
-    description: product.description,
-    alternates: {
-      canonical: `/shop/${product.slug}`,
-    },
+    title: `${variant?.productTitle || product.name} | Kibana`,
+    description: variant?.description ?? product.description,
+    alternates: { canonical },
     openGraph: {
-      title: `${product.name} | Kibana`,
-      description: product.description,
+      title: `${variant?.productTitle || product.name} | Kibana`,
+      description: variant?.description ?? product.description,
       type: "website",
-      url: `/shop/${product.slug}`,
-      images: [{ url: product.image }],
+      url: canonical,
+      images: [{ url: variant?.image || product.image }],
     },
   };
 }
-
-const CATEGORY_LABELS: Record<Product["category"], string> = {
-  "tote-bag": "Tote Bag",
-  handbag: "Handbag",
-  "laptop-bag": "Laptop Bag",
-  "sling-bag": "Sling Bag",
-  clutch: "Clutch",
-  backpack: "Backpack",
-  wallet: "Wallet",
-};
 
 async function RelatedProducts({
   category,
@@ -67,45 +58,34 @@ async function RelatedProducts({
 }: {
   category: Product["category"];
   productId: string;
-  currentProduct?: Product;
+  currentProduct: Product;
 }) {
-  // ⚡ PERFORMANCE: Use getProductsByCategory instead of getProducts
-  // This queries only products in this category (not all products)
-  // Then filters in-memory, reducing memory and network traffic
   const related = await getProductsByCategory(category, productId);
-
-  // If no related products, show current product's color variants (if it's the only one in category)
-  let productsToShow = related;
-  if (related.length === 0 && currentProduct) {
-    productsToShow = [currentProduct];
-  }
-
-  if (productsToShow.length === 0) return null;
-
-  // Expand each product into its color variants
-  const gridItems = productsToShow.flatMap((product) =>
-    product.colorVariants?.length
+  const productsToShow = related.length > 0 ? related : [currentProduct];
+  const items = productsToShow.flatMap((product) =>
+    product.colorVariants.length
       ? product.colorVariants.map((variant) => ({
           key: `${product.id}-${variant.slug}`,
           product,
-          href: `/shop/${product.slug}?color=${variant.slug}`,
+          href: productHref(product, variant),
           displayName: variant.productTitle || `${product.name} - [${variant.slug}]`,
           displayImage: getShopDisplayImage(product, variant),
-          variantInStock: variant.inStock !== false, // Default to true if not specified
+          variantInStock: productInStock(product, variant),
         }))
-      : [
-          {
-            key: product.id,
-            product,
-            href: `/shop/${product.slug}`,
-          },
-        ],
+      : [{ key: product.id, product, href: `/shop/${product.slug}` }],
   );
-
   return (
-    <section className="container py-2 pb-20 sm:py-3 sm:pb-8 md:py-14">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em]">You may also like</h2>
-      <ProductCarousel items={gridItems} />
+    <section
+      className="container pb-16 pt-10 md:pb-20 md:pt-16"
+      aria-labelledby="related-products-heading"
+    >
+      <h2
+        id="related-products-heading"
+        className="mb-8 text-center text-lg tracking-[0.18em] md:mb-12 md:text-2xl"
+      >
+        Related Products
+      </h2>
+      <ProductCarousel items={items} />
     </section>
   );
 }
@@ -122,298 +102,250 @@ export default async function ProductDetailPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  console.log(
-    "📄 PRODUCT PAGE DEBUG:",
-    JSON.stringify(
-      {
-        slug,
-        colorFromSearchParams: color,
-        colorVariantSlugs: product.colorVariants?.map((v) => v.slug),
-      },
-      null,
-      2,
-    ),
-  );
-
   const activeVariant =
-    product.colorVariants?.find((v) => v.slug === color) ?? product.colorVariants?.[0];
-
-  console.log(
-    "📄 ACTIVE VARIANT DETERMINED:",
-    JSON.stringify(
-      {
-        activeVariantSlug: activeVariant?.slug,
-        activeVariantTitle: activeVariant?.productTitle,
-        matchedByColor: !!product.colorVariants?.find((v) => v.slug === color),
-      },
-      null,
-      2,
-    ),
-  );
-  const activeProductTitle = activeVariant?.productTitle || product.name;
-  const activeStockQty = activeVariant?.stockQty;
-  const activeVariantInStock = activeVariant?.inStock !== false;
-  const galleryImages = activeVariant?.gallery?.length
-    ? activeVariant.gallery
-    : (product.gallery ?? []);
-
-  // ✅ FIXED: Use database images by default, only override for specific products
-  // Use getShopDisplayImage for products with intentional image hardcoding
-  // For all other products, use the database image directly
+    product.colorVariants.find((variant) => variant.pageSlug === slug) ??
+    product.colorVariants.find((variant) => variant.slug === color) ??
+    product.colorVariants[0];
+  const title = activeVariant?.productTitle || product.name;
+  const inStock = productInStock(product, activeVariant);
+  const stockQty = activeVariant?.stockQty;
+  const gallery = activeVariant ? (activeVariant.gallery ?? []) : product.gallery;
   const primaryImage = activeVariant
-    ? getShopDisplayImage(product, activeVariant) // Uses hardcoded rules for specific products
-    : pickDefaultProductImage(product.image, galleryImages);
-
-  const allImages = Array.from(new Set([primaryImage, ...galleryImages].filter(Boolean)));
-
-  // Per-color content overrides (fall back to product-level if not set per-color)
-  const activeDescription = activeVariant?.description || product.description;
-  const activeFeatures = activeVariant?.features?.length
-    ? activeVariant.features
-    : product.features;
-  const activeSpecs =
-    activeVariant?.specs && Object.keys(activeVariant.specs).length
-      ? activeVariant.specs
-      : product.specs;
-  const pct = discountPct(product.price, product.compareAtPrice);
-  const categoryLabel = CATEGORY_LABELS[product.category] ?? "Shop all bags";
+    ? getShopDisplayImage(product, activeVariant)
+    : pickDefaultProductImage(product.image, gallery);
+  const images = Array.from(new Set([primaryImage, ...gallery].filter(Boolean)));
+  const description = activeVariant?.description ?? product.description;
+  const features = activeVariant?.features ?? product.features;
+  const specs = activeVariant?.specs ?? product.specs;
+  const price = activeVariant?.price ?? product.price;
+  const compareAtPrice =
+    activeVariant?.price === undefined ? product.compareAtPrice : activeVariant.compareAtPrice;
+  const pct = discountPct(price, compareAtPrice);
+  const summaryClass =
+    "flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 py-5 text-[11px] font-medium uppercase tracking-[0.12em] [&::-webkit-details-marker]:hidden";
 
   return (
     <>
       <TrackProductView product={product} variant={activeVariant} />
-      <section className="container py-1 pb-16 sm:py-4 sm:pb-20 md:py-8 md:pb-8">
-        <div className="mx-auto mt-1 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 px-3 sm:mt-4 sm:gap-6 sm:px-4 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8 md:px-8 lg:gap-12">
-          {/* Gallery Column with Header */}
-          <div className="w-full min-w-0 md:w-auto">
-            <ShopHeader heading={categoryLabel} showSort={false} />
-            <ProductGallery
-              images={allImages}
-              productName={product.name}
-              discountPct={pct}
-              variantInStock={activeVariantInStock}
-            />
-          </div>
+      <section className="storefront-product mx-auto w-full max-w-[1680px] pb-10 lg:pt-6">
+        <div className="grid min-w-0 grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-12 xl:gap-20">
+          <ProductGallery
+            key={`${product.id}-${activeVariant?.slug ?? "default"}`}
+            images={images}
+            productName={title}
+            discountPct={pct}
+            variantInStock={inStock}
+          />
 
-          {/* Details */}
-          <div className="w-full min-w-0 pt-3 sm:pt-6 md:pt-11">
-            <h1 className="break-words font-display text-lg leading-tight sm:text-2xl md:text-4xl">
-              {activeProductTitle}
-            </h1>
+          <div className="min-w-0 px-5 lg:sticky lg:top-24 lg:px-0">
+            <h1 className="storefront-product-title break-words">{title}</h1>
 
-            <div className="mt-1.5 flex items-center gap-2 text-xs sm:mt-2 sm:text-sm">
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
+            <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+              {compareAtPrice && (
+                <span className="text-muted-foreground line-through">
+                  {formatINR(compareAtPrice)}
+                </span>
+              )}
+              <span className={cn("font-medium", pct > 0 && "text-kibana-sale")}>
+                {formatINR(price)}
+              </span>
+              {pct > 0 && <span className="text-xs text-kibana-sale">{pct}% OFF</span>}
+              {inStock && typeof stockQty === "number" && (
+                <span className="text-[11px] text-muted-foreground">Stock: {stockQty}</span>
+              )}
+            </div>
+
+            <a
+              href="#product-reviews"
+              className="mt-3 inline-flex items-center gap-2 text-[11px] text-muted-foreground"
+            >
+              <span className="flex gap-0.5" aria-hidden="true">
+                {Array.from({ length: 5 }, (_, index) => (
                   <Star
-                    key={i}
+                    key={index}
                     className={cn(
-                      "h-3 w-3 sm:h-3.5 sm:w-3.5",
-                      i < Math.round(product.rating)
+                      "h-3 w-3",
+                      index < Math.round(product.rating)
                         ? "fill-kibana-tan text-kibana-tan"
                         : "text-muted-foreground/40",
                     )}
                   />
                 ))}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {product.rating.toFixed(1)} ({product.reviewCount} reviews)
               </span>
-            </div>
+              {product.rating.toFixed(1)} ({product.reviewCount} reviews)
+            </a>
 
-            <div className="mt-2 flex flex-wrap items-center gap-2 sm:mt-3">
-              <span className="text-lg font-semibold sm:text-xl md:text-2xl">
-                {formatINR(product.price)}
-              </span>
-              {product.compareAtPrice && (
-                <span className="text-xs text-muted-foreground line-through sm:text-sm">
-                  {formatINR(product.compareAtPrice)}
-                </span>
-              )}
-              {pct > 0 && (
-                <span className="bg-emerald-700 px-1 py-0.5 text-[10px] font-semibold text-white sm:px-1.5 sm:text-xs">
-                  {pct}% OFF
-                </span>
-              )}
-              {activeVariantInStock && typeof activeStockQty === "number" && (
-                <span
-                  className={cn(
-                    "px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs",
-                    activeStockQty > 5
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 text-amber-800",
-                  )}
-                >
-                  Stock: {activeStockQty}
-                </span>
-              )}
-            </div>
+            <EstimatedDelivery />
 
-            {/* Value Proposition SVG Badges */}
-            <div className="mt-3 grid grid-cols-3 gap-2 border-y border-border/60 py-2.5 sm:mt-4 sm:gap-3 sm:py-3">
-              <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:justify-start sm:gap-2 sm:text-left">
-                <Truck className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
-                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
-                  Free Shipping
-                </span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1.5 border-x border-border/60 px-1 text-center sm:flex-row sm:justify-start sm:gap-2 sm:px-2 sm:text-left">
-                <Calendar className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
-                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
-                  5-7 Days Delivery
-                </span>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:flex-row sm:justify-start sm:gap-2 sm:text-left">
-                <RotateCcw className="sm:h-4.5 sm:w-4.5 h-4 w-4 shrink-0 text-kibana-camel" />
-                <span className="text-[10px] font-medium leading-tight text-kibana-ink/80 sm:text-xs">
-                  Easy Returns
-                </span>
-              </div>
-            </div>
-
-            {product.colors.length > 0 && (
-              <div className="mt-3 sm:mt-4">
-                <p className="mb-1.5 text-[8px] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-[10px]">
-                  Colour —{" "}
-                  <span className="capitalize normal-case">
-                    {(activeVariant?.slug ?? "").replace(/-/g, " ")}
-                  </span>
+            {product.colorVariants.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs">
+                  Colour: <span className="ml-1 font-medium">{activeVariant?.color}</span>
                 </p>
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  {(product.colorVariants ?? []).map((v) => {
-                    const activeSlug = color ?? product.colorVariants?.[0]?.slug ?? "";
-                    return (
-                      <a
-                        key={v.color}
-                        href={`/shop/${product.slug}?color=${v.slug}`}
-                        className={cn(
-                          "block h-6 w-6 rounded-full ring-2 ring-offset-2 transition-all hover:ring-kibana-tan sm:h-7 sm:w-7",
-                          v.slug === activeSlug ? "ring-kibana-ink" : "ring-transparent",
-                        )}
-                        style={{ backgroundColor: v.hex || v.color }}
-                        title={v.slug.replace(/-/g, " ")}
+                <div className="mt-3 flex flex-wrap gap-2.5" aria-label="Product colours">
+                  {product.colorVariants.map((variant) => (
+                    <Link
+                      key={variant.slug}
+                      href={productHref(product, variant)}
+                      aria-label={`Select ${variant.color}`}
+                      aria-current={variant.slug === activeVariant?.slug ? "true" : undefined}
+                      className={cn(
+                        "relative block h-20 w-16 overflow-hidden border bg-kibana-tile transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+                        variant.slug === activeVariant?.slug
+                          ? "border-foreground"
+                          : "border-transparent hover:border-foreground/40",
+                      )}
+                      title={variant.color}
+                    >
+                      <Image
+                        src={variant.image || product.image}
+                        alt={variant.color}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
                       />
-                    );
-                  })}
+                      {!productInStock(product, variant) && (
+                        <span className="absolute inset-x-0 bottom-0 bg-white/90 py-0.5 text-center text-[8px] uppercase tracking-wide">
+                          Sold Out
+                        </span>
+                      )}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Add to cart */}
-            <div className="mt-4 sm:mt-5">
-              <AddToCartButton product={product} activeVariantSlug={activeVariant?.slug} />
+            <div className="mt-6 grid grid-cols-3 gap-3 rounded-sm bg-kibana-tile px-3 py-5">
+              {[
+                { icon: Truck, label: "Free Shipping" },
+                { icon: Calendar, label: "Delivery within 4 days" },
+                { icon: RotateCcw, label: "Easy Returns" },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex flex-col items-center gap-2 text-center">
+                  <Icon className="h-6 w-6" strokeWidth={1.1} aria-hidden="true" />
+                  <span className="text-[10px] leading-relaxed">{label}</span>
+                </div>
+              ))}
             </div>
 
-            {/* Delivery & Share - Moved below Add to Cart */}
-            <div className="mt-6 space-y-3 border-t border-border pt-4 sm:mt-8 sm:space-y-4 sm:pt-6">
+            <div className="mt-6">
+              <AddToCartButton
+                key={activeVariant?.slug ?? product.id}
+                product={product}
+                activeVariantSlug={activeVariant?.slug}
+              />
+            </div>
+
+            <div className="mt-7">
               <DeliveryCheck />
-              <div>
-                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-xs">
-                  Share Product
-                </h3>
-                <WhatsAppShare
-                  product={product}
-                  price={product.price}
-                  colorSlug={activeVariant?.slug}
-                />
-              </div>
             </div>
 
-            {/* Key Features - Moved below Add to Cart */}
-            {activeFeatures.length > 0 && (
-              <div className="mt-6 border-t border-border pt-4 sm:mt-8 sm:pt-6">
-                <h3 className="mb-2 text-xs font-semibold sm:mb-3 sm:text-sm md:text-base">
-                  Key Features
-                </h3>
-                <ul className="grid grid-cols-1 gap-y-2 sm:grid-cols-2 sm:gap-x-4">
-                  {activeFeatures.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-kibana-camel" />
-                      <span className="text-xs leading-snug text-kibana-ink/70 sm:text-sm">
-                        {f}
-                      </span>
+            {features.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-sm font-medium tracking-[0.08em]">Key Features</h2>
+                <ul className="mt-3 grid gap-x-5 gap-y-2 sm:grid-cols-2">
+                  {features.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 text-xs leading-relaxed text-foreground/80"
+                    >
+                      <Check
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                        strokeWidth={1.4}
+                        aria-hidden="true"
+                      />
+                      {feature}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* Accordions - Moved below Add to Cart */}
-            <div className="mt-6 divide-y divide-border border-t border-border sm:mt-8">
-              {/* Description Accordion */}
-              <details className="group py-3 sm:py-4" open>
-                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                  Description
-                  <svg
+            <div className="mt-7 divide-y divide-border border-y border-border">
+              <details className="group">
+                <summary className={summaryClass}>
+                  <span className="flex items-center gap-3">
+                    <FileText className="h-4 w-4" strokeWidth={1.2} />
+                    Description
+                  </span>
+                  <ChevronDown
                     className="h-4 w-4 transition-transform group-open:rotate-180"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                    aria-hidden="true"
+                  />
                 </summary>
-                <p className="mt-2 text-xs font-light leading-relaxed text-stone-600 sm:mt-3 sm:text-sm">
-                  {activeDescription}
+                <p className="whitespace-pre-line pb-6 text-xs leading-7 text-muted-foreground">
+                  {description}
                 </p>
               </details>
-
-              <details className="group py-3 sm:py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                  Product Details
-                  <svg
+              <details className="group">
+                <summary className={summaryClass}>
+                  <span className="flex items-center gap-3">
+                    <FileText className="h-4 w-4" strokeWidth={1.2} />
+                    Product Details
+                  </span>
+                  <ChevronDown
                     className="h-4 w-4 transition-transform group-open:rotate-180"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                    aria-hidden="true"
+                  />
                 </summary>
-                <div className="mt-2 divide-y divide-border">
-                  {Object.entries(activeSpecs).map(([label, value]) => (
-                    <div key={label} className="flex items-start gap-4 py-2 sm:py-2.5">
-                      <span className="w-28 shrink-0 text-xs font-medium text-kibana-camel sm:w-36">
-                        {label}
-                      </span>
-                      <span className="text-xs font-light text-stone-600 sm:text-sm">{value}</span>
+                <dl className="divide-y divide-border pb-5">
+                  {Object.entries(specs).map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-4 py-3 text-xs leading-relaxed"
+                    >
+                      <dt className="font-medium">{label}</dt>
+                      <dd className="whitespace-pre-line text-muted-foreground">{value}</dd>
                     </div>
                   ))}
-                </div>
+                </dl>
               </details>
-
-              <details className="group py-3 sm:py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold tracking-wide text-kibana-ink sm:text-sm md:text-base">
-                  Shipping &amp; Returns
-                  <svg
+              <details className="group">
+                <summary className={summaryClass}>
+                  <span className="flex items-center gap-3">
+                    <RotateCcw className="h-4 w-4" strokeWidth={1.2} />
+                    Shipping &amp; Returns
+                  </span>
+                  <ChevronDown
                     className="h-4 w-4 transition-transform group-open:rotate-180"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                    aria-hidden="true"
+                  />
                 </summary>
-                <div className="mt-2 space-y-2 border border-border p-3 sm:mt-3 sm:space-y-2.5 sm:p-4">
-                  {[
-                    "Free shipping on all orders above ₹999",
-                    "Easy returns within 7 days of delivery",
-                    "Products must be unused and in original packaging",
-                  ].map((line) => (
-                    <p
-                      key={line}
-                      className="flex items-start gap-2 text-xs font-light leading-snug text-stone-600 sm:text-sm"
-                    >
-                      <span className="mt-0.5 shrink-0 text-kibana-tan">•</span>
-                      {line}
-                    </p>
-                  ))}
-                </div>
+                <p className="whitespace-pre-line pb-6 text-xs leading-relaxed text-muted-foreground">
+                  {activeVariant?.shippingReturns ??
+                    product.shippingReturns ??
+                    DEFAULT_SHIPPING_RETURNS}
+                </p>
               </details>
             </div>
           </div>
         </div>
+      </section>
+
+      <section
+        id="product-reviews"
+        className="container scroll-mt-28 border-t border-border py-10 text-center md:py-14"
+        aria-labelledby="product-reviews-heading"
+      >
+        <h2 id="product-reviews-heading" className="text-base font-medium tracking-[0.08em]">
+          Customer Reviews
+        </h2>
+        <div className="mt-4 flex justify-center gap-1" aria-hidden="true">
+          {Array.from({ length: 5 }, (_, index) => (
+            <Star
+              key={index}
+              className={cn(
+                "h-4 w-4",
+                index < Math.round(product.rating)
+                  ? "fill-kibana-tan text-kibana-tan"
+                  : "text-muted-foreground/40",
+              )}
+            />
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {product.rating.toFixed(1)} / 5 ({product.reviewCount} reviews)
+        </p>
       </section>
 
       <Suspense fallback={null}>

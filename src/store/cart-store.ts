@@ -6,6 +6,11 @@ import { useAuth } from "@/store/auth-store";
 import { useProductCache } from "@/store/product-cache";
 import { trackAddToCart } from "@/lib/analytics";
 import { getProductDisplayName } from "@/lib/utils";
+import {
+  orderItemFromCart,
+  selectedProductVariant,
+  unavailableProductSelection,
+} from "@/lib/product-presentation";
 
 export type CartItem = {
   product: Product;
@@ -43,45 +48,18 @@ export const useCart = create<CartState>()((set, get) => ({
     // Get the current user from auth store
     const user = useAuth.getState().user;
     if (!user) return;
+    if (unavailableProductSelection(product, colorSlug)) {
+      throw new Error("This colour is no longer available. Please choose another colour.");
+    }
 
     // CRITICAL: If no colorSlug provided but product has variants, use the first one
     // This ensures every variant-enabled product always has a specific variant, never "default"
     let finalColorSlug = colorSlug;
     if (!finalColorSlug && product.colorVariants && product.colorVariants.length > 0) {
       finalColorSlug = product.colorVariants[0].slug;
-      console.log(
-        "🛒 CART-STORE ADD DEBUG - NO COLOR PROVIDED, USING FIRST VARIANT:",
-        JSON.stringify(
-          {
-            productId: product.id,
-            defaultColorSlug: finalColorSlug,
-            firstVariantTitle: product.colorVariants[0].productTitle,
-          },
-          null,
-          2,
-        ),
-      );
     }
 
     const variantId = generateVariantId(product.id, finalColorSlug);
-
-    console.log(
-      "🛒 CART-STORE ADD DEBUG:",
-      JSON.stringify(
-        {
-          productId: product.id,
-          colorSlugParam: colorSlug,
-          finalColorSlug,
-          variantId,
-          productVariants: product.colorVariants?.map((v) => ({
-            slug: v.slug,
-            variantId: v.variantId,
-          })),
-        },
-        null,
-        2,
-      ),
-    );
 
     // OPTIMISTIC UPDATE: Update UI immediately
     const state = get();
@@ -95,20 +73,6 @@ export const useCart = create<CartState>()((set, get) => ({
             : i,
         )
       : [...state.items, { product, quantity, selectedColorSlug: finalColorSlug, variantId }];
-
-    console.log(
-      "🛒 CART-STORE ADD DEBUG - State updated:",
-      JSON.stringify(
-        {
-          existingItemFound: !!existing,
-          newQuantityForItem: existing ? existing.quantity + quantity : quantity,
-          totalItemsInCart: next.length,
-          itemKeys: next.map((i) => `${i.variantId}`),
-        },
-        null,
-        2,
-      ),
-    );
 
     set({ items: next });
 
@@ -134,29 +98,46 @@ export const useCart = create<CartState>()((set, get) => ({
       displayImage, // NEW: Variant-specific image URL
     );
 
-    // SYNC WITH SERVER in background (fire and forget)
-    // Send both color slug and variantId for redundancy, plus complete name and image
-    fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId: product.id,
-        quantity,
-        color: finalColorSlug,
-        variantId: variantId,
-        productName: displayName,
-        productImage: displayImage,
-      }),
-    }).catch((error) => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity,
+          color: finalColorSlug,
+          variantId,
+          productName: displayName,
+          productImage: displayImage,
+        }),
+      });
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
+        throw new Error(data.error || "Failed to save the selected colour to your cart.");
+      }
+    } catch (error) {
+      set((current) => ({
+        items: current.items.flatMap((item) =>
+          item.product.id === product.id && item.variantId === variantId
+            ? item.quantity > quantity
+              ? [{ ...item, quantity: item.quantity - quantity }]
+              : []
+            : [item],
+        ),
+      }));
       console.error("Failed to sync cart to server:", error);
-    });
+      throw error;
+    }
   },
 
   remove: async (productId, colorSlug?) => {
     const user = useAuth.getState().user;
     if (!user) return;
 
-    const variantId = generateVariantId(productId, colorSlug);
+    const variantId =
+      get().items.find(
+        (item) => item.product.id === productId && item.selectedColorSlug === colorSlug,
+      )?.variantId ?? generateVariantId(productId, colorSlug);
 
     // OPTIMISTIC UPDATE: Remove immediately
     const next = get().items.filter(
@@ -178,7 +159,10 @@ export const useCart = create<CartState>()((set, get) => ({
     const user = useAuth.getState().user;
     if (!user) return;
 
-    const variantId = generateVariantId(productId, colorSlug);
+    const variantId =
+      get().items.find(
+        (item) => item.product.id === productId && item.selectedColorSlug === colorSlug,
+      )?.variantId ?? generateVariantId(productId, colorSlug);
 
     // OPTIMISTIC UPDATE: Update quantity immediately
     const next = get()
@@ -223,7 +207,7 @@ export const useCart = create<CartState>()((set, get) => ({
 
   count: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
 
-  subtotal: () => get().items.reduce((acc, i) => acc + i.product.price * i.quantity, 0),
+  subtotal: () => get().items.reduce((acc, i) => acc + orderItemFromCart(i).price * i.quantity, 0),
 
   loadForUser: async (_userId) => {
     set({ isLoading: true });
@@ -233,14 +217,13 @@ export const useCart = create<CartState>()((set, get) => ({
       useProductCache.getState().invalidate();
 
       // Fetch fresh products from cache (will refetch if invalidated)
-      const productsPromise = useProductCache.getState().fetch();
-
-      // Fetch cart items from API
-      const cartRes = await fetch("/api/cart");
+      const [products, cartRes] = await Promise.all([
+        useProductCache.getState().fetch(),
+        fetch("/api/cart"),
+      ]);
 
       if (cartRes.ok) {
         const cartData = await cartRes.json();
-        const products = await productsPromise;
 
         console.log("🛒 CART-STORE LOAD DEBUG - Raw from API:", JSON.stringify(cartData, null, 2));
 
@@ -261,7 +244,9 @@ export const useCart = create<CartState>()((set, get) => ({
               }
 
               // Prefer variantId if available, fall back to color slug
-              const colorSlug = cartItem.color;
+              const colorSlug =
+                cartItem.color ||
+                selectedProductVariant(product, undefined, cartItem.variantId)?.slug;
               const variantId =
                 cartItem.variantId || generateVariantId(cartItem.productId, colorSlug || undefined);
 

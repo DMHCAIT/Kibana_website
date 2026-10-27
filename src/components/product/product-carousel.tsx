@@ -21,7 +21,7 @@ type Props = {
 export function ProductCarousel({ items }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const checkScroll = () => {
     if (!scrollContainerRef.current) return;
@@ -31,47 +31,47 @@ export function ProductCarousel({ items }: Props) {
   };
 
   useEffect(() => {
-    // Check scroll on mount and when items change
+    const container = scrollContainerRef.current;
+    if (!container) return;
     checkScroll();
-
-    // Also check after a short delay to account for image loading
-    const timer = setTimeout(checkScroll, 500);
-
-    return () => clearTimeout(timer);
+    const observer = new ResizeObserver(checkScroll);
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [items]);
 
   const scroll = (direction: "left" | "right") => {
-    if (!scrollContainerRef.current) return;
-    const scrollAmount = 400;
-    scrollContainerRef.current.scrollBy({
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const card = container.firstElementChild;
+    if (!card) return;
+    const scrollAmount =
+      card.getBoundingClientRect().width + parseFloat(getComputedStyle(container).columnGap);
+    container.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
-    setTimeout(checkScroll, 300);
   };
 
   return (
-    <div className="relative">
+    <div className="group/carousel relative">
       {/* Scroll Container */}
       <div
         ref={scrollContainerRef}
         onScroll={checkScroll}
-        className="scrollbar-hide overflow-x-auto"
-        style={{
-          scrollBehavior: "smooth",
-          display: "flex",
-          gap: "1rem",
-          paddingBottom: "0.5rem",
-        }}
+        className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 sm:gap-6 lg:gap-12"
       >
         {items.map((item, index) => (
-          <div key={item.key} className="w-[165px] shrink-0 sm:w-[220px] md:w-[250px]">
+          <div
+            key={item.key}
+            className="w-[72%] shrink-0 snap-start sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-144px)/4)]"
+          >
             <ProductCard
               product={item.product}
               href={item.href}
               displayName={item.displayName}
               displayImage={item.displayImage}
               variantInStock={item.variantInStock}
+              variantKey={item.key}
               variant="compact"
               priority={index < 4}
             />
@@ -82,8 +82,9 @@ export function ProductCarousel({ items }: Props) {
       {/* Left Arrow */}
       {canScrollLeft && (
         <button
+          type="button"
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 z-10 -translate-x-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-lg transition-all hover:bg-white sm:-translate-x-6"
+          className="pointer-events-none absolute left-3 top-[42%] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white opacity-0 shadow-md transition-opacity duration-300 focus-visible:pointer-events-auto focus-visible:opacity-100 group-focus-within/carousel:pointer-events-auto group-focus-within/carousel:opacity-100 group-hover/carousel:pointer-events-auto group-hover/carousel:opacity-100 md:pointer-events-auto md:opacity-100"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -93,23 +94,14 @@ export function ProductCarousel({ items }: Props) {
       {/* Right Arrow */}
       {canScrollRight && (
         <button
+          type="button"
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-4 rounded-full bg-white/80 p-2 shadow-lg transition-all hover:bg-white sm:translate-x-6"
+          className="pointer-events-none absolute right-3 top-[42%] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white opacity-0 shadow-md transition-opacity duration-300 focus-visible:pointer-events-auto focus-visible:opacity-100 group-focus-within/carousel:pointer-events-auto group-focus-within/carousel:opacity-100 group-hover/carousel:pointer-events-auto group-hover/carousel:opacity-100 md:pointer-events-auto md:opacity-100"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
       )}
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }

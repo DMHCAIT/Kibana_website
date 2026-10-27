@@ -8,9 +8,11 @@ import {
   contactMessages as contactMessagesTable,
   userCart as userCartTable,
 } from "@/lib/db/schema";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, desc, sql } from "drizzle-orm";
+import { assertUniqueProductSlugs } from "@/lib/admin-product";
 import type { Product } from "@/types/product";
 import { products as localProducts } from "@/lib/data";
+import { withRetry } from "@/lib/db-retry";
 import localCategories from "@/data/categories.json";
 import localSiteConfig from "@/data/site-config.json";
 
@@ -67,6 +69,8 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
     slug: row.slug,
     name: row.name,
     description: row.description,
+    shippingReturns: row.shippingReturns ?? undefined,
+    inStock: row.inStock,
     price: row.price,
     compareAtPrice: row.compareAtPrice ?? undefined,
     image: row.image,
@@ -86,6 +90,8 @@ function rowToProduct(row: typeof productsTable.$inferSelect): Product {
   };
 }
 
+let productsRequest: Promise<Product[]> | undefined;
+
 export async function getProducts(): Promise<Product[]> {
   // ⚡ Check cache first (5 second TTL for fresh prices/discounts/stock - shop page has revalidate=0)
   const cached = getCached("products");
@@ -96,14 +102,21 @@ export async function getProducts(): Promise<Product[]> {
     return localProducts;
   }
 
-  const rows = await withTimeout(
-    db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
+  if (!productsRequest) {
+    productsRequest = loadProducts().finally(() => {
+      productsRequest = undefined;
+    });
+  }
+  return productsRequest;
+}
+
+async function loadProducts(): Promise<Product[]> {
+  const rows = await withRetry(
+    async () => await db.select().from(productsTable).orderBy(asc(productsTable.sortOrder)),
   );
-  // ✅ FIX: When database is available, ONLY return database products (never fallback to localProducts)
-  // This prevents duplicate data from both sources and ensures data consistency
-  const result = (rows ?? []).map(rowToProduct);
-  setCached("products", result, 5000); // Cache for 5 seconds (shop page needs fresh prices/discounts/stock)
-  return result;
+  const products = rows.map(rowToProduct);
+  setCached("products", products, 5000);
+  return products;
 }
 
 export async function getProduct(id: string): Promise<Product | undefined> {
@@ -135,12 +148,22 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   if (cached) return cached as Product | undefined;
 
   if (!hasDatabase) {
-    const product = localProducts.find((p) => p.slug === slug);
+    const product = localProducts.find(
+      (p) => p.slug === slug || p.colorVariants.some((variant) => variant.pageSlug === slug),
+    );
     setCached(`product-slug-${slug}`, product, 5000);
     return product;
   }
   try {
-    const [row] = await db.select().from(productsTable).where(eq(productsTable.slug, slug));
+    const [row] = await db
+      .select()
+      .from(productsTable)
+      .where(
+        sql`${productsTable.slug} = ${slug} OR EXISTS (
+        SELECT 1 FROM jsonb_array_elements(${productsTable.colorVariants}) AS variant
+        WHERE variant->>'pageSlug' = ${slug}
+      )`,
+      );
     // ✅ FIX: Only use database product when database is available
     const product = row ? rowToProduct(row) : undefined;
     setCached(`product-slug-${slug}`, product, 5000); // Cache for 5 seconds
@@ -160,6 +183,7 @@ export async function saveProduct(
     slug: product.slug,
     name: product.name,
     description: product.description,
+    shippingReturns: product.shippingReturns ?? null,
     price: product.price,
     compareAtPrice: product.compareAtPrice ?? null,
     image: product.image,
@@ -171,7 +195,7 @@ export async function saveProduct(
     isTrending: product.isTrending ?? false,
     inStock: product.inStock ?? true,
     colors: product.colors as string[],
-    colorVariants: product.colorVariants as unknown[],
+    colorVariants: product.colorVariants,
     features: product.features as string[],
     specs: product.specs as Record<string, string>,
     video: product.video ?? null,
@@ -180,10 +204,28 @@ export async function saveProduct(
     sortOrder: product.order ?? 999,
     updatedAt: new Date(),
   };
-  await db
-    .insert(productsTable)
-    .values(row)
-    .onConflictDoUpdate({ target: productsTable.id, set: row });
+  if (!hasDatabase) throw new Error("Database is not configured. Product changes cannot be saved.");
+  await db.transaction(async (transaction) => {
+    await transaction.execute(sql`SELECT pg_advisory_xact_lock(7319042)`);
+    const catalog = await transaction
+      .select({
+        id: productsTable.id,
+        slug: productsTable.slug,
+        sortOrder: productsTable.sortOrder,
+        colorVariants: sql<{ pageSlug?: string }[]>`COALESCE((
+        SELECT jsonb_agg(jsonb_build_object('pageSlug', variant->>'pageSlug'))
+        FROM jsonb_array_elements(${productsTable.colorVariants}) AS variant
+      ), '[]'::jsonb)`,
+      })
+      .from(productsTable);
+    assertUniqueProductSlugs(product, catalog);
+    const existing = catalog.find((item) => item.id === product.id);
+    row.sortOrder = product.order ?? existing?.sortOrder ?? 999;
+    await transaction
+      .insert(productsTable)
+      .values(row)
+      .onConflictDoUpdate({ target: productsTable.id, set: row });
+  });
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -585,6 +627,8 @@ export type AdminOrder = {
     quantity: number;
     image: string;
     color?: string;
+    colorSlug?: string;
+    variantId?: string;
   }[];
   total: number;
   placedAt: string;
@@ -732,6 +776,7 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
           productId: userCartTable.productId,
           quantity: userCartTable.quantity,
           color: userCartTable.color,
+          variantId: userCartTable.variantId,
           addedAt: userCartTable.addedAt,
           customerName: usersTable.name,
           customerEmail: usersTable.email,
@@ -755,46 +800,19 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
     }
 
     const result = rows.map((row) => {
-      // Priority 1: Use stored product name & image (most accurate - exact state when added to cart)
-      let displayImage = row.storedProductImage || row.productImage;
-      let displayProductName = row.storedProductName || row.productName;
-      let displayColor = row.color;
-
-      // Fallback: If stored name/image not available, try to match variant from database
-      // This handles legacy cart items that were added before we started storing the name
-      if (
-        !row.storedProductName &&
-        row.color &&
-        row.colorVariants &&
-        Array.isArray(row.colorVariants)
-      ) {
-        const variants = row.colorVariants as Array<{
-          color?: string;
-          slug?: string;
-          productTitle?: string;
-          image?: string;
-        }>;
-
-        // Match variant by color name (case-insensitive)
-        const matchedVariant = variants.find(
-          (v) => v.color && v.color.toLowerCase() === (row.color?.toLowerCase() ?? ""),
-        );
-
-        if (matchedVariant) {
-          // Use variant's image if available
-          if (matchedVariant.image) {
-            displayImage = matchedVariant.image;
-          }
-          // Use variant's full product title if available
-          if (matchedVariant.productTitle) {
-            displayProductName = matchedVariant.productTitle;
-          }
-          // Use variant's color if available
-          if (matchedVariant.color) {
-            displayColor = matchedVariant.color;
-          }
-        }
-      }
+      const variants = (row.colorVariants ?? []) as Product["colorVariants"];
+      const matchedVariant = variants.find((variant) =>
+        row.color
+          ? variant.slug === row.color || variant.color.toLowerCase() === row.color.toLowerCase()
+          : variant.variantId === row.variantId ||
+            `${row.productId}-${variant.slug}` === row.variantId,
+      );
+      const displayImage = row.storedProductImage || matchedVariant?.image || row.productImage;
+      const displayProductName =
+        row.storedProductName ||
+        matchedVariant?.productTitle ||
+        (matchedVariant ? `${row.productName} - ${matchedVariant.color}` : row.productName);
+      const displayColor = matchedVariant?.color ?? row.color;
 
       return {
         id: row.id,
@@ -807,7 +825,7 @@ export async function getCartItems(): Promise<AdminCartItem[]> {
         customerEmail: row.customerEmail ?? undefined,
         customerPhone: row.customerPhone ?? undefined,
         productName: displayProductName,
-        productPrice: row.productPrice,
+        productPrice: matchedVariant?.price ?? row.productPrice,
         productImage: displayImage,
       };
     });

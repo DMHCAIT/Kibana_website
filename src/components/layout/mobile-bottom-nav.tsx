@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Heart, Search, ShoppingBag, User } from "lucide-react";
+import { Home, Heart, ShoppingBag, User } from "lucide-react";
 import { useCart } from "@/store/cart-store";
 import { useAuth } from "@/store/auth-store";
 import { useRouter, usePathname } from "next/navigation";
@@ -30,7 +30,6 @@ export function MobileBottomNav() {
 
   const navItems = [
     { label: "Home", icon: Home, href: "/" },
-    { label: "All Products", icon: Search, href: "/shop" },
     { label: "Wishlist", icon: Heart, action: handleWishlist },
     { label: "Cart", icon: ShoppingBag, href: "/cart" },
     { label: user ? "Account" : "Login", icon: User, action: handleAccount },
@@ -41,7 +40,7 @@ export function MobileBottomNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur-sm md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.href ? pathname === item.href : false;

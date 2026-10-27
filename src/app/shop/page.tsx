@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
+import ShopListing, { type CollectionSearchParams } from "@/components/shop/shop-listing";
+import { SHOP_CATEGORIES } from "@/lib/shop-categories";
 
-import { getProducts, getCategories } from "@/lib/server-data";
-import { ProductGrid } from "@/components/product/product-grid";
-import { ShopHeader } from "@/components/shop/shop-header";
-import { getShopDisplayImage } from "@/lib/product-images";
-import { TrackProductListingView } from "@/components/analytics/track-product-listing-view";
-import { TrackSearch } from "@/components/analytics/track-search";
-import type { Product } from "@/types/product";
-
-// Disable static caching for dynamic inventory/out-of-stock updates
 export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Shop Premium Bags | Kibana",
   description:
     "Explore Kibana's premium vegan-leather handbags, totes, sling bags, backpacks, and wallets.",
-  alternates: {
-    canonical: "/shop",
-  },
+  alternates: { canonical: "/shop" },
   openGraph: {
     title: "Shop Premium Bags | Kibana",
     description:
@@ -27,135 +19,24 @@ export const metadata: Metadata = {
   },
 };
 
-type SearchParams = {
-  cat?: string;
-  category?: string;
-  q?: string;
-  sort?: string;
-  slugs?: string;
-  title?: string;
-};
-
-type ProductListItem = {
-  key: string;
-  product: Product;
-  href?: string;
-  displayName?: string;
-  displayImage?: string;
-  variantInStock?: boolean;
-  variantKey?: string; // Unique key for wishlist tracking per color variant
-};
-
-function toVariantListingItems(product: Product): ProductListItem[] {
-  if (!product.colorVariants?.length) {
-    return [{ key: product.id, product, variantKey: product.id }];
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<CollectionSearchParams>;
+}) {
+  const params = await searchParams;
+  const category = SHOP_CATEGORIES.find((item) => item.slug === (params.cat || params.category));
+  const isNewArrivals =
+    params.title === "New Arrivals" && params.slugs && !params.cat && !params.category;
+  if (category || isNewArrivals) {
+    const remaining = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || key === "cat" || key === "category") continue;
+      if (isNewArrivals && (key === "slugs" || key === "title")) continue;
+      remaining.set(key, value);
+    }
+    const query = remaining.toString();
+    permanentRedirect(`${category?.href ?? "/new-arrivals"}${query ? `?${query}` : ""}`);
   }
-
-  return product.colorVariants.map((variant) => ({
-    key: `${product.id}-${variant.slug}`,
-    product,
-    href: `/shop/${product.slug}?color=${variant.slug}`,
-    displayName:
-      (product.slug === "large-aurelia-fan-tote" && variant.slug === "mocha") ||
-      product.slug === "mini-aurelia-fan-tote"
-        ? "Mini Aurelia Fan Tote"
-        : variant.productTitle || `${product.name} - ${variant.color}`,
-    displayImage: getShopDisplayImage(product, variant),
-    variantInStock: variant.inStock !== false,
-    variantKey: `${product.id}-${variant.slug}`, // Use key as variantKey for wishlist
-  }));
-}
-
-export default async function ShopPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const {
-    cat: rawCat,
-    category: rawCategory,
-    q,
-    sort = "featured",
-    slugs,
-    title,
-  } = await searchParams;
-  const cat = rawCat || rawCategory;
-  const products = await getProducts();
-  const categories = await getCategories();
-  const selectedCategories = cat
-    ? cat
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean)
-    : [];
-  const selectedSlugs = slugs
-    ? slugs
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean)
-    : [];
-
-  let filtered = products;
-  if (selectedSlugs.length > 0) {
-    filtered = filtered.filter((p) => selectedSlugs.includes(p.slug));
-  }
-  if (selectedCategories.length > 0) {
-    filtered = filtered.filter((p) => {
-      // ⚡ Fixed: Check category directly instead of keyword matching
-      const matchesSelectedCategory = selectedCategories.some((slug) => p.category === slug);
-      return matchesSelectedCategory;
-    });
-  }
-  if (q) {
-    const query = q.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
-        p.colorVariants?.some(
-          (variant) =>
-            variant.color.toLowerCase().includes(query) ||
-            variant.productTitle?.toLowerCase().includes(query),
-        ),
-    );
-  }
-
-  // Apply sort
-  if (sort === "price-asc") filtered = [...filtered].sort((a, b) => a.price - b.price);
-  else if (sort === "price-desc") filtered = [...filtered].sort((a, b) => b.price - a.price);
-  else {
-    // Default "featured" sort - stable sort by ID for consistency
-    filtered = [...filtered].sort((a, b) => a.id.localeCompare(b.id));
-  }
-
-  const listingItems = filtered.flatMap(toVariantListingItems);
-
-  const heading = title
-    ? decodeURIComponent(title)
-    : q
-      ? `Search results for "${q}"`
-      : selectedCategories.length === 1
-        ? (categories.find((c) => c.slug === selectedCategories[0])?.name ?? "Shop")
-        : selectedCategories.length > 1
-          ? selectedCategories
-              .map((slug) => categories.find((c) => c.slug === slug)?.name ?? slug)
-              .join(" + ")
-          : "Shop all bags";
-
-  return (
-    <>
-      {q && <TrackSearch query={q} resultsCount={listingItems.length} />}
-      <TrackProductListingView
-        category={selectedCategories[0]}
-        productCount={listingItems.length}
-      />
-      <section className="container py-6 md:py-10">
-        <ShopHeader heading={heading} count={listingItems.length} sort={sort} showSort />
-
-        {listingItems.length > 0 ? (
-          <ProductGrid items={listingItems} variant="full" />
-        ) : (
-          <div className="rounded-xl border border-dashed border-border px-6 py-16 text-center text-sm text-muted-foreground">
-            No products in this category yet — check back soon.
-          </div>
-        )}
-      </section>
-    </>
-  );
+  return <ShopListing searchParams={Promise.resolve(params)} />;
 }

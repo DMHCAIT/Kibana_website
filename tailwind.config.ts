@@ -3,29 +3,14 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: ["class"],
   content: ["./src/**/*.{ts,tsx,mdx}"],
+  corePlugins: {
+    container: false,
+  },
   theme: {
-    container: {
-      center: true,
-      padding: {
-        DEFAULT: "1rem",
-        sm: "1rem",
-        lg: "1.5rem",
-        xl: "2rem",
-        "2xl": "3rem",
-      },
-      screens: {
-        lg: "1024px",
-        xl: "1440px",
-        "2xl": "1600px",
-      },
-    },
-    screens: {
-      xs: "0px",
-      sm: "500px",
-      md: "1216px",
-      lg: "1440px",
-    },
     extend: {
+      screens: {
+        xs: "480px",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -52,7 +37,17 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        // Brand palette inspired by the Kibana mockup
+        // Premium luxury color palette
+        luxury: {
+          cream: "#FAF8F5",
+          beige: "#F5F0EB",
+          tan: "#D4C5B9",
+          gold: "#C9A86A",
+          copper: "#B8956A",
+          ink: "#1A1714",
+          charcoal: "#3C3C3C",
+          taupe: "#8B8680",
+        },
         kibana: {
           tan: "#C9A77B",
           camel: "#B98E5A",
@@ -60,11 +55,17 @@ const config: Config = {
           ink: "#1A1A1A",
           stone: "#EFEAE3",
           olive: "#3C4A2C",
+          brown: "#462F1E",
+          tile: "#F3F3EF",
+          sale: "#C0392B",
         },
       },
       fontFamily: {
-        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
-        display: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        sans: ["var(--font-montserrat)", "system-ui", "sans-serif"],
+        display: ["var(--font-jost)", "system-ui", "sans-serif"],
+        playfair: ["var(--font-jost)", "system-ui", "sans-serif"],
+        serif: ["var(--font-jost)", "system-ui", "sans-serif"],
+        jost: ["var(--font-jost)", "system-ui", "sans-serif"],
       },
       fontWeight: {
         light: "300",
@@ -87,10 +88,20 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(10px) scale(0.95)" },
           "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
         },
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(18px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        kenburns: {
+          "0%": { transform: "scale(1.08)" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       animation: {
         marquee: "marquee 18s linear infinite",
         fadeIn: "fadeIn 0.3s ease-out",
+        fadeUp: "fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+        kenburns: "kenburns 7s cubic-bezier(0.22, 1, 0.36, 1) both",
       },
     },
   },

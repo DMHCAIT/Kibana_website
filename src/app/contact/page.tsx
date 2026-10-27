@@ -33,10 +33,10 @@ export default function ContactPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error((data as { error?: string }).error ?? "Something went wrong.");
       }
-      
+
       // Track contact form submission via unified tracking with server-side API
       trackContact(form.email, form.phone);
-      
+
       setSuccess(true);
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err) {
@@ -46,48 +46,69 @@ export default function ContactPage() {
     }
   }
   return (
-    <main className="bg-kibana-cream text-kibana-ink">
+    <main className="bg-background text-foreground">
       <TrackPageView pageName="Contact Us" pageType="contact" />
 
-      {/* ── Hero ── */}
-      <section className="bg-kibana-ink">
-        <div className="container py-12 md:py-20">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="h-px w-8 bg-kibana-tan" />
-            <p className="text-[9px] font-bold uppercase tracking-[0.45em] text-kibana-tan">Get In Touch</p>
+      {/* Hero Section */}
+      <section className="bg-foreground text-background">
+        <div className="storefront-section-space container max-w-[1600px]">
+          <div className="max-w-2xl">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-accent">
+              Get In Touch
+            </p>
+            <h1 className="mb-6 font-display text-4xl font-semibold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+              We'd Love to
+              <br />
+              Hear From You
+            </h1>
+            <p className="max-w-lg text-sm text-background/80">
+              Whether it's a question about your order, our products, or anything else — our team is
+              ready to help.
+            </p>
           </div>
-          <h1 className="font-bold uppercase tracking-[0.1em] text-3xl sm:text-4xl md:text-5xl text-kibana-cream leading-tight max-w-lg">
-            We&apos;d Love to<br />
-            <span className="text-kibana-tan">Hear From You</span>
-          </h1>
-          <p className="text-kibana-cream/80 text-sm mt-5 max-w-md leading-relaxed">
-            Whether it&apos;s a question about your order, our products, or anything else — our team is ready to help.
-          </p>
         </div>
       </section>
 
-      {/* ── Quick contact strip ── */}
-      <section className="border-b border-kibana-ink/8">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-kibana-ink/8">
-            {([
-              { icon: Phone, label: "Call Us", value: "+91 9711414110", href: "tel:+919711414110" },
-              { icon: Mail, label: "Email Us", value: "support@kibanalife.com", href: "mailto:support@kibanalife.com" },
-              { icon: Clock, label: "Working Hours", value: "Mon – Sat, 10 am – 7 pm", href: undefined },
-              { icon: MapPin, label: "Visit Us", value: "Sultanpur, New Delhi – 110030", href: undefined },
-            ] as const).map(({ icon: Icon, label, value, href }) => (
-              <div key={label} className="px-4 sm:px-6 py-5 flex items-start gap-3 bg-kibana-stone">
-                <div className="w-8 h-8 bg-kibana-ink flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon className="h-3.5 w-3.5 text-kibana-tan" />
-                </div>
+      {/* Contact Info Strip */}
+      <section className="border-b border-border/30">
+        <div className="container max-w-[1600px]">
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            {(
+              [
+                {
+                  icon: Phone,
+                  label: "Call Us",
+                  value: "+91 9711414110",
+                  href: "tel:+919711414110",
+                },
+                {
+                  icon: Mail,
+                  label: "Email",
+                  value: "support@kibanalife.com",
+                  href: "mailto:support@kibanalife.com",
+                },
+                { icon: Clock, label: "Hours", value: "Mon – Sat, 10 am – 7 pm", href: undefined },
+                { icon: MapPin, label: "Location", value: "New Delhi", href: undefined },
+              ] as const
+            ).map(({ icon: Icon, label, value, href }) => (
+              <div
+                key={label}
+                className="flex min-w-0 items-start gap-2 border-r border-border/30 px-2 py-6 last:border-r-0 sm:gap-3 sm:px-4 lg:gap-4 lg:px-6 lg:py-8"
+              >
+                <Icon className="mt-1 h-5 w-5 flex-shrink-0 text-accent" strokeWidth={1.5} />
                 <div className="min-w-0">
-                  <p className="text-[8px] font-bold uppercase tracking-[0.25em] text-kibana-ink/40 mb-0.5">{label}</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    {label}
+                  </p>
                   {href ? (
-                    <a href={href} className="text-xs text-kibana-ink/80 hover:text-kibana-camel transition-colors leading-snug break-all">
+                    <a
+                      href={href}
+                      className="break-words text-sm text-foreground transition-colors hover:text-accent"
+                    >
                       {value}
                     </a>
                   ) : (
-                    <p className="text-xs text-kibana-ink/80 leading-snug">{value}</p>
+                    <p className="text-sm text-foreground">{value}</p>
                   )}
                 </div>
               </div>
@@ -96,152 +117,179 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ── Main content ── */}
-      <div className="container py-14 md:py-20">
-        <div className="grid md:grid-cols-[1fr_1.15fr] gap-10 md:gap-16 items-start max-w-5xl">
-
-          {/* ── Left: Info cards ── */}
+      {/* Main Content */}
+      <div className="storefront-section-space container max-w-[1600px]">
+        <div className="grid gap-12 md:grid-cols-2 lg:gap-16">
+          {/* Left Column - Info */}
           <div>
-            <div className="flex items-center gap-3 mb-7">
-              <span className="h-px w-6 bg-kibana-tan" />
-              <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-kibana-tan">Our Details</p>
-            </div>
+            <h2 className="mb-8 font-display text-2xl font-semibold">Contact Information</h2>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Address */}
-              <div className="border border-kibana-ink/10 bg-white p-5 group hover:border-kibana-tan/40 transition-colors">
-                <div className="flex items-center gap-2 mb-2.5">
-                  <MapPin className="h-3.5 w-3.5 text-kibana-tan shrink-0" />
-                  <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40">Address</p>
+              <div className="border border-border/30 p-6 transition-colors hover:border-accent/40">
+                <div className="mb-4 flex items-center gap-3">
+                  <MapPin className="h-5 w-5 flex-shrink-0 text-accent" strokeWidth={1.5} />
+                  <p className="text-sm font-semibold uppercase tracking-widest">Address</p>
                 </div>
-                <p className="text-sm text-kibana-ink/80 leading-relaxed">
-                  House No. 1, 2nd Floor, KH.No. 581/2,<br />
+                <p className="text-sm font-light leading-relaxed text-muted-foreground">
+                  House No. 1, 2nd Floor, KH.No. 581/2,
+                  <br />
                   Village Sultanpur, New Delhi – 110030
                 </p>
               </div>
 
-              {/* Email + Phone */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="border border-kibana-ink/10 bg-white p-5 hover:border-kibana-tan/40 transition-colors">
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <Mail className="h-3.5 w-3.5 text-kibana-tan shrink-0" />
-                    <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40">E-mail</p>
+              {/* Email & Phone */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-border/30 p-6 transition-colors hover:border-accent/40">
+                  <div className="mb-4 flex items-center gap-3">
+                    <Mail className="h-5 w-5 flex-shrink-0 text-accent" strokeWidth={1.5} />
+                    <p className="text-sm font-semibold uppercase tracking-widest">Email</p>
                   </div>
-                  <a href="mailto:support@kibanalife.com" className="text-xs text-kibana-ink/80 hover:text-kibana-camel transition-colors break-all leading-relaxed">
+                  <a
+                    href="mailto:support@kibanalife.com"
+                    className="text-sm text-muted-foreground transition-colors hover:text-accent"
+                  >
                     support@kibanalife.com
                   </a>
                 </div>
-                <div className="border border-kibana-ink/10 bg-white p-5 hover:border-kibana-tan/40 transition-colors">
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <Phone className="h-3.5 w-3.5 text-kibana-tan shrink-0" />
-                    <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40">Phone</p>
+                <div className="border border-border/30 p-6 transition-colors hover:border-accent/40">
+                  <div className="mb-4 flex items-center gap-3">
+                    <Phone className="h-5 w-5 flex-shrink-0 text-accent" strokeWidth={1.5} />
+                    <p className="text-sm font-semibold uppercase tracking-widest">Phone</p>
                   </div>
-                  <a href="tel:+919711414110" className="text-xs text-kibana-ink/80 hover:text-kibana-camel transition-colors">
+                  <a
+                    href="tel:+919711414110"
+                    className="text-sm text-muted-foreground transition-colors hover:text-accent"
+                  >
                     +91 9711414110
                   </a>
                 </div>
               </div>
 
-              {/* Working hours */}
-              <div className="border-l-2 border-kibana-tan bg-kibana-tan/5 px-5 py-4 flex items-start gap-4">
-                <Clock className="h-4 w-4 text-kibana-tan mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-1.5">Working Hours</p>
-                  <p className="text-sm font-semibold text-kibana-ink">Monday – Saturday</p>
-                  <p className="text-sm text-kibana-ink/60">10:00 am – 7:00 pm</p>
+              {/* Hours */}
+              <div className="border-l-2 border-accent bg-accent/5 px-6 py-6">
+                <div className="mb-4 flex items-center gap-3">
+                  <Clock className="h-5 w-5 flex-shrink-0 text-accent" strokeWidth={1.5} />
+                  <p className="text-sm font-semibold uppercase tracking-widest">Hours</p>
                 </div>
+                <p className="text-sm font-medium text-foreground">Monday – Saturday</p>
+                <p className="text-sm text-foreground/60">10:00 am – 7:00 pm</p>
               </div>
             </div>
           </div>
 
-          {/* ── Right: Form ── */}
-          <div className="bg-white border border-kibana-ink/8 px-7 py-8 sm:px-10 sm:py-10 shadow-sm">
-            <div className="flex items-center gap-3 mb-7">
-              <span className="h-px w-6 bg-kibana-tan" />
-              <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-kibana-tan">Send a Message</p>
-            </div>
+          {/* Right Column - Form */}
+          <div>
+            <h2 className="mb-8 font-display text-2xl font-semibold">Send us a Message</h2>
 
             {success ? (
-              <div className="flex flex-col items-center text-center py-10 gap-4">
-                <CheckCircle className="h-12 w-12 text-green-500" />
-                <h3 className="font-semibold text-kibana-ink text-lg">Message Sent!</h3>
-                <p className="text-sm text-kibana-ink/60">Thank you for reaching out. We&apos;ll get back to you within 24 hours.</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <CheckCircle className="mb-4 h-12 w-12 text-accent" />
+                <h3 className="mb-2 font-display text-lg font-semibold">Message Sent!</h3>
+                <p className="mb-6 text-sm text-muted-foreground">
+                  Thank you for reaching out. We'll get back to you within 24 hours.
+                </p>
                 <button
                   onClick={() => setSuccess(false)}
-                  className="mt-2 text-[9px] font-bold uppercase tracking-[0.3em] text-kibana-tan hover:text-kibana-camel transition-colors"
+                  className="text-sm font-semibold uppercase tracking-wide text-accent transition-colors hover:text-accent/80"
                 >
-                  Send Another Message
+                  Send Another
                 </button>
               </div>
             ) : (
-              <form className="space-y-5" onSubmit={handleSubmit}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Name */}
                 <div>
-                  <label htmlFor="name" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                    Name <span className="text-kibana-tan">*</span>
+                  <label
+                    htmlFor="name"
+                    className="mb-3 block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                  >
+                    Name <span className="text-accent">*</span>
                   </label>
                   <input
-                    id="name" name="name" type="text" required
-                    value={form.name} onChange={handleChange}
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={handleChange}
                     placeholder="Your full name"
-                    className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                    className="w-full border border-border/30 bg-background px-4 py-3 text-sm transition-all placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
+                {/* Email & Phone */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="email" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                      E-mail <span className="text-kibana-tan">*</span>
+                    <label
+                      htmlFor="email"
+                      className="mb-3 block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                    >
+                      Email <span className="text-accent">*</span>
                     </label>
                     <input
-                      id="email" name="email" type="email" required
-                      value={form.email} onChange={handleChange}
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={form.email}
+                      onChange={handleChange}
                       placeholder="you@example.com"
-                      className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                      className="w-full border border-border/30 bg-background px-4 py-3 text-sm transition-all placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
-                      Phone No.
+                    <label
+                      htmlFor="phone"
+                      className="mb-3 block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                    >
+                      Phone
                     </label>
                     <input
-                      id="phone" name="phone" type="tel"
-                      value={form.phone} onChange={handleChange}
-                      placeholder="+91 00000 00000"
-                      className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors"
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="+91 000 000 0000"
+                      className="w-full border border-border/30 bg-background px-4 py-3 text-sm transition-all placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     />
                   </div>
                 </div>
 
+                {/* Message */}
                 <div>
-                  <label htmlFor="message" className="block text-[8px] font-bold uppercase tracking-[0.3em] text-kibana-ink/40 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="mb-3 block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                  >
                     Message
                   </label>
                   <textarea
-                    id="message" name="message" rows={5}
-                    value={form.message} onChange={handleChange}
+                    id="message"
+                    name="message"
+                    rows={6}
+                    value={form.message}
+                    onChange={handleChange}
                     placeholder="How can we help you?"
-                    className="w-full bg-kibana-stone border border-kibana-ink/10 px-4 py-3 text-sm text-kibana-ink placeholder:text-kibana-ink/30 focus:outline-none focus:border-kibana-tan transition-colors resize-none"
+                    className="w-full resize-none border border-border/30 bg-background px-4 py-3 text-sm transition-all placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
-                {error && (
-                  <p className="text-xs text-red-500">{error}</p>
-                )}
+                {error && <p className="text-sm text-red-500">{error}</p>}
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-kibana-ink text-kibana-cream text-[10px] font-bold uppercase tracking-[0.3em] py-4 hover:bg-kibana-tan hover:text-kibana-ink transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full bg-foreground px-6 py-3 text-sm font-semibold uppercase tracking-widest text-background transition-all hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? "Sending…" : "Send Message"}
                 </button>
               </form>
             )}
           </div>
-
         </div>
       </div>
-
     </main>
   );
 }

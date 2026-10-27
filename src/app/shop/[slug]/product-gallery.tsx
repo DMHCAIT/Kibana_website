@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import Image from "@/components/ui/image";
 import { Badge } from "@/components/ui/badge";
 
 type Props = {
@@ -11,145 +12,108 @@ type Props = {
   variantInStock?: boolean;
 };
 
-const SWIPE_THRESHOLD = 48;
-
 export function ProductGallery({
   images,
   productName,
   discountPct: pct,
   variantInStock = true,
 }: Props) {
-  const [active, setActive] = useState(0);
   const allImages = images.length > 0 ? images : ["/extracted/img-060.jpg"];
-
-  const hScrollRef = useRef<HTMLDivElement>(null);
-  const vScrollRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const isSwiping = useRef(false);
-
-  const imageKey = allImages.join("|");
+  const [active, setActive] = useState(0);
+  const [zoomed, setZoomed] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const isZoomOpen = zoomed !== null;
 
   useEffect(() => {
-    setActive(0);
-  }, [imageKey]);
+    if (!isZoomOpen) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (!dialog.open) dialog.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isZoomOpen]);
 
-  useEffect(() => {
-    const hThumb = hScrollRef.current?.children[active] as HTMLElement | undefined;
-    hThumb?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  function goTo(index: number) {
+    scrollRef.current?.scrollTo({
+      left: index * scrollRef.current.clientWidth,
+      behavior: "smooth",
+    });
+  }
 
-    const vThumb = vScrollRef.current?.children[active] as HTMLElement | undefined;
-    vThumb?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "center" });
-  }, [active]);
+  function moveZoom(direction: number) {
+    setZoomed((current) =>
+      current === null ? null : (current + direction + allImages.length) % allImages.length,
+    );
+  }
 
-  const goNext = useCallback(() => {
-    if (allImages.length <= 1) return;
-    setActive((prev) => (prev + 1) % allImages.length);
-  }, [allImages.length]);
-
-  const goPrev = useCallback(() => {
-    if (allImages.length <= 1) return;
-    setActive((prev) => (prev - 1 + allImages.length) % allImages.length);
-  }, [allImages.length]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isSwiping.current = false;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
-    if (dx > dy && dx > 10) isSwiping.current = true;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isSwiping.current || allImages.length <= 1) return;
-    const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) < SWIPE_THRESHOLD) return;
-    if (delta > 0) goNext();
-    else goPrev();
-  };
-
-  const swipeProps =
-    allImages.length > 1
-      ? {
-          onTouchStart: handleTouchStart,
-          onTouchMove: handleTouchMove,
-          onTouchEnd: handleTouchEnd,
-          className:
-            "relative aspect-[3/4] w-full touch-pan-y overflow-hidden rounded-lg bg-white select-none",
-        }
-      : {
-          className: "relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-white",
-        };
-
-  const desktopSwipeProps =
-    allImages.length > 1
-      ? {
-          onTouchStart: handleTouchStart,
-          onTouchMove: handleTouchMove,
-          onTouchEnd: handleTouchEnd,
-          className:
-            "relative aspect-[8/11] w-[300px] sm:w-[360px] md:w-[400px] lg:w-[460px] max-w-full touch-pan-y overflow-hidden rounded-lg bg-white select-none",
-        }
-      : {
-          className:
-            "relative aspect-[8/11] w-[300px] sm:w-[360px] md:w-[400px] lg:w-[460px] max-w-full overflow-hidden rounded-lg bg-white",
-        };
+  const status = !variantInStock ? (
+    <Badge variant="soldOut" className="pointer-events-none absolute left-3 top-3 z-10">
+      Sold Out
+    </Badge>
+  ) : pct > 0 ? (
+    <Badge variant="discount" className="pointer-events-none absolute left-3 top-3 z-10">
+      {pct}% OFF
+    </Badge>
+  ) : null;
 
   return (
-    <>
-      {/* ── Mobile: main image → horizontal thumbs below ── */}
-      <div className="flex w-full min-w-0 flex-col gap-2 sm:gap-3 md:hidden">
-        {/* Main image */}
-        <div className="rounded-lg bg-[#f5f1ed] p-3 sm:p-4">
-          <div {...swipeProps}>
-            <Image
-              src={allImages[active]}
-              alt={productName}
-              fill
-              priority
-              sizes="(max-width: 640px) calc(100vw - 1.5rem), 100vw"
-              className="object-cover transition-opacity duration-200"
-              draggable={false}
-            />
-            {pct > 0 && (
-              <Badge variant="discount" className="absolute left-2 top-2 sm:left-3 sm:top-3">
-                {pct}% OFF
-              </Badge>
-            )}
-            {!variantInStock && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <span className="bg-black px-4 py-2 text-sm font-bold tracking-wide text-white sm:text-base">
-                  OUT OF STOCK
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Horizontal thumb strip — scrollable, no arrows */}
-        {allImages.length > 1 && (
+    <div className="min-w-0" aria-label={`${productName} gallery`}>
+      <div className="lg:hidden">
+        <div className="relative">
           <div
-            ref={hScrollRef}
-            className="scrollbar-hide flex w-full flex-row gap-1.5 overflow-x-auto px-0.5 sm:gap-2 sm:px-1"
+            ref={scrollRef}
+            className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto"
+            onScroll={(event) => {
+              const { scrollLeft, clientWidth } = event.currentTarget;
+              if (clientWidth > 0) setActive(Math.round(scrollLeft / clientWidth));
+            }}
           >
-            {allImages.map((src, i) => (
+            {allImages.map((src, index) => (
               <button
-                key={i}
-                onClick={() => setActive(i)}
-                className={`relative aspect-square w-14 shrink-0 overflow-hidden rounded border-2 bg-white transition-all sm:w-16 ${
-                  active === i ? "border-kibana-ink" : "border-transparent hover:border-kibana-tan"
-                }`}
+                key={`${src}-${index}`}
+                type="button"
+                aria-label={`Zoom ${productName} image ${index + 1}`}
+                onClick={() => setZoomed(index)}
+                className="relative aspect-[4/5] w-full shrink-0 snap-center bg-kibana-tile focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
               >
                 <Image
                   src={src}
-                  alt={`${productName} ${i + 1}`}
+                  alt={`${productName} - image ${index + 1}`}
                   fill
-                  sizes="(max-width: 640px) 56px, 64px"
+                  priority={index === 0}
+                  sizes="(max-width: 1023px) 100vw, 1px"
                   className="object-cover"
+                  draggable={false}
+                />
+              </button>
+            ))}
+          </div>
+          {status}
+          <span className="pointer-events-none absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90">
+            <ZoomIn className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </div>
+        {allImages.length > 1 && (
+          <div
+            className="flex flex-wrap justify-center gap-1 bg-white py-2"
+            aria-label="Gallery pagination"
+          >
+            {allImages.map((src, index) => (
+              <button
+                key={`${src}-${index}`}
+                type="button"
+                aria-label={`View image ${index + 1}`}
+                aria-current={active === index ? "true" : undefined}
+                onClick={() => goTo(index)}
+                className="flex h-6 w-6 items-center justify-center"
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${active === index ? "bg-foreground" : "bg-foreground/30"}`}
                 />
               </button>
             ))}
@@ -157,61 +121,98 @@ export function ProductGallery({
         )}
       </div>
 
-      {/* ── Desktop: vertical thumbs on left → main image on right (left aligned) ── */}
-      <div className="hidden w-full flex-row gap-3 sm:gap-4 md:flex">
-        {/* Vertical thumb strip — scrollable, no arrows */}
-        {allImages.length > 1 && (
-          <div
-            ref={vScrollRef}
-            className="scrollbar-hide flex w-[80px] shrink-0 flex-col gap-2 overflow-y-auto"
-          >
-            {allImages.map((src, i) => (
+      <div className="hidden grid-cols-2 gap-1 lg:grid">
+        {allImages.map((src, index) => (
+          <div key={`${src}-${index}`} className={`relative ${index === 0 ? "col-span-2" : ""}`}>
+            <button
+              type="button"
+              aria-label={`Zoom ${productName} image ${index + 1}`}
+              onClick={() => setZoomed(index)}
+              className="group/gallery relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-kibana-tile focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+            >
+              <Image
+                src={src}
+                alt={`${productName} - image ${index + 1}`}
+                fill
+                priority={index === 0}
+                sizes={
+                  index === 0 ? "(min-width: 1024px) 52vw, 1px" : "(min-width: 1024px) 26vw, 1px"
+                }
+                className="object-cover"
+              />
+              <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white opacity-0 transition-opacity group-hover/gallery:opacity-100 group-focus-visible/gallery:opacity-100">
+                <ZoomIn className="h-4 w-4" aria-hidden="true" />
+              </span>
+            </button>
+            {index === 0 && status}
+          </div>
+        ))}
+      </div>
+
+      <dialog
+        ref={dialogRef}
+        aria-label={`${productName} image viewer`}
+        className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none bg-white p-0 backdrop:bg-black/60"
+        onCancel={() => setZoomed(null)}
+        onClose={() => setZoomed(null)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setZoomed(null);
+          }
+          if (event.key === "ArrowLeft") moveZoom(-1);
+          if (event.key === "ArrowRight") moveZoom(1);
+        }}
+      >
+        {zoomed !== null && (
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-end px-5 py-3">
               <button
-                key={i}
-                onClick={() => setActive(i)}
-                className={`relative aspect-square w-[72px] shrink-0 overflow-hidden rounded border-2 bg-white transition-all ${
-                  active === i ? "border-kibana-ink" : "border-transparent hover:border-kibana-tan"
-                }`}
+                type="button"
+                aria-label="Close image viewer"
+                onClick={() => setZoomed(null)}
+                className="ml-4 flex h-11 w-11 shrink-0 items-center justify-center"
               >
-                <Image
-                  src={src}
-                  alt={`${productName} ${i + 1}`}
-                  fill
-                  sizes="72px"
-                  className="object-cover"
-                />
+                <X className="h-5 w-5" />
               </button>
-            ))}
+            </div>
+            <div className="relative min-h-0 flex-1">
+              <Image
+                src={allImages[zoomed]}
+                alt={`${productName} - image ${zoomed + 1}`}
+                fill
+                sizes="100vw"
+                className="object-contain"
+              />
+            </div>
+            <div className="flex items-center justify-center gap-6 py-4">
+              {allImages.length > 1 && (
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  onClick={() => moveZoom(-1)}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              )}
+              <span className="text-xs" aria-live="polite">
+                {zoomed + 1} / {allImages.length}
+              </span>
+              {allImages.length > 1 && (
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  onClick={() => moveZoom(1)}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              )}
+            </div>
           </div>
         )}
-
-        {/* Main image — snug container to prevent trailing whitespace */}
-        <div className="w-fit min-w-0 shrink-0 rounded-lg bg-[#f5f1ed] p-3 sm:p-4">
-          <div {...desktopSwipeProps}>
-            {!variantInStock && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-                <span className="bg-black px-6 py-3 text-lg font-bold tracking-wide text-white">
-                  OUT OF STOCK
-                </span>
-              </div>
-            )}
-            <Image
-              src={allImages[active]}
-              alt={productName}
-              fill
-              priority
-              sizes="(max-width: 1024px) 80vw, 512px"
-              className="object-cover transition-opacity duration-200"
-              draggable={false}
-            />
-            {pct > 0 && (
-              <Badge variant="discount" className="absolute left-3 top-3">
-                {pct}% OFF
-              </Badge>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
+      </dialog>
+    </div>
   );
 }

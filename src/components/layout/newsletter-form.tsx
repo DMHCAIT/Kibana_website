@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
@@ -30,8 +30,8 @@ export function NewsletterForm() {
 
   if (done) {
     return (
-      <div className="flex items-center gap-2 border border-kibana-cream/20 bg-kibana-cream/10 px-4 py-3 text-sm text-kibana-cream">
-        <CheckCircle2 className="h-4 w-4 text-kibana-tan" />
+      <div className="mx-auto flex w-full max-w-md items-center justify-center gap-2 rounded-full border border-kibana-brown/30 px-5 py-3 text-[13px] text-kibana-brown">
+        <CheckCircle2 className="h-4 w-4" strokeWidth={1.5} />
         Thank you for subscribing to Kibana!
       </div>
     );
@@ -41,26 +41,31 @@ export function NewsletterForm() {
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="flex w-full max-w-sm flex-col gap-1 md:max-w-md"
+      className="mx-auto flex w-full max-w-md flex-col gap-2"
     >
-      <div className="flex gap-0">
+      <div className="relative">
         <input
           {...register("email")}
           type="email"
           placeholder="Enter Your Mail"
+          aria-label="Email address"
           aria-invalid={!!errors.email}
-          className="h-10 min-w-0 flex-1 border border-r-0 border-kibana-cream/20 bg-kibana-cream/10 px-3 text-sm text-kibana-cream placeholder:text-kibana-cream/50 focus:outline-none focus:ring-1 focus:ring-kibana-tan"
+          className="h-12 w-full rounded-full border border-foreground/25 bg-white pl-6 pr-14 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-kibana-brown focus:outline-none"
         />
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-10 shrink-0 items-center gap-1.5 bg-kibana-tan px-4 text-sm font-semibold text-kibana-ink transition-colors hover:bg-kibana-cream disabled:opacity-60"
+          aria-label="Subscribe"
+          className="absolute right-1.5 top-1.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-kibana-brown text-white transition-colors hover:bg-[#2f1f13] disabled:opacity-60"
         >
-          {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          Subscribe
+          {isSubmitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+          )}
         </button>
       </div>
-      {errors.email && <p className="text-xs text-red-300">{errors.email.message}</p>}
+      {errors.email && <p className="pl-6 text-[12px] text-kibana-sale">{errors.email.message}</p>}
     </form>
   );
 }

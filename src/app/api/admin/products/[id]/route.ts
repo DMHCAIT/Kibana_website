@@ -7,7 +7,7 @@ import { invalidateProductsCache } from "@/lib/api/products-cache";
 import { db } from "@/lib/db";
 import { mediaFiles } from "@/lib/db/schema";
 import { like } from "drizzle-orm";
-import type { Product } from "@/types/product";
+import { AdminProductSchema, normalizeProductImages } from "@/lib/admin-product";
 
 /** Delete all files under a folder prefix in a Supabase bucket */
 async function deleteStorageFolder(supabase: SupabaseClient, bucket: string, folderPrefix: string) {
@@ -34,28 +34,38 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await auth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
-  const body = (await req.json()) as Product & { order?: number };
-
   try {
-    await saveProduct({ ...body, id });
+    const parsed = AdminProductSchema.safeParse({ ...(await req.json()), id });
+    if (!parsed.success)
+      return NextResponse.json(
+        {
+          error: parsed.error.issues
+            .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+            .join("\n"),
+        },
+        { status: 400 },
+      );
+    const body = parsed.data;
+    await saveProduct({ ...normalizeProductImages(body), order: body.order });
 
     // ✅ Invalidate cache so website shows fresh data immediately
-    invalidateCache("products");
-    invalidateCache(`product-${id}`);
-    invalidateCache(`product-slug-${body.slug}`);
+    invalidateCache();
     invalidateProductsCache(); // Also invalidate API cache
 
     // ✅ Revalidate all product-related pages
     revalidatePath("/shop/[slug]", "page");
     revalidatePath("/shop", "page");
     revalidatePath("/", "page");
+    revalidatePath("/category/[slug]", "page");
+    revalidatePath("/new-arrivals", "page");
+    revalidatePath("/admin/products", "page");
 
     return NextResponse.json({ success: true, message: "Product updated and website revalidated" });
   } catch (error) {
     console.error("Error updating product:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to update product" },
-      { status: 500 },
+      { status: error instanceof SyntaxError ? 400 : 500 },
     );
   }
 }
@@ -81,8 +91,8 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   await deleteProduct(id);
   // ✅ Invalidate cache so website shows fresh data immediately
   const importedInvalidateCache = (await import("@/lib/server-data")).invalidateCache;
-  importedInvalidateCache("products");
-  importedInvalidateCache(`product-${id}`);
+  importedInvalidateCache();
   invalidateProductsCache(); // Also invalidate API cache
+  revalidatePath("/", "layout");
   return NextResponse.json({ success: true });
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ShoppingBag, Minus, Plus, Heart, Check, X, ArrowRight } from "lucide-react";
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/store/cart-store";
@@ -11,6 +11,7 @@ import { useWishlist } from "@/store/wishlist-store";
 import { cn, formatINR, getProductDisplayName } from "@/lib/utils";
 import { trackAddToCart } from "@/lib/analytics";
 import type { Product } from "@/types/product";
+import { productInStock } from "@/lib/product-presentation";
 
 interface AddToCartButtonProps {
   product: Product;
@@ -24,34 +25,17 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
   const [addedVariant, setAddedVariant] = useState<Product["colorVariants"][number] | undefined>(
     undefined,
   );
+  const [adding, setAdding] = useState(false);
+  const addingRef = useRef(false);
   const add = useCart((s) => s.add);
   const { user, openAuthModal } = useAuth();
   const { add: addWishlist, remove: removeWishlist, has } = useWishlist();
 
   // Find the active variant from product using the slug
-  const activeVariant = product.colorVariants?.find((v) => v.slug === activeVariantSlug);
-  const isOutOfStock = activeVariant?.inStock === false;
-
-  // Log the received props
-  console.log(
-    "🛒 ADD-TO-CART BUTTON - Props received:",
-    JSON.stringify(
-      {
-        productId: product.id,
-        productName: product.name,
-        activeVariantSlugReceived: activeVariantSlug,
-        activeVariantFound: !!activeVariant,
-        activeVariantTitle: activeVariant?.productTitle,
-        productColorVariantsCount: product.colorVariants?.length,
-        productColorVariants: product.colorVariants?.map((v) => ({
-          slug: v.slug,
-          title: v.productTitle,
-        })),
-      },
-      null,
-      2,
-    ),
-  );
+  const activeVariant = activeVariantSlug
+    ? product.colorVariants.find((v) => v.slug === activeVariantSlug)
+    : product.colorVariants[0];
+  const isOutOfStock = !productInStock(product, activeVariant);
 
   useEffect(() => {
     const itemKey = activeVariantSlug ? `${product.id}-${activeVariantSlug}` : product.id;
@@ -74,50 +58,27 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
   }
 
   async function handleAddToCart() {
+    if (isOutOfStock || addingRef.current) return;
     if (!user) {
       openAuthModal("Please log in to add items to your cart.");
       return;
     }
 
-    // CRITICAL: Get the current color from URL in real-time
-    // This ensures we're using the exact color the user selected, not a cached prop value
-    const urlParams = new URLSearchParams(window.location.search);
-    const colorFromUrl = urlParams.get("color");
+    const colorSlugToUse = activeVariantSlug ?? activeVariant?.slug;
+    const variantToAdd = activeVariant;
 
-    // Priority order:
-    // 1. Color from URL (what the user clicked)
-    // 2. activeVariantSlug prop (from server)
-    // 3. activeVariant?.slug (computed from prop)
-    // 4. First variant slug (fallback)
-    const colorSlugToUse =
-      colorFromUrl || activeVariantSlug || activeVariant?.slug || product.colorVariants?.[0]?.slug;
-
-    // Find the variant using the determined color slug
-    const variantToAdd =
-      product.colorVariants?.find((v) => v.slug === colorSlugToUse) || product.colorVariants?.[0];
-
-    console.log(
-      "🛒 ADD TO CART DEBUG - Full Trace:",
-      JSON.stringify(
-        {
-          productId: product.id,
-          colorFromUrl,
-          activeVariantSlug_fromProps: activeVariantSlug,
-          activeVariant_slug: activeVariant?.slug,
-          firstVariant_slug: product.colorVariants?.[0]?.slug,
-          colorSlugToUse_final: colorSlugToUse,
-          variantToAdd_slug: variantToAdd?.slug,
-          variantToAdd_productTitle: variantToAdd?.productTitle,
-          qty,
-          totalColorVariants: product.colorVariants?.length,
-        },
-        null,
-        2,
-      ),
-    );
-
-    // Pass the color slug to cart
-    await add(product, qty, colorSlugToUse);
+    addingRef.current = true;
+    setAdding(true);
+    setAddedNotification(false);
+    try {
+      await add(product, qty, colorSlugToUse);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Could not add this colour to your cart.");
+      return;
+    } finally {
+      addingRef.current = false;
+      setAdding(false);
+    }
 
     // Track AddToCart event for Meta Pixel & Conversions API
     const variantPrice = variantToAdd?.price ?? product.price;
@@ -131,7 +92,7 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
   }
 
   return (
-    <div className="w-full min-w-0 space-y-4">
+    <div className="w-full min-w-0">
       {/* Added to cart notification */}
       {addedNotification && (
         <div className="fixed bottom-24 right-4 z-50 flex w-[calc(100vw-2rem)] max-w-sm items-start gap-3 rounded-xl border border-border bg-white p-4 shadow-xl duration-300 animate-in slide-in-from-bottom-4 sm:bottom-6">
@@ -155,7 +116,7 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
                   {getProductDisplayName(product, addedVariant)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Qty: {qty} · {formatINR(product.price * qty)}
+                  Qty: {qty} · {formatINR((addedVariant?.price ?? product.price) * qty)}
                 </p>
               </div>
             </div>
@@ -185,51 +146,47 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
         </div>
       )}
 
-      {!isOutOfStock && (
-        <>
-          {/* Quantity selector */}
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              Quantity
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex">
+        {!isOutOfStock && (
+          <div
+            className="col-span-2 flex h-12 w-fit shrink-0 items-center rounded-full border border-border"
+            aria-label="Quantity"
+          >
+            <button
+              type="button"
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
+              className="flex h-11 w-9 items-center justify-center rounded-l-full transition-colors hover:bg-muted sm:w-10"
+              aria-label="Decrease quantity"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <span className="min-w-6 text-center text-xs font-medium" aria-live="polite">
+              {qty}
             </span>
-            <div className="flex items-center border border-border">
-              <button
-                type="button"
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="px-3 py-2 transition-colors hover:bg-muted"
-                aria-label="Decrease quantity"
-              >
-                <Minus className="h-3.5 w-3.5" />
-              </button>
-              <span className="min-w-[3rem] px-5 py-2 text-center text-sm font-medium">{qty}</span>
-              <button
-                type="button"
-                onClick={() => setQty((q) => q + 1)}
-                className="px-3 py-2 transition-colors hover:bg-muted"
-                aria-label="Increase quantity"
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setQty((q) => q + 1)}
+              className="flex h-11 w-9 items-center justify-center rounded-r-full transition-colors hover:bg-muted sm:w-10"
+              aria-label="Increase quantity"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
           </div>
-        </>
-      )}
-
-      {/* Action buttons */}
-      <div className="flex gap-2">
+        )}
         <Button
           size="lg"
-          className="flex-1 rounded-none text-xs sm:text-sm"
+          className="min-w-0 flex-1 rounded-full px-3 text-[10px] font-normal tracking-[0.16em] sm:px-5 sm:text-xs"
           onClick={handleAddToCart}
-          disabled={isOutOfStock}
+          disabled={isOutOfStock || adding}
+          aria-busy={adding}
         >
-          <ShoppingBag className="h-4 w-4 shrink-0" />
-          {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          <ShoppingBag className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {isOutOfStock ? "Out of Stock" : adding ? "Adding..." : "Add to Cart"}
         </Button>
         <Button
           size="lg"
-          variant="outline"
-          className="shrink-0 rounded-none px-3 sm:px-4"
+          variant="ghost"
+          className="h-12 w-10 shrink-0 rounded-none px-0 hover:bg-transparent sm:w-12"
           onClick={handleWishlist}
           aria-label={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
         >

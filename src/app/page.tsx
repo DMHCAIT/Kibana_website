@@ -1,11 +1,13 @@
 import dynamicImport from "next/dynamic";
+import { Suspense } from "react";
 
 // ⚡ Enable ISR: revalidate every 60 seconds instead of on every request
 export const revalidate = 60;
 import { HeroBanner } from "@/components/home/hero-banner";
-import { AnnouncementBanner } from "@/components/layout/announcement-banner";
 import { NewArrivals } from "@/components/home/new-arrivals";
+import { SocialFeed } from "@/components/home/social-feed";
 import { TrackPageView } from "@/components/analytics/track-page-view";
+import { Reveal } from "@/components/ui/reveal";
 import { getProducts, getSiteConfig } from "@/lib/server-data";
 import type { Product } from "@/types/product";
 
@@ -67,43 +69,59 @@ function sectionProducts(
   }
 }
 
-export default async function HomePage() {
+async function HomeSections() {
   const [products, config] = await Promise.all([getProducts(), getSiteConfig()]);
   const pinned = config?.sectionProducts ?? {};
   const sections = config.sections.filter((s) => s.visible).sort((a, b) => a.order - b.order);
 
   const SECTION_COMPONENTS: Record<string, (products: Product[]) => React.ReactNode> = {
     "new-arrivals": (_) => <NewArrivals products={products} />,
-    "best-sellers": (p) => <BestSellers products={p} config={config.sectionContent?.bestSellers} />,
-    "shop-by-category": (_) => <ShopByCategory />,
+    "best-sellers": (_) => <BestSellers products={products} />,
+    "shop-by-category": (_) => <ShopByCategory products={products} />,
     "most-trending": (_) => <MostTrending products={products} />,
     "about-us": (_) => <AboutUs />,
-    "style-in-motion": (p) => <StyleInMotion products={p} />,
+    "style-in-motion": (_) => <StyleInMotion />,
     "customer-review": (_) => <CustomerReview />,
+    "social-feed": (_) => <SocialFeed />,
   };
 
   return (
     <>
-      <TrackPageView pageName="Home" pageType="homepage" />
-      <HeroBanner />
-      <AnnouncementBanner text={config.announcementBar} />
-      {sections.map((s, i) => {
+      {sections.map((s) => {
         if (s.id === "customer-review") return null;
         const render = SECTION_COMPONENTS[s.id];
         if (!render) return null;
-        // For new-arrivals and most-trending, components manage their own products
+        // Ranked homepage sections select their own variants from the full catalog.
         const sectionProds =
-          s.id === "new-arrivals" || s.id === "most-trending"
+          s.id === "new-arrivals" || s.id === "most-trending" || s.id === "best-sellers"
             ? products
             : sectionProducts(products, s.id, pinned);
-        const bg = i % 2 === 0 ? "bg-white" : "bg-[#fdf8f3]";
-        const wrapperClass = s.id === "new-arrivals" ? "" : bg;
         return (
-          <div key={s.id} className={wrapperClass}>
+          <Reveal key={s.id} className="bg-white">
             {render(sectionProds)}
-          </div>
+          </Reveal>
         );
       })}
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <div className="storefront-home">
+      <TrackPageView pageName="Home" pageType="homepage" />
+      <HeroBanner />
+      <Suspense
+        fallback={
+          <div role="status" aria-label="Loading collections" className="container py-10">
+            <span className="sr-only">Loading collections...</span>
+            <SectionSkeleton />
+            <SectionSkeleton />
+          </div>
+        }
+      >
+        <HomeSections />
+      </Suspense>
+    </div>
   );
 }

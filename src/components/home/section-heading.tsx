@@ -3,21 +3,26 @@ import { cn } from "@/lib/utils";
 export function SectionHeading({
   title,
   className,
-  align = "left",
+  align = "center",
+  subtitle,
+  eyebrow,
 }: {
   title: string;
   className?: string;
   align?: "left" | "center";
+  subtitle?: string;
+  eyebrow?: string;
 }) {
+  const center = align === "center";
   return (
-    <h2
-      className={cn(
-        "mb-5 text-lg font-bold uppercase leading-tight tracking-[0.15em] text-foreground sm:mb-6 sm:text-xl md:text-[22px]",
-        align === "center" && "text-center",
-        className,
+    <div className={cn("storefront-section-heading", center && "text-center", className)}>
+      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+      <h2 className={cn("section-title", !center && "text-left")}>{title}</h2>
+      {subtitle && (
+        <p className={cn("mt-3 max-w-xl text-[13px] text-muted-foreground", center && "mx-auto")}>
+          {subtitle}
+        </p>
       )}
-    >
-      {title}
-    </h2>
+    </div>
   );
 }

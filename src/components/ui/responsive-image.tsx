@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/image";
 
 export function ResponsiveImage({
   src,
@@ -26,7 +26,15 @@ export function ResponsiveImage({
   // If width/height provided, render fixed image which Next can optimize.
   if (width && height) {
     return (
-      <Image src={src} alt={alt} width={width} height={height} className={className} sizes={sizes} priority={priority} />
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        sizes={sizes}
+        priority={priority}
+      />
     );
   }
 
@@ -34,15 +42,30 @@ export function ResponsiveImage({
   if (fill) {
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
-        <Image src={src} alt={alt} fill style={{ objectFit: "cover" }} sizes={sizes ?? "100vw"} priority={priority} className={className} />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          style={{ objectFit: "cover" }}
+          sizes={sizes ?? "100vw"}
+          priority={priority}
+          className={className}
+        />
       </div>
     );
   }
 
   // Otherwise render fill image inside a positioned container.
   return (
-    <div className={className ?? "relative w-full h-full"} style={{ position: "relative" }}>
-      <Image src={src} alt={alt} fill style={{ objectFit: "cover" }} sizes={sizes ?? "100vw"} priority={priority} />
+    <div className={className ?? "relative h-full w-full"} style={{ position: "relative" }}>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        style={{ objectFit: "cover" }}
+        sizes={sizes ?? "100vw"}
+        priority={priority}
+      />
     </div>
   );
 }

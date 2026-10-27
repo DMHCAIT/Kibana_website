@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/image";
 
 type CollectionCard = {
   id: string;
@@ -25,7 +25,7 @@ const CARDS: CollectionCard[] = [
     title: "SOPHISTICATED GIRLIE",
     subtitle: "Sling Bags",
     image: "/rakhi/new2.jpeg",
-    href: "/shop?cat=sling-bag",
+    href: "/category/sling",
     iconType: "sling",
   },
   {
@@ -33,7 +33,7 @@ const CARDS: CollectionCard[] = [
     title: "MINIMAL GIRLIE",
     subtitle: "Clutches",
     image: "/rakhi/new3.jpeg",
-    href: "/shop?cat=clutch",
+    href: "/category/clutch",
     iconType: "clutch",
   },
 ];

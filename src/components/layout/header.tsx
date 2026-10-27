@@ -25,25 +25,13 @@ const mainMenu = [
   {
     label: "Women Bags",
     submenu: [
-      { label: "Tote Bags", href: "/shop?cat=tote-bag" },
-      { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
-      { label: "Sling Bags", href: "/shop?cat=sling-bag" },
-      { label: "Shoulder Bags", href: "/shop?cat=shoulder-bag" },
-      { label: "Backpacks", href: "/shop?cat=backpack" },
-      { label: "Clutch", href: "/shop?cat=clutch" },
-      { label: "Wallets", href: "/shop?cat=wallet" },
-    ],
-  },
-  {
-    label: "Men Bags",
-    submenu: [
-      { label: "Tote Bags", href: "/shop?cat=tote-bag" },
-      { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
-      { label: "Sling Bags", href: "/shop?cat=sling-bag" },
-      { label: "Shoulder Bags", href: "/shop?cat=shoulder-bag" },
-      { label: "Backpacks", href: "/shop?cat=backpack" },
-      { label: "Clutch", href: "/shop?cat=clutch" },
-      { label: "Wallets", href: "/shop?cat=wallet" },
+      { label: "Tote Bags", href: "/category/tote" },
+      { label: "Laptop Bags", href: "/category/laptop" },
+      { label: "Sling Bags", href: "/category/sling" },
+      { label: "Shoulder Bags", href: "/category/shoulder" },
+      { label: "Backpacks", href: "/category/backpack" },
+      { label: "Clutch", href: "/category/clutch" },
+      { label: "Wallets", href: "/category/wallet" },
     ],
   },
   { label: "All Products", submenu: null },
@@ -51,13 +39,8 @@ const mainMenu = [
 
 const desktopNav = [
   { label: "Shop", href: "/shop" },
-  { label: "Tote Bags", href: "/shop?cat=tote-bag" },
-  { label: "Laptop Bags", href: "/shop?cat=laptop-bag" },
-  { label: "Sling Bags", href: "/shop?cat=sling-bag" },
-  { label: "Shoulder Bags", href: "/shop?cat=shoulder-bag" },
-  { label: "Backpacks", href: "/shop?cat=backpack" },
-  { label: "Clutch", href: "/shop?cat=clutch" },
-  { label: "Wallets", href: "/shop?cat=wallet" },
+  { label: "Women", href: "/shop" },
+  { label: "About", href: "/about" },
 ];
 
 export function Header() {

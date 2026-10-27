@@ -1,17 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import Image from "@/components/ui/image";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart, Plus } from "lucide-react";
 import type { Product } from "@/types/product";
-import { Button } from "@/components/ui/button";
 import { cn, discountPct, formatINR } from "@/lib/utils";
 import { pickDefaultProductImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-store";
 import { useWishlist } from "@/store/wishlist-store";
 import { useAuth } from "@/store/auth-store";
 import { trackWishlist } from "@/lib/analytics";
+import {
+  hasProductTag,
+  productHref as getProductHref,
+  productInStock,
+} from "@/lib/product-presentation";
 
 type Props = {
   product: Product;
@@ -21,8 +26,8 @@ type Props = {
   href?: string;
   displayName?: string;
   displayImage?: string;
-  variantInStock?: boolean; // New: indicates if color variant is out of stock
-  variantKey?: string; // New: unique key for wishlist tracking per color variant
+  variantInStock?: boolean;
+  variantKey?: string;
   priority?: boolean;
 };
 
@@ -34,48 +39,42 @@ export function ProductCard({
   href,
   displayName,
   displayImage,
-  variantInStock = true, // Default to in stock
-  variantKey, // New: variant-specific wishlist key
+  variantInStock = true,
+  variantKey,
   priority = false,
 }: Props) {
   const add = useCart((s) => s.add);
   const { has: isInWishlist, add: addToWishlist, remove: removeFromWishlist } = useWishlist();
   const { user, openAuthModal } = useAuth();
   const [inWishlist, setInWishlist] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const addingRef = useRef(false);
 
-  // Use variantKey for wishlist tracking (per color variant), fallback to product.id for backward compatibility
   const wishlistKey = variantKey ?? product.id;
 
   useEffect(() => {
     setInWishlist(isInWishlist(wishlistKey));
   }, [wishlistKey, isInWishlist]);
 
-  const pct = discountPct(product.price, product.compareAtPrice);
-  const productHref = href ?? `/shop/${product.slug}`;
-  const cardName = displayName ?? product.name;
+  const productHref = href ?? getProductHref(product, product.colorVariants[0]);
+  const colorSlugFromHref = new URL(productHref, "http://localhost").searchParams.get("color");
+  const selectedVariant =
+    product.colorVariants.find((color) =>
+      colorSlugFromHref
+        ? color.slug === colorSlugFromHref
+        : color.pageSlug && productHref.split("?")[0] === `/shop/${color.pageSlug}`,
+    ) ?? product.colorVariants[0];
+  const colorSlug = selectedVariant?.slug;
+  const price = selectedVariant?.price ?? product.price;
+  const compareAtPrice =
+    selectedVariant?.price === undefined ? product.compareAtPrice : selectedVariant.compareAtPrice;
+  const pct = discountPct(price, compareAtPrice);
+  const inStock = variantInStock && productInStock(product, selectedVariant);
+  const gallery = selectedVariant ? (selectedVariant.gallery ?? []) : product.gallery;
+  const cardName = displayName ?? selectedVariant?.productTitle ?? product.name;
   const cardImage =
-    displayImage ??
-    product.displayImage ??
-    pickDefaultProductImage(product.image, product.gallery ?? []);
-  const visibleColorVariants = product.colorVariants?.length
-    ? product.colorVariants
-    : product.colors.map((color) => ({
-        color,
-        slug: color.toLowerCase().replace(/\s+/g, "-"),
-        image: product.image,
-        hex: undefined,
-      }));
-
-  // Extract color slug from href if it exists (e.g., "/shop/product?color=mint-green")
-  const colorSlugFromHref = (() => {
-    if (!href) return undefined;
-    try {
-      const url = new URL(href, "http://localhost"); // Use relative URL parsing
-      return url.searchParams.get("color") || undefined;
-    } catch {
-      return undefined;
-    }
-  })();
+    displayImage ?? pickDefaultProductImage(selectedVariant?.image ?? product.image, gallery);
+  const hoverImage = gallery.find((image) => image && image !== cardImage);
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -94,104 +93,140 @@ export function ProductCard({
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!inStock || addingRef.current) return;
+    if (!user) {
+      openAuthModal("Please log in to add items to your cart.");
+      return;
+    }
+    addingRef.current = true;
+    setAdding(true);
+    try {
+      await add(product, 1, colorSlug);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Could not add this colour to your cart.");
+    } finally {
+      addingRef.current = false;
+      setAdding(false);
+    }
+  };
+
+  const badge = hasProductTag(product, "isBestSeller", selectedVariant)
+    ? "Best Seller"
+    : hasProductTag(product, "isNew", selectedVariant)
+      ? "New"
+      : null;
+
   return (
     <div className={cn("group flex flex-col", className)}>
-      <Link
-        href={productHref}
-        className={cn(
-          "relative block overflow-hidden rounded-lg bg-kibana-cream",
-          imageClassName ?? "aspect-[5/6]",
-        )}
-      >
-        <Image
-          src={cardImage}
-          alt={cardName}
-          fill
-          priority={priority}
-          loading={priority ? "eager" : "lazy"}
-          fetchPriority={priority ? "high" : "auto"}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          quality={70}
-          className={cn(
-            "transition-transform duration-500",
-            variant === "full"
-              ? "scale-[1.08] object-contain group-hover:scale-[1.11]"
-              : "object-cover group-hover:scale-105",
+      <div className={cn("relative block overflow-hidden", imageClassName ?? "aspect-[4/5]")}>
+        <Link href={productHref} className="absolute inset-0 block">
+          <Image
+            src={cardImage}
+            alt={cardName}
+            fill
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            sizes={
+              variant === "full"
+                ? "(max-width: 1023px) 100vw, 50vw"
+                : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            }
+            className={cn(
+              "object-cover",
+              "duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] transition-[opacity,transform] group-hover:scale-[1.06]",
+              hoverImage && "group-hover:opacity-0",
+            )}
+          />
+          {hoverImage && (
+            <Image
+              src={hoverImage}
+              alt=""
+              aria-hidden
+              fill
+              loading="lazy"
+              sizes={
+                variant === "full"
+                  ? "(max-width: 1023px) 100vw, 50vw"
+                  : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              }
+              className={cn(
+                "object-cover",
+                "duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] scale-[1.04] opacity-0 transition-[opacity,transform] group-hover:scale-100 group-hover:opacity-100",
+              )}
+            />
           )}
-        />
-        {/* Discount badge — top left on image */}
-        {pct > 0 && variant !== "minimal" && (
-          <span className="absolute left-2 top-2 bg-gray-900 px-1.5 py-0.5 text-[9px] tracking-wide text-white sm:text-[10px]">
-            {pct}% OFF
-          </span>
-        )}
-        {/* Out of Stock banner */}
-        {!variantInStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <span className="rounded bg-black px-4 py-2 text-xs font-bold tracking-wide text-white sm:text-sm">
-              OUT OF STOCK
+
+          {inStock && badge && variant !== "minimal" && (
+            <span className="absolute left-0 top-2 whitespace-nowrap bg-kibana-brown px-1.5 py-0.5 font-jost text-[8px] font-normal uppercase leading-normal tracking-[0.12em] text-white sm:top-3 sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.18em]">
+              {badge}
             </span>
-          </div>
-        )}
+          )}
+
+          {!inStock && (
+            <Badge variant="soldOut" className="absolute left-2 top-2 sm:left-3 sm:top-3">
+              Sold Out
+            </Badge>
+          )}
+        </Link>
+
         <button
-          aria-label="Add to wishlist"
-          className="absolute right-2 top-2 z-10 inline-flex h-7 w-7 items-center justify-center transition-all hover:scale-110 sm:h-8 sm:w-8"
+          type="button"
+          aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          className="pointer-events-none absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center bg-transparent opacity-0 transition-opacity duration-300 focus-visible:pointer-events-auto focus-visible:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
           onClick={toggleWishlist}
         >
           <Heart
             className={cn(
-              "h-5 w-5 transition-colors sm:h-6 sm:w-6",
-              inWishlist ? "text-red-500" : "text-gray-400 hover:text-gray-600",
+              "h-4 w-4 transition-all duration-300",
+              inWishlist ? "fill-kibana-brown text-kibana-brown" : "text-foreground",
             )}
-            fill={inWishlist ? "currentColor" : "none"}
+            strokeWidth={1.4}
           />
         </button>
-      </Link>
 
-      <div className="flex flex-col gap-0.5 pt-1.5">
-        <Link
-          href={productHref}
-          className="line-clamp-1 text-xs leading-snug hover:underline sm:text-sm md:text-base"
-        >
+        {variant !== "minimal" && inStock && (
+          <button
+            type="button"
+            aria-label={`Add ${cardName} to cart`}
+            aria-busy={adding}
+            disabled={adding}
+            onClick={handleAddToCart}
+            className="pointer-events-none absolute bottom-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center bg-white text-foreground opacity-0 transition-opacity duration-300 focus-visible:pointer-events-auto focus-visible:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+          >
+            {adding ? (
+              <span role="status" className="text-[9px]">
+                Adding...
+              </span>
+            ) : (
+              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+            )}
+          </button>
+        )}
+      </div>
+
+      <div className="product-card-info flex flex-col items-center px-1 text-center">
+        <Link href={productHref} className="product-title line-clamp-2 hover:text-kibana-brown">
           {cardName}
         </Link>
+
         {variant !== "minimal" && (
-          <div className="flex flex-wrap items-center gap-1">
-            <span className="text-[12px] sm:text-sm md:text-lg">{formatINR(product.price)}</span>
-            {product.compareAtPrice && (
-              <span className="text-[11px] text-muted-foreground line-through sm:text-xs md:text-base">
-                {formatINR(product.compareAtPrice)}
+          <div className="product-card-price flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+            {compareAtPrice && pct > 0 && (
+              <span className="text-muted-foreground line-through">
+                {formatINR(compareAtPrice)}
               </span>
             )}
-          </div>
-        )}
-        {variant === "full" && visibleColorVariants.length > 0 && (
-          <div className="mt-0.5 flex items-center gap-1.5">
-            <div className="flex items-center gap-0.5">
-              {visibleColorVariants.map((variantColor) => (
-                <span
-                  key={variantColor.slug}
-                  className="h-3.5 w-3.5 rounded-full border border-white shadow-sm"
-                  style={{ backgroundColor: variantColor.hex || variantColor.color }}
-                  title={variantColor.color}
-                />
-              ))}
-            </div>
-            <span className="text-[10px] text-muted-foreground">
-              {visibleColorVariants.length} colors
+            <span className={cn(pct > 0 ? "text-kibana-sale" : "text-foreground")}>
+              {formatINR(price)}
             </span>
           </div>
         )}
-        {variant === "full" && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="mt-1 h-7 w-full text-[10px] sm:h-8 sm:text-xs"
-            onClick={() => add(product, 1, colorSlugFromHref)}
-          >
-            <ShoppingBag className="h-3 w-3" />
-            Add to Cart
-          </Button>
+        {variant !== "minimal" && pct > 0 && (
+          <span className="text-[11px] uppercase tracking-[0.14em] text-kibana-sale">
+            {pct}% Off
+          </span>
         )}
       </div>
     </div>

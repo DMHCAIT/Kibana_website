@@ -20,57 +20,57 @@ body {
 
 @layer base {
   :root {
-    --background: 36 33% 91%; /* soft cream - darkened slightly */
-    --foreground: 0 0% 10%; /* near-black ink */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 0 0% 10%;
-    --primary-foreground: 36 33% 96%;
+    --primary: 26 40% 20%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 36 30% 90%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 60 11% 95%;
+    --secondary-foreground: 0 0% 11%;
 
-    --muted: 36 20% 92%;
-    --muted-foreground: 0 0% 35%;
+    --muted: 60 9% 95%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 32 33% 64%; /* kibana tan */
-    --accent-foreground: 0 0% 10%;
+    --accent: 26 40% 20%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 6 63% 46%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 36 15% 85%;
-    --input: 36 15% 85%;
-    --ring: 32 33% 50%;
+    --border: 0 0% 89%;
+    --input: 0 0% 85%;
+    --ring: 26 40% 20%;
 
-    --radius: 0.5rem;
+    --radius: 0rem;
   }
 
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 36 20% 92%;
-    --card: 0 0% 8%;
-    --card-foreground: 36 20% 92%;
-    --popover: 0 0% 8%;
-    --popover-foreground: 36 20% 92%;
-    --primary: 36 20% 92%;
-    --primary-foreground: 0 0% 6%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 36 20% 92%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 32 33% 64%;
-    --accent-foreground: 0 0% 6%;
+    --background: 20 10% 8%;
+    --foreground: 30 15% 95%;
+    --card: 20 10% 10%;
+    --card-foreground: 30 15% 95%;
+    --popover: 20 10% 10%;
+    --popover-foreground: 30 15% 95%;
+    --primary: 30 15% 95%;
+    --primary-foreground: 20 10% 8%;
+    --secondary: 20 10% 15%;
+    --secondary-foreground: 30 15% 95%;
+    --muted: 20 10% 20%;
+    --muted-foreground: 30 8% 60%;
+    --accent: 40 35% 60%;
+    --accent-foreground: 20 10% 8%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 32 33% 64%;
+    --border: 20 10% 20%;
+    --input: 20 10% 20%;
+    --ring: 40 35% 60%;
   }
 }
 
@@ -93,15 +93,68 @@ body {
     min-height: 100%;
     overscroll-behavior-y: none;
     overflow-x: clip;
+    font-family: var(--font-montserrat), system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    letter-spacing: 0;
+    text-rendering: optimizeLegibility;
   }
+
+  /* Headings — Jost, uppercase, airy tracking */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-normal;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+
+  h1 {
+    @apply text-[24px] md:text-[30px] lg:text-[34px];
+    line-height: 1.3;
+  }
+
+  h2 {
+    @apply text-[22px] md:text-[26px] lg:text-[28px];
+    line-height: 1.35;
+  }
+
+  h3 {
+    @apply text-[18px] md:text-[20px];
+    line-height: 1.4;
+  }
+
+  h4 {
+    @apply text-[15px] md:text-[16px];
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+  }
+
+  h5 {
+    @apply text-[14px] font-medium;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+  }
+
+  h6 {
+    @apply text-[13px] font-medium;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+  }
+
   .font-logo {
-    font-family: var(--font-canela), Georgia, serif;
+    font-family: var(--font-jost), system-ui, sans-serif;
+    @apply font-medium tracking-[0.32em];
   }
-  /* Editorial body copy defaults to the light cut of the site font.
-     Any explicit font-* utility on a <p> still overrides this. */
+
   p {
-    @apply font-light;
+    @apply font-normal leading-relaxed;
+    letter-spacing: 0;
   }
+
   body::-webkit-scrollbar {
     display: none;
   }
@@ -127,5 +180,296 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+  }
+
+  button {
+    @apply transition-colors duration-100 active:opacity-80;
+  }
+
+  /* Premium link styling */
+  a {
+    @apply relative transition-colors duration-300;
+  }
+}
+
+@layer components {
+  /* Fluid page width; explicit max-w utilities still constrain reading/form layouts. */
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 0.75rem;
+  }
+  @screen sm {
+    .container {
+      padding-inline: 1.25rem;
+    }
+  }
+  @screen lg {
+    .container {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Brown pill button, as used on the reference storefront */
+  .btn-pill {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-kibana-brown px-8 font-sans text-[12px] font-normal uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#2f1f13] hover:shadow-[0_10px_30px_-12px_rgba(70,47,30,0.6)];
+  }
+  .btn-pill-outline {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full border border-foreground px-8 font-sans text-[12px] font-normal uppercase tracking-[0.2em] text-foreground transition-all duration-300 hover:bg-foreground hover:text-background;
+  }
+
+  /* Underline that draws itself in on hover */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover {
+    background-size: 0% 1px;
+    background-position: 100% 100%;
+  }
+  .link-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-draw:hover {
+    background-size: 100% 1px;
+  }
+
+  .section-title {
+    @apply text-center font-jost text-[20px] font-normal uppercase leading-snug tracking-[0.18em] text-foreground sm:text-[24px] lg:text-[28px];
+  }
+  .eyebrow {
+    @apply font-jost text-[11px] font-normal uppercase tracking-[0.24em] text-muted-foreground;
+  }
+  .product-title {
+    @apply font-jost text-[12px] font-normal uppercase leading-snug tracking-[0.16em] text-foreground sm:text-[13px];
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Scoped to public routes so dashboard typography and form density stay unchanged. */
+.storefront {
+  --storefront-gutter: 20px;
+  --storefront-section-space: 40px;
+  --storefront-stack-gap: 36px;
+  --storefront-heading-size: 20px;
+  --storefront-page-title-size: 28px;
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0;
+}
+
+.storefront :is(h1, h2, h3, h4, h5, h6, .section-title, .product-title) {
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.storefront h1 {
+  font-size: var(--storefront-page-title-size);
+  line-height: 1.3;
+}
+
+.storefront .section-title {
+  font-size: var(--storefront-heading-size);
+  line-height: 1.5;
+}
+
+.storefront .product-title {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.storefront p {
+  line-height: 1.65;
+}
+
+.storefront :is(input, textarea, select) {
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.storefront :is(input:not([type="checkbox"]):not([type="radio"]), textarea) {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.storefront .container {
+  padding-inline: var(--storefront-gutter);
+}
+
+.storefront-home .container {
+  padding-block: var(--storefront-section-space);
+}
+
+.storefront-section-heading {
+  margin-bottom: var(--storefront-stack-gap);
+}
+
+.storefront-stack-margin {
+  margin-top: var(--storefront-stack-gap);
+}
+
+.storefront .storefront-section-space,
+.storefront > main > :is(section.container, div.container) {
+  padding-block: var(--storefront-section-space);
+}
+
+.storefront-header-inner {
+  min-height: 64px;
+  padding-block: 16px;
+}
+
+.storefront-header nav[aria-label="Main navigation"] {
+  gap: 28px;
+}
+
+.storefront-header nav[aria-label="Main navigation"] > a,
+.storefront-header nav[aria-label="Main navigation"] > div > a {
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.18em;
+}
+
+.storefront .eyebrow {
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.18em;
+}
+
+.storefront :is(.btn-pill, .btn-pill-outline, [data-ui-button="text"]) {
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 10.4px 28px;
+  min-height: 44px;
+  height: auto;
+  white-space: normal;
+}
+
+.storefront .product-card-info {
+  padding-top: 20px;
+  gap: 12px;
+}
+
+.storefront .product-card-price {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.storefront-collection-heading {
+  padding: var(--storefront-section-space) var(--storefront-gutter);
+}
+
+.storefront-collection-toolbar {
+  padding-inline: var(--storefront-gutter);
+  min-height: 56px;
+}
+
+.storefront-collection-products {
+  padding: 24px var(--storefront-gutter) var(--storefront-section-space);
+}
+
+.storefront h1.storefront-product-title {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.storefront footer :is(h4, .section-title) {
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+}
+
+.storefront footer h4 {
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.storefront footer :is(li a, p:not(.product-title)) {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+@media (min-width: 700px) {
+  .storefront {
+    --storefront-gutter: 32px;
+    --storefront-section-space: 48px;
+    --storefront-stack-gap: 48px;
+    --storefront-heading-size: 24px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .storefront {
+    --storefront-gutter: 48px;
+    --storefront-section-space: 64px;
+    --storefront-heading-size: 28px;
+    --storefront-page-title-size: 32px;
+  }
+
+  .storefront .section-title {
+    line-height: 1.4;
+  }
+
+  .storefront h1.storefront-product-title {
+    font-size: 22px;
+    line-height: 1.5;
+  }
+
+  .storefront-collection-products {
+    padding-top: 48px;
+  }
+
+  .storefront-product {
+    padding-inline: var(--storefront-gutter);
+  }
+}
+
+@media (min-width: 1024px) {
+  .storefront-header-inner {
+    min-height: 78px;
+    padding-block: 19.2px;
   }
 }

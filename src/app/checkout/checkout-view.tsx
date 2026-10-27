@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import {
   ShoppingBag,
@@ -22,6 +22,11 @@ import { getShopDisplayImage } from "@/lib/product-images";
 import { UPIPayment } from "@/components/payment/upi-payment";
 import { CardPayment } from "@/components/payment/card-payment";
 import { trackCheckout, trackPurchase } from "@/lib/analytics";
+import {
+  orderItemFromCart,
+  selectedProductVariant,
+  unavailableProductSelection,
+} from "@/lib/product-presentation";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Address = {
@@ -122,6 +127,7 @@ export function CheckoutView() {
   const [errors, setErrors] = useState<Partial<Address>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const placingRef = useRef(false);
 
   // Load saved address on mount
   useEffect(() => {
@@ -133,16 +139,15 @@ export function CheckoutView() {
   // ⚡ Pricing Configuration
   const COD_CHARGES = 100; // COD charges added after discount
   const ONLINE_DISCOUNT = 100; // Online discount deducted after discount
+  const unavailable = items.some((item) =>
+    unavailableProductSelection(item.product, item.selectedColorSlug, item.variantId),
+  );
 
   // Track checkout initiation when user reaches payment step
   useEffect(() => {
-    if (step === 2 && items.length > 0) {
+    if (step === 2 && items.length > 0 && !unavailable) {
       const subtotal = items.reduce((acc, i) => {
-        const variant = i.selectedColorSlug
-          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-          : undefined;
-        const price = variant?.price ?? i.product.price;
-        return acc + price * i.quantity;
+        return acc + orderItemFromCart(i).price * i.quantity;
       }, 0);
       const shipping = 0;
       const subtotalWithShipping = subtotal + shipping;
@@ -154,14 +159,24 @@ export function CheckoutView() {
       const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount + flatDiscount;
       trackCheckout(items, total, user?.id);
     }
-  }, [step, items, payment, user?.id]);
+  }, [step, items, payment, user?.id, unavailable]);
+
+  if (unavailable) {
+    return (
+      <section className="container py-16">
+        <p role="alert">
+          A selected colour is no longer available. Remove it from your cart and choose another
+          colour before checkout.
+        </p>
+        <Link href="/cart" className="mt-4 inline-block underline">
+          Return to cart
+        </Link>
+      </section>
+    );
+  }
 
   const subtotal = items.reduce((acc, i) => {
-    const variant = i.selectedColorSlug
-      ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-      : undefined;
-    const price = variant?.price ?? i.product.price;
-    return acc + price * i.quantity;
+    return acc + orderItemFromCart(i).price * i.quantity;
   }, 0);
   const hasItems = items.length > 0;
   const shipping = 0;
@@ -286,6 +301,7 @@ export function CheckoutView() {
 
   // ── Place order ────────────────────────────────────────────────────────────
   async function placeOrder() {
+    if (placingRef.current) return;
     if (!user) {
       openAuthModal("Please log in to place your order.");
       return;
@@ -294,6 +310,7 @@ export function CheckoutView() {
       alert("Please enter a valid UPI ID (e.g. name@upi).");
       return;
     }
+    placingRef.current = true;
     setPlacing(true);
     const id = `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
     const paymentLabel =
@@ -302,31 +319,7 @@ export function CheckoutView() {
     const body = {
       id,
       user: { name: user.name, email: user.email, id: user.id },
-      items: items.map((i) => {
-        // Get the display name using variant color
-        // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
-        const variant = i.selectedColorSlug
-          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-          : i.product.colorVariants?.[0];
-
-        // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
-        const finalColorSlug = i.selectedColorSlug || variant?.slug;
-
-        const displayName = getProductDisplayName(i.product, variant);
-        const displayImage = variant
-          ? getShopDisplayImage(i.product, variant)
-          : i.product.displayImage || i.product.image;
-
-        return {
-          productId: i.product.id,
-          name: displayName,
-          price: i.product.price,
-          quantity: i.quantity,
-          image: displayImage,
-          color: variant?.color,
-          colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
-        };
-      }),
+      items: items.map(orderItemFromCart),
       total,
       status: "pending",
       shippingAddress: shippingText,
@@ -344,9 +337,7 @@ export function CheckoutView() {
 
       // Build item details for analytics tracking with complete variant information
       const itemDetails = items.map((i) => {
-        const variant = i.selectedColorSlug
-          ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-          : i.product.colorVariants?.[0];
+        const variant = selectedProductVariant(i.product, i.selectedColorSlug, i.variantId);
 
         const variantId = i.variantId || generateVariantId(i.product.id, i.selectedColorSlug);
         const displayName = getProductDisplayName(i.product, variant);
@@ -372,22 +363,7 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => {
-            const variant = i.selectedColorSlug
-              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-              : i.product.colorVariants?.[0];
-            const displayName = getProductDisplayName(i.product, variant);
-            const displayImage = variant
-              ? getShopDisplayImage(i.product, variant)
-              : i.product.displayImage || i.product.image;
-
-            return {
-              name: displayName,
-              price: i.product.price,
-              quantity: i.quantity,
-              image: displayImage,
-            };
-          }),
+          items: body.items,
           total,
           paymentMethod: paymentLabel,
           shippingAddress: shippingText,
@@ -400,17 +376,21 @@ export function CheckoutView() {
     } catch {
       alert("Something went wrong. Please try again.");
     } finally {
+      placingRef.current = false;
       setPlacing(false);
     }
   }
 
   // ── Handle UPI payment success ──────────────────────────────────────────────
   async function handleUPISuccess(transactionId: string) {
+    if (placingRef.current) return;
     if (!user) {
       openAuthModal("Please log in to complete your order.");
       return;
     }
 
+    placingRef.current = true;
+    setPlacing(true);
     try {
       const id = `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
       const shippingText = `${address.fullName}, ${address.addressLine1}${address.addressLine2 ? ", " + address.addressLine2 : ""}, ${address.city}, ${address.state} - ${address.pincode}, Phone: ${address.phone}`;
@@ -418,27 +398,7 @@ export function CheckoutView() {
       const body = {
         id,
         user: { name: user.name, email: user.email, id: user.id },
-        items: items.map((i) => {
-          // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
-          const variant = i.selectedColorSlug
-            ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-            : i.product.colorVariants?.[0];
-
-          // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
-          const finalColorSlug = i.selectedColorSlug || variant?.slug;
-
-          const displayName = getProductDisplayName(i.product, variant);
-
-          return {
-            productId: i.product.id,
-            name: displayName,
-            price: i.product.price,
-            quantity: i.quantity,
-            image: variant?.image || i.product.image,
-            color: variant?.color,
-            colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
-          };
-        }),
+        items: items.map(orderItemFromCart),
         total,
         status: "confirmed",
         shippingAddress: shippingText,
@@ -467,22 +427,7 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => {
-            const variant = i.selectedColorSlug
-              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-              : i.product.colorVariants?.[0];
-            const displayName = getProductDisplayName(i.product, variant);
-            const displayImage = variant
-              ? getShopDisplayImage(i.product, variant)
-              : i.product.displayImage || i.product.image;
-
-            return {
-              name: displayName,
-              price: i.product.price,
-              quantity: i.quantity,
-              image: displayImage,
-            };
-          }),
+          items: body.items,
           total,
           paymentMethod: `UPI (${upiId})`,
           shippingAddress: shippingText,
@@ -495,19 +440,25 @@ export function CheckoutView() {
     } catch (error) {
       console.error("Error saving order:", error);
       alert(
-        "Order saved but could not record in system. Please contact support with Transaction ID: " +
+        "Payment received but the order could not be saved. Please contact support with Transaction ID: " +
           transactionId,
       );
+    } finally {
+      placingRef.current = false;
+      setPlacing(false);
     }
   }
 
   // ── Handle Card payment success ─────────────────────────────────────────────
   async function handleCardSuccess(paymentId: string) {
+    if (placingRef.current) return;
     if (!user) {
       openAuthModal("Please log in to complete your order.");
       return;
     }
 
+    placingRef.current = true;
+    setPlacing(true);
     try {
       const id = `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
       const shippingText = `${address.fullName}, ${address.addressLine1}${address.addressLine2 ? ", " + address.addressLine2 : ""}, ${address.city}, ${address.state} - ${address.pincode}, Phone: ${address.phone}`;
@@ -515,27 +466,7 @@ export function CheckoutView() {
       const body = {
         id,
         user: { name: user.name, email: user.email, id: user.id },
-        items: items.map((i) => {
-          // CRITICAL: Always have a variant - use selectedColorSlug first, then first variant
-          const variant = i.selectedColorSlug
-            ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-            : i.product.colorVariants?.[0];
-
-          // CRITICAL: Ensure colorSlug is always set (use variant's slug as fallback)
-          const finalColorSlug = i.selectedColorSlug || variant?.slug;
-
-          const displayName = getProductDisplayName(i.product, variant);
-
-          return {
-            productId: i.product.id,
-            name: displayName,
-            price: i.product.price,
-            quantity: i.quantity,
-            image: variant?.image || i.product.image,
-            color: variant?.color,
-            colorSlug: finalColorSlug, // NEW: Store exact color slug for variant tracking - ALWAYS SET
-          };
-        }),
+        items: items.map(orderItemFromCart),
         total,
         status: "confirmed",
         shippingAddress: shippingText,
@@ -564,22 +495,7 @@ export function CheckoutView() {
           email: user.email,
           name: user.name,
           orderId: id,
-          items: items.map((i) => {
-            const variant = i.selectedColorSlug
-              ? i.product.colorVariants?.find((v) => v.slug === i.selectedColorSlug)
-              : i.product.colorVariants?.[0];
-            const displayName = getProductDisplayName(i.product, variant);
-            const displayImage = variant
-              ? getShopDisplayImage(i.product, variant)
-              : i.product.displayImage || i.product.image;
-
-            return {
-              name: displayName,
-              price: i.product.price,
-              quantity: i.quantity,
-              image: displayImage,
-            };
-          }),
+          items: body.items,
           total,
           paymentMethod: "Debit / Credit Card",
           shippingAddress: shippingText,
@@ -592,17 +508,25 @@ export function CheckoutView() {
     } catch (error) {
       console.error("Error saving order:", error);
       alert(
-        "Order saved but could not record in system. Please contact support with Payment ID: " +
+        "Payment received but the order could not be saved. Please contact support with Payment ID: " +
           paymentId,
       );
+    } finally {
+      placingRef.current = false;
+      setPlacing(false);
     }
   }
 
   return (
     <section className="min-h-screen overflow-x-hidden bg-background">
+      {placing && (
+        <p role="status" className="border-b bg-muted px-5 py-3 text-center text-sm">
+          Saving your order. Please do not close this page or pay again.
+        </p>
+      )}
       {/* Header */}
       <div className="bg-card sticky top-0 z-40 w-full border-b border-border shadow-sm">
-        <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-[1600px] px-3 py-4 sm:px-5 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               {step > 0 && (
@@ -635,7 +559,7 @@ export function CheckoutView() {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-8 lg:px-8">
+      <div className="container mx-auto max-w-[1600px] px-3 py-6 sm:px-5 md:py-8 lg:px-8">
         <div className="grid w-full gap-6 lg:grid-cols-[1fr_380px]">
           {/* Left panel */}
           <div>
@@ -657,9 +581,7 @@ export function CheckoutView() {
                 </div>
                 <ul className="divide-y divide-border">
                   {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
-                    const variant = selectedColorSlug
-                      ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
-                      : product.colorVariants?.[0];
+                    const variant = selectedProductVariant(product, selectedColorSlug, variantId);
                     const displayName = getProductDisplayName(product, variant);
                     const displayImage = variant
                       ? getShopDisplayImage(product, variant)
@@ -689,7 +611,7 @@ export function CheckoutView() {
                               Qty: {quantity}
                             </span>
                             <p className="text-sm font-bold text-slate-900">
-                              {formatINR(product.price * quantity)}
+                              {formatINR((variant?.price ?? product.price) * quantity)}
                             </p>
                           </div>
                         </div>
@@ -895,7 +817,7 @@ export function CheckoutView() {
                           phone={address.phone || user?.phone || ""}
                           onSuccess={handleUPISuccess}
                           onError={(error) => alert(`UPI Payment Error: ${error}`)}
-                          disabled={!user}
+                          disabled={!user || placing}
                         />
                       </div>
                     )}
@@ -920,7 +842,7 @@ export function CheckoutView() {
                           phone={address.phone || user?.phone || ""}
                           onSuccess={handleCardSuccess}
                           onError={(error) => alert(`Card Payment Error: ${error}`)}
-                          disabled={!user}
+                          disabled={!user || placing}
                         />
                       </div>
                     )}
@@ -974,9 +896,7 @@ export function CheckoutView() {
               <>
                 <ul className="mb-4 space-y-3 border-b border-slate-200 pb-4">
                   {items.map(({ product, quantity, selectedColorSlug, variantId }) => {
-                    const variant = selectedColorSlug
-                      ? product.colorVariants?.find((v) => v.slug === selectedColorSlug)
-                      : product.colorVariants?.[0];
+                    const variant = selectedProductVariant(product, selectedColorSlug, variantId);
                     const displayName = getProductDisplayName(product, variant);
                     const displayImage = variant
                       ? getShopDisplayImage(product, variant)
@@ -1000,7 +920,7 @@ export function CheckoutView() {
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium text-slate-900">{product.name}</p>
+                          <p className="truncate font-medium text-slate-900">{displayName}</p>
                           {variantColorName && (
                             <p className="mt-0.5 truncate text-slate-600">
                               <span className="font-semibold capitalize">{variantColorName}</span>
@@ -1009,7 +929,7 @@ export function CheckoutView() {
                           <p className="mt-1 text-slate-500">Qty: {quantity}</p>
                         </div>
                         <p className="shrink-0 text-right font-bold text-slate-900">
-                          {formatINR(product.price * quantity)}
+                          {formatINR((variant?.price ?? product.price) * quantity)}
                         </p>
                       </li>
                     );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/image";
 import Link from "next/link";
 import {
   Package,
@@ -33,6 +33,7 @@ type OrderItem = {
   image: string;
   color?: string;
   colorSlug?: string;
+  variantId?: string;
 };
 type Order = {
   id: string;
@@ -100,7 +101,12 @@ export default function OrdersPage() {
         setProducts(prods || []);
         if (Array.isArray(orderData)) setOrders(orderData);
       })
-      .catch(() => {})
+      .catch((error: unknown) => {
+        console.error("Failed to load order history:", error);
+        setCancelError(
+          error instanceof Error ? error.message : "Order history could not be loaded.",
+        );
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -137,6 +143,7 @@ export default function OrdersPage() {
 
   // Helper function to get the correct display image for an order item
   const getOrderItemImage = (item: OrderItem): string => {
+    if (item.image) return item.image;
     if (item.productId) {
       const product = products.find((p) => p.id === item.productId);
       if (product && product.colorVariants && product.colorVariants.length > 0) {
