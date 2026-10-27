@@ -96,7 +96,7 @@ export function StyleInMotion() {
   return (
     <section className="w-full">
       <div className="container py-10 sm:py-12 md:py-16">
-        <SectionHeading title="Style in Motion" subtitle="See our bags in action" />
+        <SectionHeading title="Style in Motion" />
 
         <div className="scrollbar-hide -mx-3 flex snap-x gap-4 overflow-x-auto px-3 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-5 sm:overflow-visible sm:px-0 lg:gap-6">
           {TILES.map((t, i) => (

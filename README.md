@@ -62,6 +62,21 @@ node --test tests/admin-product.test.mjs tests/product-detail.test.mjs tests/pro
 
 ## Homepage section selection
 
+Homepage sections retain their main titles without the extra New Arrivals and
+Best Sellers eyebrow text or the New Arrivals, Best Sellers, Most Trending and
+Style in Motion descriptions. Homepage section padding is 24px on mobile, 32px
+from 700px and 40px from 1000px, with tighter heading-to-content gaps. New Arrivals
+has an additional 20px of top padding for breathing room below the hero. These
+spacing overrides do not affect collection, product or admin pages.
+
+On mobile and tablet (below 1024px), the footer uses compact 24px section
+padding and places Support directly below About beside the Shop links.
+The copyright row is hidden below 1024px. Desktop retains its four-column layout
+and original spacing. Homepage pill buttons use smaller responsive text and
+padding on mobile and tablet, stay within their container and wrap if needed.
+Category tabs use two columns on mobile and four on tablet, with compact labels
+and at least 44px touch targets; desktop retains the wrapping horizontal layout.
+
 In **Admin > Products > Edit > Colour Variants**, expand a colour and enable its
 New, Most Trending or Best Seller tag (or inherit the group tag). Under
 **Homepage section order**, give it a separate positive whole-number rank for

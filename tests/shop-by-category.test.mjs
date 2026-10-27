@@ -65,6 +65,10 @@ test("Sling Bags is first and selected by default; category switches retain filt
   }
   const nodes = render();
   const buttons = nodes.filter((node) => node.type === "button");
+  const categoryGroup = nodes.find((node) => node.props?.["aria-label"] === "Bag categories");
+  assert.match(categoryGroup.props.className, /grid-cols-2/);
+  assert.match(categoryGroup.props.className, /sm:grid-cols-4/);
+  assert.match(categoryGroup.props.className, /lg:flex/);
   assert.equal(buttons[0].props.children.props.children, "Sling Bags");
   assert.equal(buttons[0].props["aria-pressed"], true);
   assert.equal(nodes.find((node) => node.type === "card").props.product, products[0]);
@@ -81,12 +85,16 @@ test("Sling Bags is first and selected by default; category switches retain filt
     assert.match(button.props.className, /font-sans/);
     assert.match(button.props.className, /text-\[12px\]/);
     assert.match(button.props.className, /font-normal/);
-    assert.match(button.props.className, /tracking-\[0\.2em\]/);
+    assert.match(button.props.className, /tracking-\[0\.08em\]/);
+    assert.match(button.props.className, /lg:tracking-\[0\.2em\]/);
+    assert.match(button.props.className, /min-h-11/);
+    assert.match(button.props.className, /min-w-0/);
     assert.match(button.props.className, /leading-\[18px\]/);
     assert.doesNotMatch(button.props.className, /font-jost|uppercase/);
     assert.match(button.props.className, /outline-none/);
     assert.doesNotMatch(button.props.className, /focus-visible:outline/);
     assert.match(button.props.children.props.className, /rounded-full/);
+    assert.match(button.props.children.props.className, /max-w-full whitespace-normal/);
     assert.match(button.props.children.props.className, /group-focus-visible\/category:ring-2/);
   }
   buttons[1].props.onClick();

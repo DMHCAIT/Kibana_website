@@ -184,13 +184,22 @@ export function AddToCartButton({ product, activeVariantSlug }: AddToCartButtonP
           {isOutOfStock ? "Out of Stock" : adding ? "Adding..." : "Add to Cart"}
         </Button>
         <Button
-          size="lg"
+          type="button"
+          size="icon"
           variant="ghost"
-          className="h-12 w-10 shrink-0 rounded-none px-0 hover:bg-transparent sm:w-12"
+          className="h-12 w-12 shrink-0 border-0 bg-transparent p-0 text-foreground shadow-none hover:bg-transparent hover:text-foreground"
           onClick={handleWishlist}
           aria-label={inWishlist ? "Remove from wishlist" : "Save to wishlist"}
+          aria-pressed={inWishlist}
         >
-          <Heart className={cn("h-4 w-4", inWishlist ? "fill-red-500 text-red-500" : "")} />
+          <Heart
+            className={cn(
+              "h-6 w-6",
+              inWishlist ? "fill-red-500 text-red-500" : "text-foreground/70",
+            )}
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
         </Button>
       </div>
     </div>

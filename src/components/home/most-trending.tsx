@@ -28,7 +28,7 @@ export function MostTrending({ products = [] }: { products?: Product[] }) {
     <section className="w-full">
       <div className="container py-10 sm:py-12 md:py-16">
         <div className="relative">
-          <SectionHeading title="Most Trending" subtitle="What everyone is obsessing over" />
+          <SectionHeading title="Most Trending" />
           {trendingProducts.length > 0 && (
             <div className="absolute right-0 top-1 hidden gap-2 md:flex">
               <button

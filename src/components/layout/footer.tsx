@@ -33,7 +33,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-white text-foreground">
+    <footer className="storefront-footer bg-white text-foreground">
       <div className="border-y border-border bg-kibana-tile">
         <div className="storefront-section-space container text-center">
           <h2 className="section-title">Join Our Newsletter</h2>
@@ -45,13 +45,13 @@ export function Footer() {
       </div>
 
       <div className="storefront-section-space container">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="col-span-2 md:col-span-1">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-y-10">
+          <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="font-logo text-[22px] text-foreground">
               KIBANA
             </Link>
             <p className="mt-3 text-[13px] text-muted-foreground">Pure. Minimal. Luxe.</p>
-            <div className="mt-6 flex items-center gap-2.5">
+            <div className="mt-4 flex items-center gap-2.5 lg:mt-6">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
@@ -67,29 +67,33 @@ export function Footer() {
             </div>
           </div>
 
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h4 className="mb-5 font-jost text-[13px] font-medium uppercase tracking-[0.2em] text-foreground">
-                {col.title}
-              </h4>
-              <ul className="space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="link-draw text-[13px] text-muted-foreground hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {[columns.slice(0, 1), columns.slice(1)].map((group) => (
+            <div key={group[0].title} className="space-y-6 lg:contents lg:space-y-0">
+              {group.map((col) => (
+                <div key={col.title}>
+                  <h4 className="mb-5 font-jost text-[13px] font-medium uppercase tracking-[0.2em] text-foreground">
+                    {col.title}
+                  </h4>
+                  <ul className="space-y-2 lg:space-y-3">
+                    {col.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="link-draw text-[13px] text-muted-foreground hover:text-foreground"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="border-t border-border">
+      <div className="hidden border-t border-border lg:block">
         <p className="container py-5 text-center text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
           © {new Date().getFullYear()} Kibana. All rights reserved.
         </p>

@@ -31,7 +31,7 @@ export function ShopByCategory({ products }: { products: Product[] }) {
         <div
           role="group"
           aria-label="Bag categories"
-          className="mt-5 flex flex-wrap justify-center gap-x-3 gap-y-1 sm:gap-x-6 lg:gap-x-10"
+          className="mt-5 grid grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-4 lg:flex lg:flex-wrap lg:justify-center lg:gap-x-10"
         >
           {categories.map((cat) => (
             <button
@@ -40,11 +40,11 @@ export function ShopByCategory({ products }: { products: Product[] }) {
               aria-pressed={activeCategory === cat.slug}
               aria-controls="shop-by-category-products"
               onClick={() => setActiveCategory(cat.slug)}
-              className="group/category inline-flex min-h-11 items-center justify-center py-2 font-sans text-[12px] font-normal normal-case leading-[18px] tracking-[0.2em] outline-none"
+              className="group/category inline-flex min-h-11 min-w-0 items-center justify-center py-2 font-sans text-[11px] font-normal normal-case leading-[18px] tracking-[0.08em] outline-none sm:text-[12px] lg:tracking-[0.2em]"
             >
               <span
                 className={cn(
-                  "whitespace-nowrap rounded-full px-4 py-1 transition-colors group-focus-visible/category:ring-2 group-focus-visible/category:ring-kibana-brown group-focus-visible/category:ring-offset-2 motion-reduce:transition-none",
+                  "max-w-full whitespace-normal rounded-full px-2 py-1 text-center transition-colors group-focus-visible/category:ring-2 group-focus-visible/category:ring-kibana-brown group-focus-visible/category:ring-offset-2 motion-reduce:transition-none lg:whitespace-nowrap lg:px-4",
                   activeCategory === cat.slug
                     ? "bg-kibana-brown text-white"
                     : "text-foreground hover:bg-kibana-tile",

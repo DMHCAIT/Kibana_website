@@ -365,7 +365,20 @@ test("purchase controls retain quantity, exact color, authentication, wishlist a
     .find((node) => node.type === "button" && text(node).includes("Add to Cart"))
     .props.onClick();
   assert.deepEqual(additions, [[product, 2, "blue"]]);
-  button(elements, "Save to wishlist").props.onClick();
+  const wishlistButton = button(elements, "Save to wishlist");
+  assert.match(wishlistButton.props.className, /(?:^|\s)w-12(?:\s|$)/);
+  assert.equal(wishlistButton.props.size, "icon");
+  assert.equal(wishlistButton.props.variant, "ghost");
+  assert.match(wishlistButton.props.className, /(?:^|\s)border-0(?:\s|$)/);
+  assert.match(wishlistButton.props.className, /(?:^|\s)bg-transparent(?:\s|$)/);
+  assert.match(wishlistButton.props.className, /(?:^|\s)hover:bg-transparent(?:\s|$)/);
+  assert.equal(wishlistButton.props["aria-pressed"], false);
+  const wishlistHeart = nodes(wishlistButton).find((node) => node.type === "Heart");
+  assert.ok(wishlistHeart);
+  assert.match(wishlistHeart.props.className, /(?:^|\s)h-6 w-6(?:\s|$)/);
+  assert.match(wishlistHeart.props.className, /(?:^|\s)text-foreground\/70(?:\s|$)/);
+  assert.equal(wishlistHeart.props.strokeWidth, 1.5);
+  wishlistButton.props.onClick();
   assert.deepEqual(wishlist, ["bag-blue"]);
   user = null;
   elements = render();

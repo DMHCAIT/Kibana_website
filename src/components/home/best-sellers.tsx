@@ -23,11 +23,7 @@ export function BestSellers({
   return (
     <section className="w-full">
       <div className="container py-10 sm:py-12 md:py-16">
-        <SectionHeading
-          eyebrow="MOST LOVED"
-          title="Best Sellers"
-          subtitle="The pieces defining the KIBANA edit."
-        />
+        <SectionHeading title="Best Sellers" />
 
         {bestSellerProducts.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6">
