@@ -3,7 +3,8 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 // Rebuild trigger: Image cache update
 const nextConfig = (phase: string): NextConfig => ({
-  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-build",
+  distDir:
+    phase === PHASE_DEVELOPMENT_SERVER || process.env.VERCEL === "1" ? ".next" : ".next-build",
   reactStrictMode: true,
   compress: true,
   serverExternalPackages: ["sharp"],

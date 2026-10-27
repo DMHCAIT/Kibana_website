@@ -24,8 +24,10 @@ pnpm dev
 Then open http://localhost:3003. The fixed development port prevents a second
 Kibana dev server from silently starting on another port and corrupting the same
 Webpack cache. Run only one development server per checkout. Development uses
-`.next`; production builds and `next start` use `.next-build` so a build does not
-overwrite the running development server's files.
+`.next`; local production builds and `next start` use `.next-build` so a build does
+not overwrite the running development server's files. On Vercel (`VERCEL=1`),
+builds and runtime use `.next`, which the Vercel Next.js deployment adapter expects.
+Keep Vercel's Output Directory at the Next.js default (`.next`).
 
 ## Variant-only product editing and purchasing
 

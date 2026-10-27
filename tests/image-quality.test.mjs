@@ -20,6 +20,7 @@ function loadModule(relativePath, imports) {
   const exports = {};
   vm.runInNewContext(outputText, {
     exports,
+    process: { env: {} },
     require(name) {
       if (name === "react/jsx-runtime") return { jsx, jsxs: jsx };
       assert.ok(Object.hasOwn(imports, name), `Unexpected import: ${name}`);

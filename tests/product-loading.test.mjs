@@ -172,14 +172,22 @@ test("database pool uses native query deadlines and is reused without background
   assert.equal(options.onerror, undefined);
 });
 
-test("development and production never share a Next.js build directory", () => {
+test("local development and production use separate Next.js build directories", () => {
   const config = loadModule("next.config.ts", {
     "next/constants": { PHASE_DEVELOPMENT_SERVER: "development-server" },
-  }).default;
+  }, { process: { env: {} } }).default;
 
   assert.equal(config("development-server").distDir, ".next");
   assert.equal(config("production-build").distDir, ".next-build");
   assert.equal(config("production-server").distDir, ".next-build");
+});
+
+test("Vercel builds and runtime use the default directory required by deployment packaging", () => {
+  const config = loadModule("next.config.ts", {
+    "next/constants": { PHASE_DEVELOPMENT_SERVER: "development-server" },
+  }, { process: { env: { VERCEL: "1" } } }).default;
+  assert.equal(config("production-build").distDir, ".next");
+  assert.equal(config("production-server").distDir, ".next");
 });
 
 test("the dev script uses a fixed port rather than silently starting another server", () => {
