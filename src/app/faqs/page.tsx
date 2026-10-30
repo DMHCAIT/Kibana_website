@@ -16,7 +16,7 @@ const categories: Category[] = [
     faqs: [
       {
         q: "How can I cancel my order?",
-        a: "You can cancel your order within 24 hours of placing it by contacting our support team at support@kibana.in. Once the order has been dispatched, cancellations are not possible.",
+        a: "You can cancel your order within 24 hours of placing it by contacting our support team at support@kibanalife.com. Once the order has been dispatched, cancellations are not possible.",
       },
       {
         q: "Can I replace or modify my order after placing it?",
@@ -38,7 +38,7 @@ const categories: Category[] = [
       },
       {
         q: "How can I return a product if I change my mind?",
-        a: "We accept returns within 7 days of delivery, provided the item is unused, in its original packaging with tags intact. Contact support@kibana.in to initiate the process.",
+        a: "We accept returns within 7 days of delivery, provided the item is unused, in its original packaging with tags intact. Contact support@kibanalife.com to initiate the process.",
       },
       {
         q: "What is your return and exchange policy?",
@@ -50,7 +50,7 @@ const categories: Category[] = [
       },
       {
         q: "How do I initiate an online return?",
-        a: "Email us at support@kibana.in with your order number, reason for return, and photos if applicable. Our team will guide you through the process within 24 hours.",
+        a: "Email us at support@kibanalife.com with your order number, reason for return, and photos if applicable. Our team will guide you through the process within 24 hours.",
       },
       {
         q: "How will I receive my refund?",
@@ -142,7 +142,7 @@ const categories: Category[] = [
       },
       {
         q: "Who should I contact for queries or support?",
-        a: "You can reach our support team at support@kibana.in or via WhatsApp. We typically respond within 24 business hours.",
+        a: "You can reach our support team at support@kibanalife.com or via WhatsApp. We typically respond within 24 business hours.",
       },
       {
         q: "How often is the website updated with new products?",
@@ -360,7 +360,7 @@ export default function FAQsPage() {
             </div>
             <div className="flex flex-shrink-0 flex-col gap-4 sm:flex-row">
               <a
-                href="mailto:support@kibana.in"
+                href="mailto:support@kibanalife.com"
                 className="inline-flex items-center justify-center bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-widest text-foreground transition-all hover:bg-accent/90"
               >
                 Email Support

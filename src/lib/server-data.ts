@@ -6,6 +6,7 @@ import {
   users as usersTable,
   siteConfig as siteConfigTable,
   contactMessages as contactMessagesTable,
+  newsletterSubscribers as newsletterSubscribersTable,
   userCart as userCartTable,
 } from "@/lib/db/schema";
 import { eq, asc, desc, sql } from "drizzle-orm";
@@ -734,6 +735,23 @@ export async function isFirstTimeCustomer(userId: string, userEmail: string): Pr
   return !orders.some(
     ({ user }) => user?.id === userId || user?.email?.toLowerCase().trim() === cleanEmail,
   );
+}
+
+export type NewsletterSubscriber = {
+  email: string;
+  subscribedAt: string;
+};
+
+export async function getNewsletterSubscribers(): Promise<NewsletterSubscriber[]> {
+  const rows = await db
+    .select()
+    .from(newsletterSubscribersTable)
+    .orderBy(desc(newsletterSubscribersTable.subscribedAt));
+
+  return rows.map((row) => ({
+    email: row.email,
+    subscribedAt: row.subscribedAt.toISOString(),
+  }));
 }
 
 // ── Cart Items ────────────────────────────────────────────────────────────────

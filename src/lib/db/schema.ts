@@ -120,6 +120,12 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ── Newsletter subscribers ────────────────────────────────────────────────────
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  email: text("email").primaryKey(),
+  subscribedAt: timestamp("subscribed_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // ── Media files (uploaded to Supabase Storage, tracked in DB) ─────────────────
 export const mediaFiles = pgTable("media_files", {
   id: text("id").primaryKey(),

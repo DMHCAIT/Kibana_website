@@ -21,7 +21,14 @@ import { useAuth } from "@/store/auth-store";
 import { SHOP_CATEGORIES } from "@/lib/shop-categories";
 import { cn } from "@/lib/utils";
 
-const DEFAULT_ANNOUNCEMENTS = ["100% PREMIUM VEGAN LEATHER", "FREE SHIPPING ON ORDERS ABOVE ₹999"];
+const DEFAULT_ANNOUNCEMENTS = [
+  "100% PREMIUM VEGAN LEATHER",
+  "DELIVERY WITHIN 4 DAYS ACROSS INDIA",
+  "PAY ONLINE, GET ₹100 OFF AUTOMATICALLY",
+  "RATED 4.7★ BY 112 CUSTOMERS",
+];
+const LEGACY_ANNOUNCEMENT =
+  "UPTO 60% OFF ON SELECTED STYLES · 100% PREMIUM VEGAN LEATHER · FREE SHIPPING ON ORDERS ABOVE ₹999";
 
 const secondaryMenu = [
   { label: "Shop All", href: "/shop" },
@@ -31,8 +38,9 @@ const secondaryMenu = [
 ];
 
 function AnnouncementBar({ text }: { text?: string }) {
-  const phrases = text
-    ? text
+  const announcementText = text === LEGACY_ANNOUNCEMENT ? undefined : text;
+  const phrases = announcementText
+    ? announcementText
         .split("·")
         .map((s) => s.trim())
         .filter(Boolean)

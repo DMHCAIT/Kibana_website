@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:migrate-newsletter": "tsx scripts/migrate-newsletter.ts",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
     "db:migrate-homepage-ranks": "tsx scripts/migrate-homepage-ranks.ts",

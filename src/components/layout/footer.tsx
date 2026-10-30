@@ -38,7 +38,8 @@ export function Footer() {
         <div className="storefront-section-space container text-center">
           <h2 className="section-title">Join Our Newsletter</h2>
           <p className="mx-auto mb-7 mt-3 max-w-md text-[13px] text-muted-foreground">
-            Pure. Minimal. Luxe.
+            Subscribe now to receive exclusive updates, special offers, and the latest news straight
+            to your inbox!
           </p>
           <NewsletterForm />
         </div>

@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronRight,
   MessageSquare,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { href: "/admin/cart", label: "Cart Items", icon: ShoppingCart, exact: false },
   { href: "/admin/members", label: "Members", icon: Users, exact: false },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare, exact: false },
+  { href: "/admin/newsletter", label: "Newsletter", icon: Mail, exact: false },
   { href: "/admin/media", label: "Media", icon: ImageIcon, exact: false },
   { href: "/admin/content", label: "Content", icon: FileText, exact: false },
 ];

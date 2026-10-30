@@ -13,6 +13,7 @@ type FormValues = z.infer<typeof schema>;
 
 export function NewsletterForm() {
   const [done, setDone] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const {
     register,
     handleSubmit,
@@ -22,10 +23,24 @@ export function NewsletterForm() {
     defaultValues: { email: "" },
   });
 
-  async function onSubmit(_values: FormValues) {
-    // Wire this to Resend / Supabase function later.
-    await new Promise((r) => setTimeout(r, 700));
-    setDone(true);
+  async function onSubmit(values: FormValues) {
+    setSubmitError("");
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to subscribe right now. Please try again.");
+      }
+      setDone(true);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Unable to subscribe right now. Please try again.",
+      );
+    }
   }
 
   if (done) {
@@ -66,6 +81,11 @@ export function NewsletterForm() {
         </button>
       </div>
       {errors.email && <p className="pl-6 text-[12px] text-kibana-sale">{errors.email.message}</p>}
+      {submitError && (
+        <p role="alert" className="pl-6 text-[12px] text-kibana-sale">
+          {submitError}
+        </p>
+      )}
     </form>
   );
 }
