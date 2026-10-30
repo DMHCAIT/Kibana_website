@@ -69,6 +69,10 @@ export function AuthModal() {
       setError("Please enter your name.");
       return;
     }
+    if (tab === "signup" && !/^\d{10}$/.test(phone.trim())) {
+      setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
     if (!acceptedPolicy) {
       setError("Please accept Privacy Policy and T&Cs to continue.");
       return;
@@ -132,7 +136,7 @@ export function AuthModal() {
     const result = await verifyOtp(
       email,
       otpString,
-      isNewUser ? { name: name.trim(), ...(phone.trim() && { phone: phone.trim() }) } : undefined,
+      isNewUser ? { name: name.trim(), phone: phone.trim() } : undefined,
     );
     setLoading(false);
 
@@ -217,7 +221,7 @@ export function AuthModal() {
             {step === "email" ? (
               tab === "signup" ? (
                 <span className="inline-block px-1 text-base font-semibold tracking-[0.06em] text-amber-900 sm:text-lg">
-                  SIGN UP &amp; GET UPTO 10% OFF
+                  SIGN UP &amp; GET UPTO 10% OFF ON FIRST ORDER
                 </span>
               ) : (
                 "Welcome Back"
@@ -273,16 +277,17 @@ export function AuthModal() {
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium uppercase tracking-widest text-gray-500">
-                        Mobile Number{" "}
-                        <span className="normal-case tracking-normal text-gray-400">
-                          (Optional)
-                        </span>
+                        Mobile Number *
                       </label>
                       <Input
                         type="tel"
                         placeholder="Enter your mobile number"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        required
+                        inputMode="numeric"
+                        autoComplete="tel-national"
+                        maxLength={10}
                         className="h-10 sm:h-11"
                       />
                     </div>

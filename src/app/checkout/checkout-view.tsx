@@ -40,6 +40,7 @@ type Address = {
 };
 
 type PaymentMethod = "cod" | "upi" | "card";
+type FirstOrderCheck = { userId: string; eligible: boolean } | { userId: string; error: true };
 
 const SAVED_ADDRESS_KEY = "kibana-saved-address";
 const STEPS = ["Order Summary", "Delivery Address", "Payment"] as const;
@@ -128,6 +129,8 @@ export function CheckoutView() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const placingRef = useRef(false);
+  const [firstOrderCheck, setFirstOrderCheck] = useState<FirstOrderCheck | null>(null);
+  const [firstOrderCheckAttempt, setFirstOrderCheckAttempt] = useState(0);
 
   // Load saved address on mount
   useEffect(() => {
@@ -135,6 +138,39 @@ export function CheckoutView() {
     const saved = loadSavedAddress();
     if (saved.fullName) setAddress(saved);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+
+    fetch("/api/admin/check-first-order")
+      .then(async (response) => {
+        const data = (await response.json()) as { isFirstTime?: unknown; error?: string };
+        if (!response.ok || typeof data.isFirstTime !== "boolean") {
+          throw new Error(data.error || "Could not check first-order eligibility");
+        }
+        if (active) {
+          setFirstOrderCheck({ userId: user.id, eligible: data.isFirstTime });
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to check first-order eligibility:", error);
+        if (active) setFirstOrderCheck({ userId: user.id, error: true });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id, firstOrderCheckAttempt]);
+
+  const currentFirstOrderCheck =
+    user && firstOrderCheck?.userId === user.id ? firstOrderCheck : null;
+  const firstOrderEligible =
+    currentFirstOrderCheck !== null &&
+    "eligible" in currentFirstOrderCheck &&
+    currentFirstOrderCheck.eligible;
+  const firstOrderCheckFailed =
+    currentFirstOrderCheck !== null && "error" in currentFirstOrderCheck;
 
   // ⚡ Pricing Configuration
   const COD_CHARGES = 100; // COD charges added after discount
@@ -151,15 +187,16 @@ export function CheckoutView() {
       }, 0);
       const shipping = 0;
       const subtotalWithShipping = subtotal + shipping;
+      const firstOrderDiscount = firstOrderEligible ? Math.round(subtotal * 0.1) : 0;
       // Calculate charges based on payment method
       const codCharges = payment === "cod" ? COD_CHARGES : 0;
       const upiDiscount = payment === "upi" ? -ONLINE_DISCOUNT : 0;
       const cardDiscount = payment === "card" ? -ONLINE_DISCOUNT : 0;
-      const flatDiscount = -Math.round(subtotal * 0.6);
-      const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount + flatDiscount;
+      const total =
+        subtotalWithShipping + codCharges + upiDiscount + cardDiscount - firstOrderDiscount;
       trackCheckout(items, total, user?.id);
     }
-  }, [step, items, payment, user?.id, unavailable]);
+  }, [step, items, payment, user?.id, unavailable, firstOrderEligible]);
 
   if (unavailable) {
     return (
@@ -185,8 +222,9 @@ export function CheckoutView() {
   const codCharges = payment === "cod" ? COD_CHARGES : 0;
   const upiDiscount = payment === "upi" ? -ONLINE_DISCOUNT : 0;
   const cardDiscount = payment === "card" ? -ONLINE_DISCOUNT : 0;
+  const firstOrderDiscount = firstOrderEligible ? Math.round(subtotal * 0.1) : 0;
 
-  const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount;
+  const total = subtotalWithShipping + codCharges + upiDiscount + cardDiscount - firstOrderDiscount;
 
   // ── Wait for cart to load ────────────────────────────────────────────────
   if (!mounted || isLoading) {
@@ -294,6 +332,7 @@ export function CheckoutView() {
       openAuthModal("Please log in to proceed to checkout.");
       return;
     }
+    if (!currentFirstOrderCheck || firstOrderCheckFailed) return;
     if (!validateAddress()) return;
     saveAddress(address);
     setStep(2);
@@ -364,6 +403,11 @@ export function CheckoutView() {
           name: user.name,
           orderId: id,
           items: body.items,
+          subtotal,
+          shipping,
+          codCharges,
+          firstOrderDiscount,
+          onlinePaymentDiscount: Math.abs(upiDiscount + cardDiscount),
           total,
           paymentMethod: paymentLabel,
           shippingAddress: shippingText,
@@ -428,6 +472,11 @@ export function CheckoutView() {
           name: user.name,
           orderId: id,
           items: body.items,
+          subtotal,
+          shipping,
+          codCharges,
+          firstOrderDiscount,
+          onlinePaymentDiscount: Math.abs(upiDiscount + cardDiscount),
           total,
           paymentMethod: `UPI (${upiId})`,
           shippingAddress: shippingText,
@@ -496,6 +545,11 @@ export function CheckoutView() {
           name: user.name,
           orderId: id,
           items: body.items,
+          subtotal,
+          shipping,
+          codCharges,
+          firstOrderDiscount,
+          onlinePaymentDiscount: Math.abs(upiDiscount + cardDiscount),
           total,
           paymentMethod: "Debit / Credit Card",
           shippingAddress: shippingText,
@@ -620,6 +674,28 @@ export function CheckoutView() {
                   })}
                 </ul>
                 <div className="border-t border-border bg-muted px-6 py-4">
+                  {user && !currentFirstOrderCheck && (
+                    <p role="status" className="mb-3 text-sm text-muted-foreground">
+                      Checking first-order offer...
+                    </p>
+                  )}
+                  {user && firstOrderCheckFailed && (
+                    <div className="mb-3 flex items-center justify-between gap-3 text-sm text-red-700">
+                      <p role="alert">
+                        We couldn’t verify first-order eligibility. Please try again to continue.
+                      </p>
+                      <button
+                        type="button"
+                        className="shrink-0 underline"
+                        onClick={() => {
+                          setFirstOrderCheck(null);
+                          setFirstOrderCheckAttempt((attempt) => attempt + 1);
+                        }}
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
                   <Button
                     size="lg"
                     className="w-full rounded-lg bg-primary font-semibold text-white hover:bg-primary/90"
@@ -628,8 +704,9 @@ export function CheckoutView() {
                         openAuthModal("Please log in to proceed to checkout.");
                         return;
                       }
-                      setStep(1);
+                      if (currentFirstOrderCheck && !firstOrderCheckFailed) setStep(1);
                     }}
+                    disabled={!!user && (!currentFirstOrderCheck || firstOrderCheckFailed)}
                   >
                     Proceed to Address <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -953,6 +1030,12 @@ export function CheckoutView() {
                 <div className="flex items-center justify-between text-sm">
                   <dt className="text-muted-foreground">COD Charges</dt>
                   <dd className="font-medium text-foreground">{formatINR(codCharges)}</dd>
+                </div>
+              )}
+              {firstOrderDiscount > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <dt className="text-muted-foreground">First Order Discount (10%)</dt>
+                  <dd className="font-medium text-emerald-600">{formatINR(-firstOrderDiscount)}</dd>
                 </div>
               )}
               {upiDiscount < 0 && (

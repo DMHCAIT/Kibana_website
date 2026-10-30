@@ -728,16 +728,12 @@ export async function deleteOrder(id: string): Promise<void> {
 export async function isFirstTimeCustomer(userId: string, userEmail: string): Promise<boolean> {
   if (!hasDatabase) return true;
 
-  try {
-    const orders = await getOrders();
-    // Check if user has ANY orders (regardless of status - pending, cancelled, delivered, etc.)
-    // Once they place their first order, the discount should not appear on future orders
-    const hasAnyOrder = orders.some((o) => o.user?.id === userId || o.user?.email === userEmail);
-
-    return !hasAnyOrder;
-  } catch {
-    return true;
-  }
+  const orders = await db.select({ user: ordersTable.user }).from(ordersTable);
+  const cleanEmail = userEmail.toLowerCase().trim();
+  // Any placed order uses the first-order offer, regardless of its current status.
+  return !orders.some(
+    ({ user }) => user?.id === userId || user?.email?.toLowerCase().trim() === cleanEmail,
+  );
 }
 
 // ── Cart Items ────────────────────────────────────────────────────────────────

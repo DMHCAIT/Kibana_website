@@ -21,6 +21,11 @@ interface OrderConfirmationOptions {
   name: string;
   orderId: string;
   items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  codCharges: number;
+  firstOrderDiscount: number;
+  onlinePaymentDiscount: number;
   total: number;
   paymentMethod: string;
   shippingAddress: string;
@@ -152,6 +157,7 @@ function getOrderConfirmationTemplate(options: OrderConfirmationOptions) {
       `,
     )
     .join("");
+  const formatPrice = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
 
   const formattedDate = new Date(options.placedAt).toLocaleString("en-IN", {
     year: "numeric",
@@ -210,11 +216,48 @@ function getOrderConfirmationTemplate(options: OrderConfirmationOptions) {
             </table>
           </div>
 
-          <!-- Total -->
-          <div style="text-align:right;padding:16px 0;border-top:2px solid #e6e6e6;">
-            <p style="margin:0;font-size:18px;font-weight:700;color:#111;">
-              Total: ₹${options.total.toLocaleString("en-IN")}
-            </p>
+          <!-- Order Total -->
+          <div style="padding:16px 0;border-top:2px solid #e6e6e6;">
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+              <tbody>
+                <tr>
+                  <td style="padding:6px 0;color:#666;">Subtotal</td>
+                  <td style="padding:6px 0;text-align:right;">${formatPrice(options.subtotal)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 0;color:#666;">Shipping</td>
+                  <td style="padding:6px 0;text-align:right;">${options.shipping === 0 ? "FREE" : formatPrice(options.shipping)}</td>
+                </tr>
+                ${
+                  options.codCharges > 0
+                    ? `<tr>
+                  <td style="padding:6px 0;color:#666;">COD Charges</td>
+                  <td style="padding:6px 0;text-align:right;">${formatPrice(options.codCharges)}</td>
+                </tr>`
+                    : ""
+                }
+                ${
+                  options.firstOrderDiscount > 0
+                    ? `<tr>
+                  <td style="padding:6px 0;color:#666;">First Order Discount (10%)</td>
+                  <td style="padding:6px 0;text-align:right;color:#059669;">-${formatPrice(options.firstOrderDiscount)}</td>
+                </tr>`
+                    : ""
+                }
+                ${
+                  options.onlinePaymentDiscount > 0
+                    ? `<tr>
+                  <td style="padding:6px 0;color:#666;">Online Payment Discount</td>
+                  <td style="padding:6px 0;text-align:right;color:#059669;">-${formatPrice(options.onlinePaymentDiscount)}</td>
+                </tr>`
+                    : ""
+                }
+                <tr style="border-top:1px solid #e6e6e6;">
+                  <td style="padding:12px 0 0;font-size:18px;font-weight:700;color:#111;">Total</td>
+                  <td style="padding:12px 0 0;text-align:right;font-size:18px;font-weight:700;color:#111;">${formatPrice(options.total)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- Shipping Address -->
@@ -274,10 +317,7 @@ export async function sendOrderConfirmationEmail(
 
     const sendPromise = transporter.sendMail(mailOptions);
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Email send timeout after 30 seconds")),
-        30000,
-      ),
+      setTimeout(() => reject(new Error("Email send timeout after 30 seconds")), 30000),
     );
 
     await Promise.race([sendPromise, timeoutPromise]);

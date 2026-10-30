@@ -1,22 +1,47 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { users as usersTable } from "@/lib/db/schema";
+import { getLocalUserById } from "@/lib/local-user-store";
 import { isFirstTimeCustomer } from "@/lib/server-data";
 
 export const dynamic = "force-dynamic";
+const isDev = process.env.NODE_ENV === "development";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-    const userEmail = searchParams.get("userEmail");
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("kibana-user-id")?.value;
 
-    if (!userId || !userEmail) {
-      return NextResponse.json({ error: "userId and userEmail required" }, { status: 400 });
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ⚡ Check if customer is placing their first order
-    const isFirst = await isFirstTimeCustomer(userId, userEmail);
+    let userEmail: string | null;
+    try {
+      const [user] = await db
+        .select({ email: usersTable.email })
+        .from(usersTable)
+        .where(eq(usersTable.id, userId))
+        .limit(1);
+      userEmail = user?.email ?? null;
+    } catch (error) {
+      if (!isDev) throw error;
+      const localUser = await getLocalUserById(userId);
+      userEmail = localUser?.email ?? null;
+    }
 
-    return NextResponse.json({ isFirstTime: isFirst });
+    if (!userEmail && isDev) {
+      const localUser = await getLocalUserById(userId);
+      userEmail = localUser?.email ?? null;
+    }
+    if (!userEmail) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const isFirstTime = await isFirstTimeCustomer(userId, userEmail);
+    return NextResponse.json({ isFirstTime });
   } catch (error) {
     console.error("❌ Error checking first-time customer:", error);
     return NextResponse.json({ error: "Failed to check customer status" }, { status: 500 });

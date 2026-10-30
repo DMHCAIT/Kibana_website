@@ -42,7 +42,7 @@ type AuthState = {
   verifyOtp: (
     email: string,
     otp: string,
-    signupData?: { name: string; phone?: string },
+    signupData?: { name: string; phone: string },
   ) => Promise<{ error?: string; user?: AuthUser }>;
 
   logout: () => Promise<void>;

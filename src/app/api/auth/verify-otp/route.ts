@@ -32,6 +32,15 @@ export async function POST(request: Request) {
       console.log("❌ Missing email or OTP in request");
       return NextResponse.json({ error: "Missing email or OTP" }, { status: 400 });
     }
+    if (
+      signupData &&
+      (!signupData.name?.trim() || !/^\d{10}$/.test(signupData.phone?.trim() ?? ""))
+    ) {
+      return NextResponse.json(
+        { error: "A valid 10-digit mobile number is required to sign up" },
+        { status: 400 },
+      );
+    }
 
     const cleanEmail = email.toLowerCase().trim();
     console.log(`🔐 Starting OTP verification for ${cleanEmail} with code: ${otp.trim()}`);
@@ -72,9 +81,7 @@ export async function POST(request: Request) {
             registeredAt: new Date(),
           });
 
-          console.log(
-            `✅ User created in ${Date.now() - insertStart}ms with ID: ${userId}`,
-          );
+          console.log(`✅ User created in ${Date.now() - insertStart}ms with ID: ${userId}`);
 
           // Invalidate admin cache so the new user appears in the Members page
           invalidateCache("users");
@@ -90,7 +97,7 @@ export async function POST(request: Request) {
         } catch (err) {
           const dbErr = err as Error & { code?: string; message?: string };
           // Check if user already exists (unique constraint error)
-          if (dbErr.code === '23505' || dbErr.message?.includes('unique')) {
+          if (dbErr.code === "23505" || dbErr.message?.includes("unique")) {
             console.log(`❌ User already exists: ${cleanEmail}`);
             return NextResponse.json(
               { error: "Account already exists with this email" },
@@ -168,15 +175,14 @@ export async function POST(request: Request) {
 
         // Increment login count asynchronously (don't wait for it)
         if (!usedLocalFallback) {
-          db
-            .update(usersTable)
+          db.update(usersTable)
             .set({
               loginCount: sql`${usersTable.loginCount} + 1`,
               loginAt: new Date(),
             })
             .where(eq(usersTable.email, cleanEmail))
             .then(() => console.log(`📝 Login count updated for ${cleanEmail}`))
-            .catch(err => console.error(`❌ Login count update error:`, err));
+            .catch((err) => console.error(`❌ Login count update error:`, err));
         }
       } catch (err) {
         console.error("❌ Login lookup error:", err);
